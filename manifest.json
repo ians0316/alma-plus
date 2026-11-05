@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Alma Sync Helper",
+  "version": "1.1.0",
+  "description": "Adds days-left badges, recent grades, custom tasks, and calendar tools to Alma's To Do page.",
+  "permissions": ["storage"],
+  "web_accessible_resources": [
+    {
+      "resources": ["google-calendar.svg"],
+      "matches": ["https://*.getalma.com/*"]
+    }
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://*.getalma.com/home/assignments*"],
+      "js": ["content.js", "alma-plus.js"],
+      "css": ["style.css", "alma-plus.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
