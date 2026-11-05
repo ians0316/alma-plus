@@ -1,7 +1,7 @@
 "use strict";
 
 const RECENT_DAYS = 7;
-const CACHE_KEY = "alma-sync-helper:recent";
+const CACHE_KEY = "alma-plus:recent";
 const CACHE_MINUTES = 10;
 const PARALLEL_FETCHES = 3;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -169,7 +169,7 @@ async function loadRecentGrades(box) {
     writeCache(grades);
     showGrades(box, grades);
   } catch (error) {
-    console.warn("Alma Sync Helper:", error);
+    console.warn("Alma Plus:", error);
     box.querySelector(".ash-body").textContent = "Couldn't load recent grades. Refresh the page to try again.";
   }
 }

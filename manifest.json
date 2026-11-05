@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Alma Sync Helper",
+  "name": "Alma Plus",
   "version": "1.1.0",
   "description": "Adds days-left badges, recent grades, custom tasks, and calendar tools to Alma's To Do page.",
   "permissions": ["storage"],

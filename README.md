@@ -1,4 +1,4 @@
-# Alma Helper
+# Alma Plus
 
 A Chrome extension that improves the To Do page of the Alma student portal. Everything runs in the browser, using the Alma login already there. It sends nothing to outside servers.
 
