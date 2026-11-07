@@ -366,10 +366,16 @@ function buildCustomRow(task, columnCount) {
   classLine.className = "alma-plus-class";
   classLine.textContent = task.category || "My task";
 
-  const title = document.createElement("span");
+  const title = document.createElement("a");
+  title.href = "#";
   title.className = "alma-plus-title";
   if (completed) title.classList.add("alma-plus-completed-title");
   title.textContent = task.name;
+  title.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openDetails(row._almaPlusTask);
+  });
 
   nameCell.append(classLine, title);
   // Filled in below; sits on the right of the class line so the row stays Alma's height.
@@ -721,6 +727,111 @@ function openModal(existingTask = null) {
   });
 
   modal.querySelector("#alma-plus-input-name").focus();
+}
+
+// The details popup reuses the classes of Alma's own "Assignment Details" popup,
+// so Alma's stylesheet gives it the same header bar, fonts and spacing.
+function formatShortDate(value) {
+  const d = new Date(value + "T00:00:00");
+  return `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
+}
+
+function closeDetails() {
+  document.getElementById("alma-plus-details-overlay")?.remove();
+  document.getElementById("alma-plus-details")?.remove();
+  document.removeEventListener("keydown", closeDetailsOnEscape);
+}
+
+function closeDetailsOnEscape(e) {
+  if (e.key === "Escape") closeDetails();
+}
+
+function el(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function openDetails(task) {
+  closeDetails();
+  const completed = Boolean(task.completed);
+  const priority = ["low", "high"].includes(task.priority) ? task.priority : "normal";
+
+  const overlay = el("div");
+  overlay.id = "alma-plus-details-overlay";
+  overlay.addEventListener("click", closeDetails);
+
+  const panel = el("div", "alma-student-assignment-details-modal alma-modal-base yui3-widget yui3-panel alma-plus-details");
+  panel.id = "alma-plus-details";
+  panel.setAttribute("role", "dialog");
+  panel.setAttribute("aria-label", "Task Details");
+
+  const content = el("div", "yui3-panel-content yui3-widget-stdmod");
+  const hd = el("div", "yui3-widget-hd", "Task Details");
+  const buttons = el("span", "yui3-widget-buttons");
+  const close = el("button", "yui3-button yui3-button-close", "Close");
+  close.type = "button";
+  close.addEventListener("click", closeDetails);
+  buttons.appendChild(close);
+  hd.appendChild(buttons);
+
+  const bd = el("div", "yui3-widget-bd");
+  const header = el("header");
+  const classDiv = el("div", "class");
+  classDiv.appendChild(el("h3", "", task.category || "My task"));
+  const assignment = el("div", "assignment");
+  assignment.appendChild(el("h3", "assignment-name", task.name));
+  assignment.appendChild(el("span", "assignment-type",
+    priority === "normal" ? "My task" : `My task · ${priority[0].toUpperCase()}${priority.slice(1)} priority`));
+  header.append(classDiv, assignment);
+
+  const dl = el("dl", "simple");
+  const addRow = (label, value) => {
+    dl.appendChild(el("dt", "", label));
+    dl.appendChild(document.createTextNode(" "));
+    const dd = el("dd");
+    dd.appendChild(el("strong", "", value));
+    dl.appendChild(dd);
+  };
+  addRow("Status:", completed ? "Done" : "Not done");
+  const hasRange = task.end && task.end > task.due;
+  addRow(hasRange ? "Dates:" : "Due:",
+    hasRange ? `${formatShortDate(task.due)} – ${formatShortDate(task.end)}` : formatShortDate(task.due));
+
+  bd.append(header, dl);
+  if (task.notes) bd.appendChild(el("p", "alma-plus-details-notes", task.notes));
+
+  const actions = el("div", "alma-plus-details-actions");
+  const action = (text, primary, onClick) => {
+    const b = el("button", primary ? "pure-button pure-button-primary" : "pure-button", text);
+    b.type = "button";
+    b.addEventListener("click", onClick);
+    return b;
+  };
+  actions.append(
+    action("Remove", false, async () => {
+      await deleteTask(task.id);
+      closeDetails();
+      renderCustomRows();
+    }),
+    action("Edit", false, () => {
+      closeDetails();
+      openModal(task);
+    }),
+    action(completed ? "Mark as not done" : "Mark as done", true, async () => {
+      await setTaskCompleted(task.id, !completed);
+      closeDetails();
+      renderCustomRows();
+    })
+  );
+  bd.appendChild(actions);
+
+  content.append(hd, bd);
+  panel.appendChild(content);
+  document.body.append(overlay, panel);
+  document.addEventListener("keydown", closeDetailsOnEscape);
+  close.focus();
 }
 
 function scheduleRender() {
