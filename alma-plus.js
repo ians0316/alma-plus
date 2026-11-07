@@ -671,6 +671,7 @@ function getClasses() {
             name: link?.textContent.trim() || "",
             url: (link?.getAttribute("href") || "").split("?")[0],
             teacher: first ? `${first} ${last}` : raw,
+            messageUrl: tr.querySelector("td.teacher a.send-msg")?.getAttribute("href") || "",
           };
         }).filter((c) => c.name);
       })
@@ -911,6 +912,19 @@ function openDetails(task) {
         const teacher = el("span", "teacher");
         teacher.appendChild(el("span", "fn", match.teacher));
         classDiv.appendChild(teacher);
+        if (match.messageUrl.startsWith("/message/person/")) {
+          // Same envelope link as Alma's popup; Alma opens its own Send Message window for it.
+          const msg = el("a", "send-msg");
+          msg.href = match.messageUrl;
+          msg.dataset.almaModal = "Message";
+          msg.setAttribute("aria-label", "Send Message");
+          const icon = el("i", "fa fa-envelope");
+          icon.setAttribute("aria-hidden", "true");
+          msg.appendChild(icon);
+          // Close after Alma's own click handler has seen the link.
+          msg.addEventListener("click", () => setTimeout(closeDetails, 0));
+          classDiv.append(" ", msg);
+        }
       }
     } else {
       h3.textContent = task.category || "My task";
