@@ -119,10 +119,6 @@ function compareSortValues(a, b, numeric) {
   return String(a).localeCompare(String(b), undefined, { sensitivity: "base" });
 }
 
-function formatDueLabel(date) {
-  return date.toLocaleDateString("en-US", { month: "short", day: "2-digit" });
-}
-
 // due cells have a unix timestamp in data-sortable-val; the visible text
 // ("Sep 17") has no year, so the fallback picks the closest one
 function parseAlmaDueCellDate(cell) {
@@ -160,7 +156,7 @@ function getNameCell(row) {
   return row.cells.length > 1 ? row.cells[row.cells.length - 1] : null;
 }
 
-// name cell is <small>Class</small> Assignment name in alma's rows, <strong> in ours
+// name cell is <small>Class</small> Assignment name in alma's rows; custom rows keep their task
 function getRowAssignment(row) {
   const dueCell = row.cells[0];
   const nameCell = getNameCell(row);
@@ -169,20 +165,25 @@ function getRowAssignment(row) {
   const due = parseAlmaDueCellDate(dueCell);
   if (!due) return null;
 
-  const titleEl = nameCell.querySelector(".alma-plus-title") || nameCell;
-  const category = titleEl.querySelector("strong, small")?.textContent.trim() || "";
-  const fullText = [...titleEl.childNodes]
-    .filter((n) => !(n.nodeType === Node.ELEMENT_NODE && n.matches("strong, small, button, .alma-plus-badge")))
-    .map((n) => n.textContent)
-    .join(" ")
-    .replace(/\s+/g, " ")
-    .trim();
-  const name = fullText || category;
+  const custom = row.dataset.almaPlusRow === "true";
+  const task = custom ? row._almaPlusTask : null;
+
+  let name, category;
+  if (task) {
+    name = task.name;
+    category = task.category || "";
+  } else {
+    category = nameCell.querySelector("small")?.textContent.trim() || "";
+    name = [...nameCell.childNodes]
+      .filter((n) => !(n.nodeType === Node.ELEMENT_NODE && n.matches("small, button")))
+      .map((n) => n.textContent)
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim() || category;
+  }
   if (!name) return null;
 
   const link = nameCell.querySelector("a[href*='/home/assignment/']")?.href || "";
-  const custom = row.dataset.almaPlusRow === "true";
-  const task = custom ? row._almaPlusTask : null;
   return {
     uid: row.dataset.almaPlusId || `${toCalendarDate(due)}-${category}-${name}`,
     name,
@@ -243,7 +244,10 @@ function ensureCalendarButtons(tbody) {
     const nameCell = getNameCell(row);
     if (!nameCell || nameCell.querySelector(".alma-plus-cal-btn")) continue;
     if (!getRowAssignment(row)) continue;
-    nameCell.appendChild(buildCalendarButton(row));
+    // In custom rows the icon goes right after the name, as in Alma's rows.
+    const title = nameCell.querySelector(".alma-plus-title");
+    if (title) title.after(buildCalendarButton(row));
+    else nameCell.appendChild(buildCalendarButton(row));
   }
 }
 
@@ -326,6 +330,8 @@ function exportIcs() {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
+// Built the same way as Alma's own rows: "Nov / 09" in the shaded due cell, a small
+// bold class line, and the name at normal size. Alma's stylesheet does the rest.
 function buildCustomRow(task, columnCount) {
   const row = document.createElement("tr");
   row.dataset.almaPlusRow = "true";
@@ -337,89 +343,67 @@ function buildCustomRow(task, columnCount) {
   const dueDate = new Date(task.due + "T00:00:00");
 
   const dueCell = document.createElement("td");
-  dueCell.className = "alma-plus-due-cell";
   dueCell.dataset.sortableVal = String(Math.floor(dueDate.getTime() / 1000));
-  dueCell.textContent = formatDueLabel(dueDate);
+  dueCell.append(
+    dueDate.toLocaleDateString("en-US", { month: "short" }),
+    document.createElement("br"),
+    String(dueDate.getDate()).padStart(2, "0")
+  );
 
   const nameCell = document.createElement("td");
   nameCell.className = "alma-plus-name-cell";
   nameCell.dataset.sortableVal = task.name;
 
-  const badge = document.createElement("span");
-  badge.className = "alma-plus-badge";
-  badge.textContent = "MINE";
+  const classLine = document.createElement("small");
+  classLine.className = "alma-plus-class";
+  classLine.textContent = task.category || "My task";
 
-  const title = document.createElement("div");
+  const title = document.createElement("span");
   title.className = "alma-plus-title";
   if (completed) title.classList.add("alma-plus-completed-title");
-  if (task.category) {
-    const cat = document.createElement("strong");
-    cat.textContent = task.category;
-    title.appendChild(cat);
-    title.appendChild(document.createElement("br"));
-  }
-  title.appendChild(document.createTextNode(task.name));
+  title.textContent = task.name;
 
-  const metadata = document.createElement("div");
-  metadata.className = "alma-plus-metadata";
-  if (priorityValue !== "normal") {
-    const priority = document.createElement("span");
-    priority.className = `alma-plus-priority alma-plus-priority-${priorityValue}`;
-    priority.textContent = `${priorityValue} priority`;
-    metadata.appendChild(priority);
-  }
-  if (task.notes) {
-    const notes = document.createElement("span");
-    notes.className = "alma-plus-notes";
-    notes.textContent = task.notes;
-    metadata.appendChild(notes);
+  nameCell.append(classLine, title);
+  // Filled in below; sits on the right of the class line so the row stays Alma's height.
+
+  const details = [];
+  if (priorityValue !== "normal") details.push(`${priorityValue[0].toUpperCase()}${priorityValue.slice(1)} priority`);
+  if (task.notes) details.push(task.notes);
+  if (details.length) {
+    const metadata = document.createElement("small");
+    metadata.className = "alma-plus-metadata";
+    if (priorityValue === "high") metadata.classList.add("alma-plus-priority-high");
+    metadata.textContent = details.join(" · ");
+    nameCell.appendChild(metadata);
   }
 
-  const actions = document.createElement("div");
+  const actions = document.createElement("small");
   actions.className = "alma-plus-task-actions";
 
-  const completeLabel = document.createElement("label");
-  completeLabel.className = "alma-plus-complete-label";
-  completeLabel.addEventListener("click", (e) => e.stopPropagation());
-  const completeCheckbox = document.createElement("input");
-  completeCheckbox.type = "checkbox";
-  completeCheckbox.checked = completed;
-  completeCheckbox.setAttribute("aria-label", `Mark ${task.name} ${completed ? "incomplete" : "complete"}`);
-  completeCheckbox.addEventListener("change", async (e) => {
-    e.stopPropagation();
-    await setTaskCompleted(task.id, completeCheckbox.checked);
-    renderCustomRows();
-  });
-  completeLabel.appendChild(completeCheckbox);
-  completeLabel.appendChild(document.createTextNode("Done"));
-  actions.appendChild(completeLabel);
+  const actionLink = (text, label, onClick) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.textContent = text;
+    btn.setAttribute("aria-label", label);
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      await onClick();
+    });
+    return btn;
+  };
 
-  const editBtn = document.createElement("button");
-  editBtn.type = "button";
-  editBtn.className = "alma-plus-edit";
-  editBtn.textContent = "Edit";
-  editBtn.addEventListener("click", (e) => {
-    e.stopPropagation();
-    openModal(task);
-  });
-  actions.appendChild(editBtn);
-
-  const deleteBtn = document.createElement("button");
-  deleteBtn.type = "button";
-  deleteBtn.className = "alma-plus-delete";
-  deleteBtn.textContent = "×";
-  deleteBtn.title = "Remove this task";
-  deleteBtn.addEventListener("click", async (e) => {
-    e.stopPropagation();
-    await deleteTask(task.id);
-    renderCustomRows();
-  });
-
-  nameCell.appendChild(badge);
-  nameCell.appendChild(title);
-  nameCell.appendChild(metadata);
-  nameCell.appendChild(actions);
-  nameCell.appendChild(deleteBtn);
+  actions.append(
+    actionLink(completed ? "Undo" : "Done", `Mark ${task.name} ${completed ? "not done" : "done"}`, async () => {
+      await setTaskCompleted(task.id, !completed);
+      renderCustomRows();
+    }),
+    actionLink("Edit", `Edit ${task.name}`, () => openModal(task)),
+    actionLink("Remove", `Remove ${task.name}`, async () => {
+      await deleteTask(task.id);
+      renderCustomRows();
+    })
+  );
+  nameCell.prepend(actions);
   if (completed) row.classList.add("alma-plus-completed-row");
 
   row.appendChild(dueCell);
@@ -475,6 +459,7 @@ async function renderCustomRows() {
 function buildAddButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-add-btn";
+  btn.className = "pure-button pure-button-primary";
   btn.type = "button";
   btn.textContent = "+ Add my own task";
   btn.addEventListener("click", () => openModal());
@@ -484,6 +469,7 @@ function buildAddButton() {
 function buildExportButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-export-btn";
+  btn.className = "pure-button";
   btn.type = "button";
   btn.textContent = "Export to calendar (.ics)";
   btn.title = "Download all assignments as a calendar file you can import into Google Calendar";
@@ -494,6 +480,7 @@ function buildExportButton() {
 function buildBackupButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-backup-btn";
+  btn.className = "pure-button";
   btn.type = "button";
   btn.textContent = "Back up tasks";
   btn.title = "Download your custom tasks as a JSON backup";
@@ -504,6 +491,7 @@ function buildBackupButton() {
 function buildImportButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-import-btn";
+  btn.className = "pure-button";
   btn.type = "button";
   btn.textContent = "Restore tasks";
   btn.title = "Import custom tasks from a JSON backup";
@@ -633,6 +621,7 @@ function ensureAddButton() {
   if (table && !document.getElementById("alma-plus-add-btn")) {
     const toolbar = document.createElement("div");
     toolbar.id = "alma-plus-toolbar";
+    toolbar.className = "pure-form";
     toolbar.appendChild(buildAddButton());
     toolbar.appendChild(buildExportButton());
     toolbar.appendChild(buildBackupButton());
@@ -651,8 +640,9 @@ function openModal(existingTask = null) {
 
   const modal = document.createElement("div");
   modal.id = "alma-plus-modal";
+  modal.className = "pure-form";
   modal.innerHTML = `
-    <h3>Add your own task</h3>
+    <h4>Add your own task</h4>
     <label>Task name
       <input type="text" id="alma-plus-input-name" placeholder="e.g. Study for chem quiz">
     </label>
@@ -673,15 +663,15 @@ function openModal(existingTask = null) {
       <input type="date" id="alma-plus-input-date">
     </label>
     <div class="alma-plus-modal-actions">
-      <button type="button" id="alma-plus-cancel">Cancel</button>
-      <button type="button" id="alma-plus-save">Add</button>
+      <button type="button" id="alma-plus-cancel" class="pure-button">Cancel</button>
+      <button type="button" id="alma-plus-save" class="pure-button pure-button-primary">Add</button>
     </div>
   `;
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
 
-  modal.querySelector("h3").textContent = existingTask ? "Edit your task" : "Add your own task";
+  modal.querySelector("h4").textContent = existingTask ? "Edit your task" : "Add your own task";
   modal.querySelector("#alma-plus-save").textContent = existingTask ? "Save" : "Add";
   modal.querySelector("#alma-plus-input-name").value = existingTask?.name || "";
   modal.querySelector("#alma-plus-input-category").value = existingTask?.category || "";
@@ -725,6 +715,10 @@ function openModal(existingTask = null) {
 function scheduleRender() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
+    if (!isToDoPage()) {
+      document.querySelectorAll("[data-alma-plus-row], #alma-plus-toolbar").forEach((el) => el.remove());
+      return;
+    }
     ensureAddButton();
     renderCustomRows();
   }, 80);
@@ -735,7 +729,14 @@ function startObserving() {
   bodyObserver.observe(document.body, { childList: true, subtree: true });
 }
 
+// Custom tasks belong on the To Do page only. Class pages also have an
+// "Upcoming Assignments" table, and tasks must not leak into it.
+function isToDoPage() {
+  return location.pathname.startsWith("/home/assignments");
+}
+
 function init() {
+  if (!isToDoPage()) return;
   ensureAddButton();
   renderCustomRows();
   startObserving();

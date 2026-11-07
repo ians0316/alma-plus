@@ -1,66 +1,27 @@
 /* Alma+ Custom Tasks by Juho Lee and Beomgyu Kim: https://github.com/juholee10/alma-plus */
+/* Buttons, inputs and rows use Alma's own classes (pure-button, pure-form, the
+   upcoming-assignments table), so they pick up Alma's font, sizes and colors.
+   The rules below only fill the gaps. */
 
 #alma-plus-toolbar {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   gap: 8px;
-  margin: 12px 0;
+  margin: 0 0 12px;
+  font-size: 13px;
 }
 
-#alma-plus-add-btn,
-#alma-plus-export-btn,
-#alma-plus-backup-btn,
-#alma-plus-import-btn {
-  display: inline-block;
-  padding: 8px 14px;
-  background: #2f6fed;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-#alma-plus-add-btn:hover {
-  background: #1d55c9;
-}
-
-#alma-plus-export-btn {
-  background: #fff;
-  color: #2f6fed;
-  box-shadow: inset 0 0 0 1px #2f6fed;
-}
-#alma-plus-export-btn:hover {
-  background: #eef4ff;
-}
-
-#alma-plus-backup-btn,
-#alma-plus-import-btn {
-  background: #fff;
-  color: #374151;
-  box-shadow: inset 0 0 0 1px #9ca3af;
-}
-#alma-plus-backup-btn:hover,
-#alma-plus-import-btn:hover {
-  background: #f3f4f6;
+#alma-plus-toolbar .pure-button {
+  font-size: 13px;
 }
 
 #alma-plus-filter-label {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  color: #444;
-  font: 14px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-}
-
-#alma-plus-filter {
-  padding: 7px 8px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  background: #fff;
-  color: #333;
-  font: inherit;
+  margin-left: auto;
+  color: #5f6163;
 }
 
 .alma-plus-cal-btn {
@@ -77,104 +38,48 @@
   opacity: 1;
 }
 
-tr[data-alma-plus-row] {
-  background: #eef4ff;
-}
-
-.alma-plus-due-cell {
-  font-weight: 600;
-  color: #2f6fed;
-}
-
-.alma-plus-name-cell {
-  min-width: 180px;
-}
-
-.alma-plus-badge {
-  display: inline-block;
-  font-size: 10px;
+/* Custom rows: same look as Alma's rows. */
+.alma-plus-class {
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #2f6fed;
-  background: #dbe8ff;
-  border-radius: 4px;
-  padding: 2px 6px;
-  margin-bottom: 4px;
-}
-
-.alma-plus-title {
-  display: block;
 }
 
 .alma-plus-metadata {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 8px;
-  margin-top: 4px;
-  color: #555;
-  font-size: 12px;
-}
-
-.alma-plus-priority {
-  font-weight: 600;
-  text-transform: capitalize;
+  margin-top: 2px;
+  font-weight: 400;
+  color: #777;
+  white-space: pre-wrap;
 }
 .alma-plus-priority-high {
   color: #b42318;
 }
-.alma-plus-priority-low {
-  color: #667085;
+
+.alma-plus-name-cell .alma-plus-task-actions {
+  float: right;
+  margin-left: 12px;
+}
+.alma-plus-task-actions button {
+  padding: 0;
+  margin-left: 10px;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 400;
+  color: #999;
+  cursor: pointer;
+}
+.alma-plus-task-actions button:hover {
+  color: #333;
+  text-decoration: underline;
 }
 
-.alma-plus-notes {
-  white-space: pre-wrap;
-}
-
-.alma-plus-completed-row {
-  opacity: 0.65;
+.alma-plus-completed-row td {
+  opacity: 0.55;
 }
 .alma-plus-completed-title {
   text-decoration: line-through;
 }
 
-.alma-plus-task-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  margin-top: 6px;
-}
-
-.alma-plus-complete-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  color: #555;
-  cursor: pointer;
-}
-
-.alma-plus-task-actions button {
-  padding: 2px 6px;
-  border: 1px solid #d0d5dd;
-  border-radius: 4px;
-  background: #fff;
-  color: #344054;
-  font-size: 12px;
-  cursor: pointer;
-}
-
-.alma-plus-delete {
-  position: static;
-  transform: none;
-  color: #667085 !important;
-  font-size: 14px !important;
-}
-.alma-plus-delete:hover {
-  color: #d33 !important;
-}
-
+/* Add/edit window, styled like Alma's own dialogs. */
 #alma-plus-modal-overlay {
   position: fixed;
   inset: 0;
@@ -186,66 +91,57 @@ tr[data-alma-plus-row] {
 }
 
 #alma-plus-modal {
+  box-sizing: border-box;
+  width: 360px;
+  max-width: calc(100vw - 32px);
+  padding: 20px;
   background: #fff;
-  border-radius: 10px;
-  padding: 20px 24px;
-  width: 320px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  border-radius: 2px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
+  font-family: proxima-nova, sans-serif;
+  font-size: 15px;
+  color: #333;
 }
 
-#alma-plus-modal h3 {
-  margin: 0 0 14px;
-  font-size: 16px;
-  color: #111;
+#alma-plus-modal h4 {
+  margin: 0 0 16px;
+  font-size: 22.5px;
+  font-weight: 400;
+  color: #333;
 }
 
 #alma-plus-modal label {
   display: block;
+  margin-bottom: 12px;
   font-size: 12px;
-  color: #444;
-  margin-bottom: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #333;
 }
 
 #alma-plus-modal input,
 #alma-plus-modal textarea,
 #alma-plus-modal select {
   display: block;
+  box-sizing: border-box;
   width: 100%;
   margin-top: 4px;
-  padding: 6px 8px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  box-sizing: border-box;
+  font-family: inherit;
+  font-weight: 400;
+  text-transform: none;
 }
 
 #alma-plus-modal textarea {
   resize: vertical;
-  font-family: inherit;
 }
 
 .alma-plus-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
-  margin-top: 6px;
+  margin-top: 16px;
 }
 
-.alma-plus-modal-actions button {
-  padding: 6px 14px;
-  border-radius: 6px;
-  border: none;
+.alma-plus-modal-actions .pure-button {
   font-size: 13px;
-  cursor: pointer;
-}
-
-#alma-plus-cancel {
-  background: #eee;
-  color: #333;
-}
-
-#alma-plus-save {
-  background: #2f6fed;
-  color: #fff;
 }
