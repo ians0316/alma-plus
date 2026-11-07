@@ -1016,7 +1016,7 @@ function onlyMaterialsChanges(mutations) {
   return mutations.every((m) =>
     m.target.closest?.("#alma-plus-materials, .alma-plus-clip") ||
     ([...m.addedNodes, ...m.removedNodes].length > 0 &&
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.("#alma-plus-materials, .alma-plus-clip"))));
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.("#alma-plus-materials, .alma-plus-clip, #alma-plus-assignments-heading"))));
 }
 
 function startObserving() {

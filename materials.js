@@ -494,7 +494,7 @@ async function renderMaterials() {
 
     if (!items.length) {
       section.appendChild(mEl("p", "alma-plus-materials-empty",
-        "Save links, files, and photos for this class. Use the paperclip on an assignment to attach something to it."));
+        "Save links, files, and photos for this class with + Add material."));
     } else {
       // General first, then by the order assignments appear on the page, newest added first within each.
       const order = ["", ...assignments.map((x) => x.id)];
@@ -518,6 +518,7 @@ async function renderMaterials() {
     }
 
     updateClips(items, assignments);
+    ensureAssignmentsHeading(assignmentsBlock);
   } finally {
     rendering = false;
   }
@@ -552,6 +553,23 @@ function updateClips(items, assignments) {
   }
 }
 
+// Alma hides the "Past Assignments" heading when a class only has a Past list.
+// With Materials sitting right above, the table would look like part of it, so
+// show the same heading Alma uses on classes that have both lists.
+function ensureAssignmentsHeading(assignmentsBlock) {
+  const almaHeadings = [...assignmentsBlock.querySelectorAll(".segment-content > h4.module-heading")];
+  const ours = document.getElementById("alma-plus-assignments-heading");
+  if (almaHeadings.some((h) => h.offsetParent !== null)) {
+    ours?.remove();
+    return;
+  }
+  if (ours) return;
+  const heading = mEl("h4", "module-heading", almaHeadings[0]?.textContent.trim() || "Past Assignments");
+  heading.id = "alma-plus-assignments-heading";
+  const firstTable = assignmentsBlock.querySelector(".segmented-control, table");
+  if (firstTable) firstTable.before(heading);
+}
+
 function showMaterialsFor(assignmentId) {
   const section = document.getElementById("alma-plus-materials");
   if (!section) return;
@@ -571,6 +589,7 @@ async function refreshAfterAlmaChange() {
     return;
   }
   updateClips(await loadMaterials(classId), getPageAssignments());
+  ensureAssignmentsHeading(document.querySelector(".student-assignments"));
 }
 
 function startMaterials() {
@@ -580,7 +599,7 @@ function startMaterials() {
   let timer = null;
   const observer = new MutationObserver((mutations) => {
     // Ignore changes from this section and from the custom task rows.
-    const OURS = ".alma-plus-clip, #alma-plus-materials, #alma-plus-modal-overlay, #alma-plus-details, #alma-plus-details-overlay, [data-alma-plus-row], .alma-plus-cal-btn, #alma-plus-toolbar, #alma-plus-import-input";
+    const OURS = "#alma-plus-assignments-heading, .alma-plus-clip, #alma-plus-materials, #alma-plus-modal-overlay, #alma-plus-details, #alma-plus-details-overlay, [data-alma-plus-row], .alma-plus-cal-btn, #alma-plus-toolbar, #alma-plus-import-input";
     const ours = mutations.every((m) => m.target.closest?.("#alma-plus-materials, .alma-plus-clip, [data-alma-plus-row], #alma-plus-toolbar") ||
       [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(OURS)));
     if (ours) return;
