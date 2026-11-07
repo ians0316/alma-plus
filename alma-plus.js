@@ -808,7 +808,11 @@ function openDetails(task) {
   panel.setAttribute("aria-label", "Task Details");
 
   const content = el("div", "yui3-panel-content yui3-widget-stdmod");
-  const hd = el("div", "yui3-widget-hd", "Task Details");
+  // Starts as Alma's loading state ("One moment please…" and a spinning wheel),
+  // then switches to the details, the way Alma's own popup does.
+  const hd = el("div", "yui3-widget-hd");
+  const hdText = document.createTextNode("One moment please…");
+  hd.appendChild(hdText);
   const buttons = el("span", "yui3-widget-buttons");
   const close = el("button", "yui3-button yui3-button-close", "Close");
   close.type = "button";
@@ -817,6 +821,10 @@ function openDetails(task) {
   hd.appendChild(buttons);
 
   const bd = el("div", "yui3-widget-bd");
+  const loading = el("div", "alma-plus-details-loading");
+  const spinner = el("i", "fa fa-spinner fa-spin fa-4x");
+  spinner.setAttribute("aria-hidden", "true");
+  loading.appendChild(spinner);
   const header = el("header");
   const classDiv = el("div", "class");
   classDiv.appendChild(el("h3", "", task.category || "My task"));
@@ -843,8 +851,14 @@ function openDetails(task) {
   addRow(hasRange ? "Dates:" : "Due:",
     hasRange ? `${formatShortDate(task.due)} – ${formatShortDate(task.end)}` : formatShortDate(task.due));
 
-  bd.append(header, dl);
-  if (task.notes) bd.appendChild(buildDescription(task.notes));
+  const details = [header, dl];
+  if (task.notes) details.push(buildDescription(task.notes));
+  bd.appendChild(loading);
+  setTimeout(() => {
+    if (!panel.isConnected) return;
+    hdText.nodeValue = "Task Details";
+    bd.replaceChildren(...details);
+  }, 500);
 
 
   content.append(hd, bd);

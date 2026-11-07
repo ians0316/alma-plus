@@ -220,3 +220,9 @@
   text-decoration: underline;
   word-break: break-all;
 }
+
+/* Same as Alma's loading state: a large spinner centered in a 150px-tall body. */
+.alma-plus-details-loading {
+  line-height: 150px;
+  text-align: center;
+}
