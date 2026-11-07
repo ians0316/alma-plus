@@ -183,8 +183,9 @@ function openAddMaterial(classId, presetAssignmentId = "") {
 
   const linkLabel = mEl("label", "", "Link");
   const linkInput = mEl("input");
-  linkInput.type = "url";
-  linkInput.placeholder = "https://docs.google.com/...";
+  linkInput.type = "text";
+  linkInput.autocomplete = "off";
+  linkInput.placeholder = "docs.google.com/...";
   linkLabel.appendChild(linkInput);
 
   const fileLabel = mEl("label", "", "Or files and photos");
@@ -234,7 +235,9 @@ function openAddMaterial(classId, presetAssignmentId = "") {
   cancel.addEventListener("click", closeModal);
 
   save.addEventListener("click", async () => {
-    const url = linkInput.value.trim();
+    // Typing "https://" is optional: "docs.google.com/..." works too.
+    let url = linkInput.value.trim();
+    if (url && !/^[a-z][a-z0-9+.-]*:/i.test(url)) url = `https://${url.replace(/^\/+/, "")}`;
     const files = [...fileInput.files];
     const title = titleInput.value.trim();
     const assignment = assignments.find((a) => a.id === assignSelect.value);
@@ -242,8 +245,8 @@ function openAddMaterial(classId, presetAssignmentId = "") {
       alert("Add a link or choose at least one file.");
       return;
     }
-    if (url && !/^https?:\/\//i.test(url)) {
-      alert("Links need to start with http:// or https://");
+    if (url && (!/^https?:\/\//i.test(url) || !hostOf(url).includes("."))) {
+      alert("That doesn't look like a web link. Try something like docs.google.com/...");
       return;
     }
     const tooBig = files.find((f) => f.size > MAX_FILE_MB * 1024 * 1024);
@@ -431,8 +434,10 @@ function startMaterials() {
   // Alma rebuilds the assignment table when switching terms or sorting.
   let timer = null;
   const observer = new MutationObserver((mutations) => {
-    const ours = mutations.every((m) => m.target.closest?.("#alma-plus-materials, .alma-plus-clip") ||
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && (n.matches?.(".alma-plus-clip, #alma-plus-materials, #alma-plus-modal-overlay, #alma-plus-details, #alma-plus-details-overlay"))));
+    // Ignore changes from this section and from the custom task rows.
+    const OURS = ".alma-plus-clip, #alma-plus-materials, #alma-plus-modal-overlay, #alma-plus-details, #alma-plus-details-overlay, [data-alma-plus-row], .alma-plus-cal-btn, #alma-plus-toolbar, #alma-plus-import-input";
+    const ours = mutations.every((m) => m.target.closest?.("#alma-plus-materials, .alma-plus-clip, [data-alma-plus-row], #alma-plus-toolbar") ||
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(OURS)));
     if (ours) return;
     clearTimeout(timer);
     timer = setTimeout(renderMaterials, 150);

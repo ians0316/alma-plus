@@ -74,6 +74,8 @@ function normalizeTask(task) {
 function findAssignmentsTable() {
   const byClass = document.querySelector("table.upcoming-assignments");
   if (byClass) return byClass;
+  // On class pages, tasks only go in the Upcoming list, never in Past.
+  if (isClassPage()) return null;
 
   const tables = document.querySelectorAll("table");
   for (const table of tables) {
@@ -154,8 +156,32 @@ function nextDay(date) {
 }
 
 // the name is in the last column; alma adds a submit column before it
+// The name column is last on the To Do page but second on class pages
+// (which add Status, Grade, Points... after it), so find it by its header.
+function getNameColumnIndex(table) {
+  const ths = [...(table?.querySelectorAll("thead th") || [])];
+  return ths.findIndex((th) => th.classList.contains("name") || /assignment name/i.test(th.textContent));
+}
+
 function getNameCell(row) {
+  const index = getNameColumnIndex(row.closest("table"));
+  if (index > 0 && row.cells[index]) return row.cells[index];
   return row.cells.length > 1 ? row.cells[row.cells.length - 1] : null;
+}
+
+// Class pages show only that class's own tasks.
+function isClassPage() {
+  return /^\/home\/class\//.test(location.pathname);
+}
+
+function currentClassName() {
+  return document.querySelector("header.class-header h3")?.textContent.trim() || "";
+}
+
+function taskBelongsHere(task) {
+  if (!isClassPage()) return true;
+  const here = currentClassName().toLowerCase();
+  return Boolean(here) && (task.category || "").trim().toLowerCase() === here;
 }
 
 // name cell is <small>Class</small> Assignment name in alma's rows; custom rows keep their task
@@ -335,7 +361,7 @@ function exportIcs() {
 
 // Built the same way as Alma's own rows: "Nov / 09" in the shaded due cell, a small
 // bold class line, and the name at normal size. Alma's stylesheet does the rest.
-function buildCustomRow(task, columnCount) {
+function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null) {
   const row = document.createElement("tr");
   row.dataset.almaPlusRow = "true";
   row.dataset.almaPlusId = task.id;
@@ -364,7 +390,8 @@ function buildCustomRow(task, columnCount) {
 
   const classLine = document.createElement("small");
   classLine.className = "alma-plus-class";
-  classLine.textContent = task.category || "My task";
+  // On a class page the class is the whole page, so say "My task" (Alma shows the category there).
+  classLine.textContent = isClassPage() ? "My task" : task.category || "My task";
 
   const title = document.createElement("a");
   title.href = "#";
@@ -418,11 +445,13 @@ function buildCustomRow(task, columnCount) {
   nameCell.prepend(actions);
   if (completed) row.classList.add("alma-plus-completed-row");
 
-  row.appendChild(dueCell);
-  for (let i = 2; i < columnCount; i++) {
-    row.appendChild(document.createElement("td"));
+  // Same cell classes as Alma's rows in this table (class pages use "due" and "name").
+  const nameAt = nameIndex > 0 ? nameIndex : columnCount - 1;
+  if (templateRow?.cells[0]?.classList.contains("due")) dueCell.classList.add("due");
+  if (templateRow?.cells[nameAt]?.classList.contains("name")) nameCell.classList.add("name");
+  for (let i = 0; i < columnCount; i++) {
+    row.appendChild(i === 0 ? dueCell : i === nameAt ? nameCell : document.createElement("td"));
   }
-  row.appendChild(nameCell);
 
   return row;
 }
@@ -431,8 +460,9 @@ async function renderCustomRows() {
   const table = findAssignmentsTable();
   if (!table) return;
   const tbody = getTbody(table);
-  const tasks = await loadTasks();
+  const tasks = (await loadTasks()).filter(taskBelongsHere);
   const sort = getActiveSort(table);
+  const nameIndex = getNameColumnIndex(table);
 
   bodyObserver?.disconnect();
   try {
@@ -445,7 +475,7 @@ async function renderCustomRows() {
       2;
 
     for (const task of tasks) {
-      const row = buildCustomRow(task, columnCount);
+      const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0]);
       const rowValue = getCellSortValue(row, sort.columnIndex);
 
       const target = existingRows.find((r) => {
@@ -736,7 +766,8 @@ function openModal(existingTask = null) {
   modal.querySelector("h4").textContent = existingTask ? "Edit your task" : "Add your own task";
   modal.querySelector("#alma-plus-save").textContent = existingTask ? "Save" : "Add";
   modal.querySelector("#alma-plus-input-name").value = existingTask?.name || "";
-  modal.querySelector("#alma-plus-input-category").value = existingTask?.category || "";
+  modal.querySelector("#alma-plus-input-category").value =
+    existingTask?.category || (isClassPage() ? currentClassName() : "");
   getClasses().then((classes) => {
     const list = modal.querySelector("#alma-plus-class-list");
     for (const c of classes) {
@@ -946,7 +977,7 @@ function openDetails(task) {
 function scheduleRender() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
-    if (!isToDoPage()) {
+    if (!isTaskPage()) {
       document.querySelectorAll("[data-alma-plus-row], #alma-plus-toolbar").forEach((el) => el.remove());
       return;
     }
@@ -955,19 +986,29 @@ function scheduleRender() {
   }, 80);
 }
 
+// Changes made by the class materials section don't need a re-render.
+function onlyMaterialsChanges(mutations) {
+  return mutations.every((m) =>
+    m.target.closest?.("#alma-plus-materials, .alma-plus-clip") ||
+    ([...m.addedNodes, ...m.removedNodes].length > 0 &&
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.("#alma-plus-materials, .alma-plus-clip"))));
+}
+
 function startObserving() {
-  bodyObserver = new MutationObserver(scheduleRender);
+  bodyObserver = new MutationObserver((mutations) => {
+    if (!onlyMaterialsChanges(mutations)) scheduleRender();
+  });
   bodyObserver.observe(document.body, { childList: true, subtree: true });
 }
 
-// Custom tasks belong on the To Do page only. Class pages also have an
-// "Upcoming Assignments" table, and tasks must not leak into it.
-function isToDoPage() {
-  return location.pathname.startsWith("/home/assignments");
+// Tasks show on the To Do page (all of them) and on class pages (only that
+// class's tasks, in its Upcoming list). Nowhere else.
+function isTaskPage() {
+  return location.pathname.startsWith("/home/assignments") || isClassPage();
 }
 
 function init() {
-  if (!isToDoPage()) return;
+  if (!isTaskPage()) return;
   getClasses(); // start loading so suggestions and teacher names are ready
   ensureAddButton();
   renderCustomRows();
