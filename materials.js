@@ -174,34 +174,50 @@ function openAddMaterial(classId, presetAssignmentId = "") {
   if (document.getElementById("alma-plus-modal-overlay")) return;
   const assignments = getPageAssignments();
 
+  // Built like Alma's own form windows: dark header bar, gray boxes, Cancel + green button.
   const overlay = mEl("div");
   overlay.id = "alma-plus-modal-overlay";
-  const modal = mEl("div", "pure-form");
+  const modal = mEl("div", "alma-message-modal alma-modal alma-modal-base yui3-widget yui3-panel alma-plus-form");
   modal.id = "alma-plus-modal";
+  modal.setAttribute("role", "dialog");
+  modal.innerHTML = `
+    <div class="yui3-panel-content yui3-widget-stdmod">
+      <div class="yui3-widget-hd">Add Material<span class="yui3-widget-buttons"><button type="button" class="yui3-button yui3-button-close">Close</button></span></div>
+      <div class="yui3-widget-bd">
+        <form class="pure-form" novalidate>
+          <section class="container pure-form-stacked">
+            <div class="section">
+              <label class="section-label" for="alma-plus-material-link">Link:</label>
+              <input type="text" class="pure-input-1" id="alma-plus-material-link" autocomplete="off" placeholder="docs.google.com/...">
+            </div>
+            <div class="section">
+              <label class="section-label" for="alma-plus-material-files">Files and Photos:</label>
+              <p class="helper">Add a link, or choose files and photos (up to ${MAX_FILE_MB} MB each).</p>
+              <input type="file" id="alma-plus-material-files" multiple>
+            </div>
+          </section>
+          <section class="container pure-form-stacked message-container">
+            <div class="section">
+              <label class="section-label" for="alma-plus-material-title">Name:</label>
+              <input type="text" class="pure-input-1" id="alma-plus-material-title" placeholder="e.g. Chapter 3 notes (optional)">
+            </div>
+            <div class="section">
+              <label class="section-label" for="alma-plus-material-assignment">Assignment:</label>
+              <select class="pure-input-1" id="alma-plus-material-assignment"></select>
+            </div>
+          </section>
+          <div class="buttons">
+            <button type="button" class="pure-button pure-button-link alma-plus-cancel">Cancel</button>
+            <button type="submit" class="pure-button pure-button-primary alma-plus-save">Add</button>
+          </div>
+        </form>
+      </div>
+    </div>`;
 
-  modal.appendChild(mEl("h4", "", "Add material"));
-
-  const linkLabel = mEl("label", "", "Link");
-  const linkInput = mEl("input");
-  linkInput.type = "text";
-  linkInput.autocomplete = "off";
-  linkInput.placeholder = "docs.google.com/...";
-  linkLabel.appendChild(linkInput);
-
-  const fileLabel = mEl("label", "", "Or files and photos");
-  const fileInput = mEl("input");
-  fileInput.type = "file";
-  fileInput.multiple = true;
-  fileLabel.appendChild(fileInput);
-
-  const titleLabel = mEl("label", "", "Name (optional)");
-  const titleInput = mEl("input");
-  titleInput.type = "text";
-  titleInput.placeholder = "e.g. Chapter 3 notes";
-  titleLabel.appendChild(titleInput);
-
-  const assignLabel = mEl("label", "", "Assignment");
-  const assignSelect = mEl("select");
+  const linkInput = modal.querySelector("#alma-plus-material-link");
+  const fileInput = modal.querySelector("#alma-plus-material-files");
+  const titleInput = modal.querySelector("#alma-plus-material-title");
+  const assignSelect = modal.querySelector("#alma-plus-material-assignment");
   const general = mEl("option", "", "General (whole class)");
   general.value = "";
   assignSelect.appendChild(general);
@@ -211,30 +227,26 @@ function openAddMaterial(classId, presetAssignmentId = "") {
     assignSelect.appendChild(o);
   }
   assignSelect.value = presetAssignmentId;
-  assignLabel.appendChild(assignSelect);
+  const save = modal.querySelector(".alma-plus-save");
 
-  const actions = mEl("div", "alma-plus-modal-actions");
-  const cancel = mEl("button", "pure-button", "Cancel");
-  cancel.type = "button";
-  const save = mEl("button", "pure-button pure-button-primary", "Add");
-  save.type = "button";
-  actions.append(cancel, save);
-
-  modal.append(linkLabel, fileLabel, titleLabel, assignLabel, actions);
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  document.body.append(overlay, modal);
   mLockScroll();
-
+  const closeOnEscape = (e) => {
+    if (e.key === "Escape") closeModal();
+  };
   const closeModal = () => {
     overlay.remove();
+    modal.remove();
+    document.removeEventListener("keydown", closeOnEscape);
     mUnlockScroll();
   };
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) closeModal();
-  });
-  cancel.addEventListener("click", closeModal);
+  document.addEventListener("keydown", closeOnEscape);
+  overlay.addEventListener("click", closeModal);
+  modal.querySelector(".yui3-button-close").addEventListener("click", closeModal);
+  modal.querySelector(".alma-plus-cancel").addEventListener("click", closeModal);
 
-  save.addEventListener("click", async () => {
+  modal.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
     // Typing "https://" is optional: "docs.google.com/..." works too.
     let url = linkInput.value.trim();
     if (url && !/^[a-z][a-z0-9+.-]*:/i.test(url)) url = `https://${url.replace(/^\/+/, "")}`;
@@ -296,16 +308,17 @@ function openAddMaterial(classId, presetAssignmentId = "") {
 
 // ---- Materials section and paperclips ----
 
-function materialRow(classId, item) {
+// One row, laid out like Alma's assignment rows: shaded "Nov / 07" cell (date
+// added), small bold type line over the name, then the assignment it belongs to.
+function materialRow(classId, item, assignments) {
   const row = mEl("tr");
-  const iconCell = mEl("td", "alma-plus-material-icon");
-  if (item.kind === "photo") {
-    const thumb = mEl("img", "alma-plus-thumb");
-    thumb.src = item.data;
-    thumb.alt = "";
-    iconCell.appendChild(thumb);
-  } else {
-    iconCell.appendChild(mIcon(item.kind === "link" ? "fa-link" : "fa-file-alt"));
+  const added = item.added ? new Date(item.added) : null;
+
+  const dateCell = mEl("td", "due");
+  if (added) {
+    dateCell.dataset.sortableVal = String(Math.floor(added.getTime() / 1000));
+    dateCell.append(added.toLocaleDateString("en-US", { month: "short" }), mEl("br"),
+      String(added.getDate()).padStart(2, "0"));
   }
 
   const nameCell = mEl("td", "name");
@@ -326,6 +339,15 @@ function materialRow(classId, item) {
   }
   nameCell.appendChild(open);
 
+  const a = assignments.find((x) => x.id === item.assignmentId);
+  const forCell = mEl("td", "alma-plus-material-for");
+  if (item.assignmentId) {
+    forCell.appendChild(mEl("small", "", a?.category || "Assignment"));
+    forCell.append(a?.name || item.assignmentName || "Assignment");
+  } else {
+    forCell.textContent = "General";
+  }
+
   const actionCell = mEl("td", "alma-plus-material-actions");
   const remove = mEl("button", "", "Remove");
   remove.type = "button";
@@ -337,7 +359,7 @@ function materialRow(classId, item) {
   });
   actionCell.appendChild(remove);
 
-  row.append(iconCell, nameCell, actionCell);
+  row.append(dateCell, nameCell, forCell, actionCell);
   return row;
 }
 
@@ -360,49 +382,37 @@ async function renderMaterials() {
     }
     section.replaceChildren();
 
-    const heading = mEl("h4", "page-heading assignments-header", "Materials");
+    // Same heading style as Alma's "Past Assignments" / "Upcoming Assignments".
+    const heading = mEl("h4", "module-heading", "Materials");
     const add = mEl("button", "pure-button pure-button-primary alma-plus-add-material", "+ Add material");
     add.type = "button";
     add.addEventListener("click", () => openAddMaterial(classId));
-    section.append(heading, add);
+    const head = mEl("div", "alma-plus-materials-head");
+    head.append(heading, add);
+    section.appendChild(head);
 
     if (!items.length) {
-      section.appendChild(mEl("p", "dimmed alma-plus-materials-empty",
-        "Save links, files, and photos for this class here. Use the paperclip on an assignment to attach something to it."));
+      section.appendChild(mEl("p", "alma-plus-materials-empty",
+        "Save links, files, and photos for this class. Use the paperclip on an assignment to attach something to it."));
     } else {
-      // General first, then assignments in the order they appear on the page.
-      const order = ["", ...assignments.map((a) => a.id)];
-      const groups = new Map();
-      for (const item of items) {
-        const key = item.assignmentId || "";
-        if (!groups.has(key)) groups.set(key, []);
-        groups.get(key).push(item);
-      }
-      const keys = [...groups.keys()].sort((a, b) => {
-        const ia = order.indexOf(a), ib = order.indexOf(b);
-        return (ia === -1 ? 1e9 : ia) - (ib === -1 ? 1e9 : ib);
-      });
+      // General first, then by the order assignments appear on the page, newest added first within each.
+      const order = ["", ...assignments.map((x) => x.id)];
+      const rank = (item) => {
+        const i = order.indexOf(item.assignmentId || "");
+        return i === -1 ? 1e9 : i;
+      };
+      const sorted = [...items].sort((x, y) => rank(x) - rank(y) || String(y.added).localeCompare(String(x.added)));
 
-      const table = mEl("table", "pure-table pure-table-horizontal alma-plus-materials-table");
-      const tbody = mEl("tbody");
-      for (const key of keys) {
-        const a = assignments.find((x) => x.id === key);
-        const groupRow = mEl("tr", "alma-plus-material-group");
-        groupRow.id = `alma-plus-group-${key || "general"}`;
-        const cell = mEl("th");
-        cell.colSpan = 3;
-        cell.scope = "colgroup";
-        if (!key) {
-          cell.textContent = "General";
-        } else {
-          cell.textContent = a?.name || groups.get(key)[0].assignmentName || "Assignment";
-          if (a?.due) cell.appendChild(mEl("small", "dimmed", `  ${a.category ? `${a.category} · ` : ""}Due ${shortDue(a.due)}`));
-        }
-        groupRow.appendChild(cell);
-        tbody.appendChild(groupRow);
-        for (const item of groups.get(key)) tbody.appendChild(materialRow(classId, item));
+      const table = mEl("table", "pure-table pure-table-horizontal assignment-grades alma-plus-materials-table");
+      const thead = mEl("thead");
+      const hr = mEl("tr");
+      for (const [cls, text] of [["due snug", "Added"], ["name", "Name"], ["", "For"], ["", ""]]) {
+        hr.appendChild(mEl("th", cls, text));
       }
-      table.appendChild(tbody);
+      thead.appendChild(hr);
+      const tbody = mEl("tbody");
+      for (const item of sorted) tbody.appendChild(materialRow(classId, item, assignments));
+      table.append(thead, tbody);
       section.appendChild(table);
     }
 

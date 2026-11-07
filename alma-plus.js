@@ -718,52 +718,78 @@ function findClass(classes, name) {
 function openModal(existingTask = null) {
   if (document.getElementById("alma-plus-modal-overlay")) return;
 
+  // Built like Alma's own form windows (New Message): dark header bar with a
+  // close button, gray rounded boxes with bold field labels, Cancel + green button.
   const overlay = document.createElement("div");
   overlay.id = "alma-plus-modal-overlay";
 
   const modal = document.createElement("div");
   modal.id = "alma-plus-modal";
-  modal.className = "pure-form";
+  modal.className = "alma-message-modal alma-modal alma-modal-base yui3-widget yui3-panel alma-plus-form";
+  modal.setAttribute("role", "dialog");
   modal.innerHTML = `
-    <h4>Add your own task</h4>
-    <label>Task name
-      <input type="text" id="alma-plus-input-name" placeholder="e.g. Study for chem quiz">
-    </label>
-    <label>Class / category (optional)
-      <input type="text" id="alma-plus-input-category" list="alma-plus-class-list" autocomplete="off" placeholder="e.g. P4 Algebra 1">
-      <datalist id="alma-plus-class-list"></datalist>
-    </label>
-    <label>Description (optional)
-      <textarea id="alma-plus-input-notes" rows="5" placeholder="Details, instructions, links..."></textarea>
-    </label>
-    <label>Priority
-      <select id="alma-plus-input-priority">
-        <option value="low">Low</option>
-        <option value="normal">Normal</option>
-        <option value="high">High</option>
-      </select>
-    </label>
-    <label>Due date (or start date)
-      <input type="date" id="alma-plus-input-date">
-    </label>
-    <label>End date (optional, for more than one day)
-      <input type="date" id="alma-plus-input-end">
-    </label>
-    <div class="alma-plus-modal-actions">
-      <button type="button" id="alma-plus-cancel" class="pure-button">Cancel</button>
-      <button type="button" id="alma-plus-save" class="pure-button pure-button-primary">Add</button>
+    <div class="yui3-panel-content yui3-widget-stdmod">
+      <div class="yui3-widget-hd"><span class="alma-plus-form-title">Add Task</span><span class="yui3-widget-buttons"><button type="button" class="yui3-button yui3-button-close" id="alma-plus-close">Close</button></span></div>
+      <div class="yui3-widget-bd">
+        <form class="pure-form" novalidate>
+          <section class="container pure-form-stacked">
+            <div class="section">
+              <label class="section-label" for="alma-plus-input-name">Task Name:</label>
+              <input type="text" class="pure-input-1" id="alma-plus-input-name" placeholder="e.g. Study for chem quiz">
+            </div>
+            <div class="section">
+              <label class="section-label" for="alma-plus-input-category">Class:</label>
+              <input type="text" class="pure-input-1" id="alma-plus-input-category" list="alma-plus-class-list" autocomplete="off" placeholder="e.g. P4 Algebra 1">
+              <datalist id="alma-plus-class-list"></datalist>
+            </div>
+          </section>
+          <section class="container pure-form-stacked message-container">
+            <div class="section">
+              <label class="section-label" for="alma-plus-input-notes">Description:</label>
+              <textarea class="pure-input-1" id="alma-plus-input-notes" rows="5" placeholder="Details, instructions, links..."></textarea>
+            </div>
+            <div class="section">
+              <label class="section-label" for="alma-plus-input-priority">Priority:</label>
+              <select class="pure-input-1" id="alma-plus-input-priority">
+                <option value="low">Low</option>
+                <option value="normal">Normal</option>
+                <option value="high">High</option>
+              </select>
+            </div>
+            <div class="section">
+              <label class="section-label" for="alma-plus-input-date">Due Date:</label>
+              <input type="date" class="pure-input-1" id="alma-plus-input-date">
+            </div>
+            <div class="section">
+              <label class="section-label" for="alma-plus-input-end">End Date:</label>
+              <p class="helper">Only for tasks that last more than one day.</p>
+              <input type="date" class="pure-input-1" id="alma-plus-input-end">
+            </div>
+          </section>
+          <div class="buttons">
+            <button type="button" id="alma-plus-cancel" class="pure-button pure-button-link">Cancel</button>
+            <button type="submit" id="alma-plus-save" class="pure-button pure-button-primary">Add</button>
+          </div>
+        </form>
+      </div>
     </div>
   `;
 
-  overlay.appendChild(modal);
-  document.body.appendChild(overlay);
+  document.body.append(overlay, modal);
   lockPageScroll();
+  const closeOnEscape = (e) => {
+    if (e.key === "Escape") closeModal();
+  };
   const closeModal = () => {
     overlay.remove();
+    modal.remove();
+    document.removeEventListener("keydown", closeOnEscape);
     unlockPageScroll();
   };
+  document.addEventListener("keydown", closeOnEscape);
+  modal.querySelector("#alma-plus-close").addEventListener("click", closeModal);
 
-  modal.querySelector("h4").textContent = existingTask ? "Edit your task" : "Add your own task";
+  modal.querySelector(".alma-plus-form-title").textContent = existingTask ? "Edit Task" : "Add Task";
   modal.querySelector("#alma-plus-save").textContent = existingTask ? "Save" : "Add";
   modal.querySelector("#alma-plus-input-name").value = existingTask?.name || "";
   modal.querySelector("#alma-plus-input-category").value =
@@ -781,11 +807,10 @@ function openModal(existingTask = null) {
   modal.querySelector("#alma-plus-input-date").value = existingTask?.due || "";
   modal.querySelector("#alma-plus-input-end").value = existingTask?.end || "";
 
-  overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) closeModal();
-  });
+  overlay.addEventListener("click", closeModal);
   modal.querySelector("#alma-plus-cancel").addEventListener("click", closeModal);
-  modal.querySelector("#alma-plus-save").addEventListener("click", async () => {
+  modal.querySelector("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
     const name = modal.querySelector("#alma-plus-input-name").value.trim();
     const category = modal.querySelector("#alma-plus-input-category").value.trim();
     const notes = modal.querySelector("#alma-plus-input-notes").value.trim();

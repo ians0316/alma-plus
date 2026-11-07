@@ -1,62 +1,67 @@
-/* Class materials. Headings, buttons, tables, and popups use Alma's own classes
-   (page-heading, pure-button, pure-table, yui3-panel); these rules fill the gaps. */
+/* Class materials. The heading, table, buttons, and windows use Alma's own classes
+   (module-heading, assignment-grades, pure-button, yui3-panel); these rules only
+   fill the gaps so it reads like the assignments table below it. */
 
 #alma-plus-materials {
   margin-bottom: 24px;
 }
 
-#alma-plus-materials .page-heading {
-  display: inline-block;
-  margin-right: 12px;
+.alma-plus-materials-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.alma-plus-materials-head .module-heading {
+  margin: 0;
 }
 
 .alma-plus-add-material {
   font-size: 13px;
-  vertical-align: middle;
 }
 
 .alma-plus-materials-empty {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
+  font-size: 13px;
   color: #777;
 }
 
 .alma-plus-materials-table {
   width: 100%;
-  margin-top: 8px;
+  margin-top: 12px;
 }
 
-.alma-plus-material-group th {
-  padding: 10px 12px 6px;
+/* Same light uppercase header as Alma's assignment tables */
+.alma-plus-materials-table thead {
   background: transparent;
-  font-size: 15px;
-  font-weight: 700;
-  text-align: left;
+  border: 1px solid transparent;
   color: #333;
+  font-size: 80%;
+  text-transform: uppercase;
 }
-.alma-plus-material-group small {
-  font-size: 12px;
-  font-weight: 400;
+#alma-plus-materials .alma-plus-materials-table thead,
+#alma-plus-materials .alma-plus-materials-table thead th {
+  background: transparent !important;
+  color: #333 !important;
+}
+.alma-plus-materials-table thead th {
+  font-weight: 700;
+  border-bottom: 1px solid #cbcbcb;
+}
+.alma-plus-materials-table tbody {
+  background: #fff;
+  border: 1px solid #cbcbcb;
 }
 
-.alma-plus-material-icon {
-  width: 48px;
+/* Same shaded date cell as Alma's due column */
+.alma-plus-materials-table td.due {
+  width: 1%;
   background: #eee;
   border-right: 1px solid #cbcbcb;
   text-align: center;
-  color: #5f6163;
-  font-size: 18px;
 }
 
-.alma-plus-thumb {
-  display: block;
-  width: 48px;
-  height: 48px;
-  margin: -6px auto;
-  object-fit: cover;
-  border-radius: 2px;
-}
-
-.alma-plus-materials-table td.name small {
+.alma-plus-materials-table td small,
+.alma-plus-material-for small {
   display: block;
   font-size: 12px;
   font-weight: 700;

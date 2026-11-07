@@ -120,71 +120,76 @@
   text-decoration: line-through;
 }
 
-/* Add/edit window, styled like Alma's own dialogs. */
+/* Add/edit window: Alma's own panel and form classes do the styling; this only
+   places it like Alma's popups (top center) and dims the page behind it. */
 #alma-plus-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 999999;
+  background: rgba(65, 66, 67, 0.5);
+  z-index: 999998;
 }
 
 #alma-plus-modal {
-  box-sizing: border-box;
-  width: 360px;
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
   max-width: calc(100vw - 32px);
-  padding: 20px;
-  background: #fff;
-  border-radius: 2px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.25);
-  font-family: proxima-nova, sans-serif;
-  font-size: 15px;
-  color: #333;
+  max-height: 100vh;
+  overflow-y: auto;
+  z-index: 999999;
 }
 
-#alma-plus-modal h4 {
-  margin: 0 0 16px;
-  font-size: 22.5px;
-  font-weight: 400;
-  color: #333;
+/* Inside of the form windows, matching Alma's New Message window: light gray
+   rounded boxes, 13px bold labels, italic helper text, Cancel + green button. */
+.alma-plus-form section.container {
+  margin: 0 0 24px;
+  padding: 12px;
+  background: #f7f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
 }
-
-#alma-plus-modal label {
+.alma-plus-form .section + .section {
+  margin-top: 14px;
+}
+.alma-plus-form .pure-form-stacked .section-label {
   display: block;
-  margin-bottom: 12px;
-  font-size: 12px;
+  margin: 0 0 5px;
+  padding: 0;
+  font-size: 13px;
   font-weight: 700;
-  text-transform: uppercase;
   color: #333;
 }
-
-#alma-plus-modal input,
-#alma-plus-modal textarea,
-#alma-plus-modal select {
+.alma-plus-form .helper {
+  margin: 0 0 5px;
+  font-size: 13px;
+  font-style: italic;
+  color: #333;
+}
+.alma-plus-form .pure-form-stacked .pure-input-1 {
   display: block;
   box-sizing: border-box;
   width: 100%;
-  margin-top: 4px;
+  margin: 0;
   font-family: inherit;
-  font-weight: 400;
-  text-transform: none;
 }
-
-#alma-plus-modal textarea {
+.alma-plus-form textarea.pure-input-1 {
   resize: vertical;
 }
-
-.alma-plus-modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 16px;
+.alma-plus-form .buttons {
+  text-align: right;
 }
-
-.alma-plus-modal-actions .pure-button {
-  font-size: 13px;
+.alma-plus-form .buttons .pure-button {
+  margin-left: 8px;
+}
+.alma-plus-form .buttons .pure-button-link {
+  background: none;
+  color: #333;
+}
+.alma-plus-form .buttons-left {
+  float: left;
+  margin-left: 0 !important;
 }
 
 /* Task details popup: Alma's own panel classes do the styling; this only places it. */

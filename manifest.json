@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Alma+ Custom Tasks",
-  "version": "1.13.0",
+  "version": "1.14.0",
   "description": "Add your own custom tasks into Alma's To Do list and add assignments on Alma to your Google Calendar.",
   "icons": {
     "16": "icons/icon16.png",
