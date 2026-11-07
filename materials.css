@@ -96,11 +96,9 @@
   text-decoration: underline;
 }
 
-/* Paperclip on assignment rows: part of the small category line ("Unit Tests 📎1"),
-   so it never covers the assignment name. Hidden (taking no space) until you hover
-   the row, and always shown when something is attached. */
+/* Paperclip with a count, only on assignments that have materials. It sits on the
+   small category line ("Unit Tests 📎1"), so it never covers the assignment name. */
 .alma-plus-clip {
-  display: none;
   margin-left: 6px;
   padding: 0 2px;
   border: none;
@@ -108,17 +106,20 @@
   font: inherit;
   font-weight: 400;
   line-height: inherit;
-  color: #999;
+  color: #5f6163;
   cursor: pointer;
 }
-.student-assignments tr:hover .alma-plus-clip,
-.alma-plus-clip:focus,
-.alma-plus-clip.has-items {
-  display: inline;
+.alma-plus-clip:hover {
+  color: #333;
+  text-decoration: underline;
 }
-.alma-plus-clip:hover,
-.alma-plus-clip.has-items {
-  color: #5f6163;
+
+/* Brief highlight when a paperclip jumps to its materials */
+.alma-plus-materials-table tbody tr td {
+  transition: background-color 0.4s;
+}
+.alma-plus-materials-table tbody tr.alma-plus-flash td {
+  background-color: #fff6d5;
 }
 
 /* Photo viewer */

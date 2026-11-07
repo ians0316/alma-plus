@@ -22,9 +22,15 @@ function classIdFromUrl() {
   return location.pathname.match(/^\/home\/class\/([0-9a-f]+)/)?.[1] || null;
 }
 
+// Materials (photos and files included) are read from storage once and kept in
+// memory; re-reading them on every page change is what made the page lag.
+let allMaterialsCache = null;
 async function loadAllMaterials() {
-  const result = await chrome.storage.local.get(MATERIALS_KEY);
-  return result[MATERIALS_KEY] || {};
+  if (!allMaterialsCache) {
+    const result = await chrome.storage.local.get(MATERIALS_KEY);
+    allMaterialsCache = result[MATERIALS_KEY] || {};
+  }
+  return allMaterialsCache;
 }
 
 async function loadMaterials(classId) {
@@ -32,10 +38,18 @@ async function loadMaterials(classId) {
 }
 
 async function saveMaterials(classId, items) {
-  const all = await loadAllMaterials();
-  all[classId] = items;
+  const all = { ...(await loadAllMaterials()), [classId]: items };
   await chrome.storage.local.set({ [MATERIALS_KEY]: all });
+  allMaterialsCache = all;
 }
+
+// Another Alma tab changed materials: pick up the new list.
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes[MATERIALS_KEY]) {
+    allMaterialsCache = changes[MATERIALS_KEY].newValue || {};
+    if (classIdFromUrl()) renderMaterials();
+  }
+});
 
 // Assignments listed on this class page: id, name, category, due date.
 function getPageAssignments() {
@@ -386,6 +400,7 @@ function openAddMaterial(classId, presetAssignmentId = "", existing = null) {
 // added), small bold type line over the name, then the assignment it belongs to.
 function materialRow(classId, item, assignments) {
   const row = mEl("tr");
+  row.dataset.assignmentId = item.assignmentId || "";
   const added = item.added ? new Date(item.added) : null;
 
   const dateCell = mEl("td", "due");
@@ -502,30 +517,60 @@ async function renderMaterials() {
       section.appendChild(table);
     }
 
-    // Paperclip on each assignment row: attach to that assignment, with a count.
-    for (const a of assignments) {
-      const nameCell = a.row.querySelector("td.name");
-      nameCell.querySelector(".alma-plus-clip")?.remove();
-      const count = items.filter((i) => i.assignmentId === a.id).length;
-      const clip = mEl("button", `alma-plus-clip${count ? " has-items" : ""}`);
-      clip.type = "button";
-      clip.title = count ? `${count} material${count === 1 ? "" : "s"}. Click to add more.` : "Attach a link, file, or photo";
-      clip.appendChild(mIcon("fa-paperclip"));
-      if (count) clip.append(` ${count}`);
-      clip.addEventListener("click", (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        openAddMaterial(classId, a.id);
-      });
-      // On the small category line, right after the words ("Unit Tests 📎1"), so it
-      // never covers the assignment name.
-      const categoryLine = nameCell.querySelector("small");
-      if (categoryLine) categoryLine.appendChild(clip);
-      else nameCell.appendChild(clip);
-    }
+    updateClips(items, assignments);
   } finally {
     rendering = false;
   }
+}
+
+// Paperclip with a count, only on assignments that have materials. Clicking it
+// scrolls up to the Materials table and highlights that assignment's rows.
+// Rows are only touched when their count changes, to keep the page quick.
+function updateClips(items, assignments) {
+  for (const a of assignments) {
+    const nameCell = a.row.querySelector("td.name");
+    const existing = nameCell.querySelector(".alma-plus-clip");
+    const count = items.filter((i) => i.assignmentId === a.id).length;
+    if (!count) {
+      existing?.remove();
+      continue;
+    }
+    if (existing?.dataset.count === String(count)) continue;
+    existing?.remove();
+    const clip = mEl("button", "alma-plus-clip");
+    clip.type = "button";
+    clip.dataset.count = String(count);
+    clip.title = `${count} material${count === 1 ? "" : "s"}. Click to see ${count === 1 ? "it" : "them"}.`;
+    clip.append(mIcon("fa-paperclip"), ` ${count}`);
+    clip.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showMaterialsFor(a.id);
+    });
+    // On the small category line ("Unit Tests 📎1"), so it never covers the name.
+    (nameCell.querySelector("small") || nameCell).appendChild(clip);
+  }
+}
+
+function showMaterialsFor(assignmentId) {
+  const section = document.getElementById("alma-plus-materials");
+  if (!section) return;
+  section.scrollIntoView({ behavior: "smooth", block: "start" });
+  const rows = section.querySelectorAll(`tbody tr[data-assignment-id="${CSS.escape(assignmentId)}"]`);
+  rows.forEach((r) => r.classList.add("alma-plus-flash"));
+  setTimeout(() => rows.forEach((r) => r.classList.remove("alma-plus-flash")), 1600);
+}
+
+// Cheap refresh after Alma changes its own table (sorting, switching terms):
+// only the paperclips need checking, unless the Materials section is gone.
+async function refreshAfterAlmaChange() {
+  const classId = classIdFromUrl();
+  if (!classId) return;
+  if (!document.getElementById("alma-plus-materials")) {
+    renderMaterials();
+    return;
+  }
+  updateClips(await loadMaterials(classId), getPageAssignments());
 }
 
 function startMaterials() {
@@ -540,7 +585,7 @@ function startMaterials() {
       [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(OURS)));
     if (ours) return;
     clearTimeout(timer);
-    timer = setTimeout(renderMaterials, 150);
+    timer = setTimeout(refreshAfterAlmaChange, 150);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 }
