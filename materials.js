@@ -283,6 +283,7 @@ function openAddMaterial(classId, presetAssignmentId = "", existing = null) {
       const keepOld = assignSelect.value && assignSelect.value === existing.assignmentId && !assignment;
       const updated = {
         ...existing,
+        updated: new Date().toISOString(),
         assignmentId: assignSelect.value || "",
         assignmentName: keepOld ? existing.assignmentName : assignment?.name || "",
       };
@@ -421,6 +422,14 @@ function materialRow(classId, item, assignments) {
     forCell.textContent = "General";
   }
 
+  // Like Alma's Updated column: short date of the last change (or when it was added).
+  const changed = item.updated || item.added;
+  const updatedCell = mEl("td", "updated");
+  if (changed) {
+    const d = new Date(changed);
+    updatedCell.textContent = `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
+  }
+
   const actionCell = mEl("td", "alma-plus-material-actions");
   const edit = mEl("button", "", "Edit");
   edit.type = "button";
@@ -436,7 +445,7 @@ function materialRow(classId, item, assignments) {
   });
   actionCell.appendChild(remove);
 
-  row.append(dateCell, nameCell, forCell, actionCell);
+  row.append(dateCell, nameCell, forCell, updatedCell, actionCell);
   return row;
 }
 
@@ -483,7 +492,7 @@ async function renderMaterials() {
       const table = mEl("table", "pure-table pure-table-horizontal assignment-grades alma-plus-materials-table");
       const thead = mEl("thead");
       const hr = mEl("tr");
-      for (const [cls, text] of [["due snug", "Added"], ["name", "Name"], ["", "For"], ["", ""]]) {
+      for (const [cls, text] of [["due snug", "Added"], ["name", "Material Name"], ["", "For"], ["updated", "Updated"], ["", ""]]) {
         hr.appendChild(mEl("th", cls, text));
       }
       thead.appendChild(hr);
