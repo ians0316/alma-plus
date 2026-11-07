@@ -220,13 +220,3 @@
   text-decoration: underline;
   word-break: break-all;
 }
-
-.alma-plus-details-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  margin-top: 15px;
-}
-.alma-plus-details-actions .pure-button {
-  font-size: 13px;
-}

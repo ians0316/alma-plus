@@ -636,6 +636,22 @@ function ensureAddButton() {
   }
 }
 
+// While one of our windows is open the page behind it stays still, as with
+// Alma's own popups (they set overflow: hidden on the body the same way).
+let scrollLocks = 0;
+let savedBodyOverflow = "";
+function lockPageScroll() {
+  if (scrollLocks++ === 0) {
+    savedBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+  }
+}
+function unlockPageScroll() {
+  if (scrollLocks > 0 && --scrollLocks === 0) {
+    document.body.style.overflow = savedBodyOverflow;
+  }
+}
+
 function openModal(existingTask = null) {
   if (document.getElementById("alma-plus-modal-overlay")) return;
 
@@ -677,6 +693,11 @@ function openModal(existingTask = null) {
 
   overlay.appendChild(modal);
   document.body.appendChild(overlay);
+  lockPageScroll();
+  const closeModal = () => {
+    overlay.remove();
+    unlockPageScroll();
+  };
 
   modal.querySelector("h4").textContent = existingTask ? "Edit your task" : "Add your own task";
   modal.querySelector("#alma-plus-save").textContent = existingTask ? "Save" : "Add";
@@ -688,9 +709,9 @@ function openModal(existingTask = null) {
   modal.querySelector("#alma-plus-input-end").value = existingTask?.end || "";
 
   overlay.addEventListener("click", (e) => {
-    if (e.target === overlay) overlay.remove();
+    if (e.target === overlay) closeModal();
   });
-  modal.querySelector("#alma-plus-cancel").addEventListener("click", () => overlay.remove());
+  modal.querySelector("#alma-plus-cancel").addEventListener("click", closeModal);
   modal.querySelector("#alma-plus-save").addEventListener("click", async () => {
     const name = modal.querySelector("#alma-plus-input-name").value.trim();
     const category = modal.querySelector("#alma-plus-input-category").value.trim();
@@ -720,7 +741,7 @@ function openModal(existingTask = null) {
     };
     if (existingTask) await updateTask(task);
     else await addTask(task);
-    overlay.remove();
+    closeModal();
     renderCustomRows();
   });
 
@@ -735,8 +756,11 @@ function formatShortDate(value) {
 }
 
 function closeDetails() {
+  const panel = document.getElementById("alma-plus-details");
+  if (!panel) return;
   document.getElementById("alma-plus-details-overlay")?.remove();
-  document.getElementById("alma-plus-details")?.remove();
+  panel.remove();
+  unlockPageScroll();
   document.removeEventListener("keydown", closeDetailsOnEscape);
 }
 
@@ -798,8 +822,12 @@ function openDetails(task) {
   classDiv.appendChild(el("h3", "", task.category || "My task"));
   const assignment = el("div", "assignment");
   assignment.appendChild(el("h3", "assignment-name", task.name));
-  assignment.appendChild(el("span", "assignment-type",
-    priority === "normal" ? "My task" : `My task · ${priority[0].toUpperCase()}${priority.slice(1)} priority`));
+  // "My task" already shows on the class line when there's no class.
+  const typeText = [
+    task.category ? "My task" : "",
+    priority === "normal" ? "" : `${priority[0].toUpperCase()}${priority.slice(1)} priority`,
+  ].filter(Boolean).join(" · ");
+  if (typeText) assignment.appendChild(el("span", "assignment-type", typeText));
   header.append(classDiv, assignment);
 
   const dl = el("dl", "simple");
@@ -818,34 +846,11 @@ function openDetails(task) {
   bd.append(header, dl);
   if (task.notes) bd.appendChild(buildDescription(task.notes));
 
-  const actions = el("div", "alma-plus-details-actions");
-  const action = (text, primary, onClick) => {
-    const b = el("button", primary ? "pure-button pure-button-primary" : "pure-button", text);
-    b.type = "button";
-    b.addEventListener("click", onClick);
-    return b;
-  };
-  actions.append(
-    action("Remove", false, async () => {
-      await deleteTask(task.id);
-      closeDetails();
-      renderCustomRows();
-    }),
-    action("Edit", false, () => {
-      closeDetails();
-      openModal(task);
-    }),
-    action(completed ? "Mark as not done" : "Mark as done", true, async () => {
-      await setTaskCompleted(task.id, !completed);
-      closeDetails();
-      renderCustomRows();
-    })
-  );
-  bd.appendChild(actions);
 
   content.append(hd, bd);
   panel.appendChild(content);
   document.body.append(overlay, panel);
+  lockPageScroll();
   document.addEventListener("keydown", closeDetailsOnEscape);
   close.focus();
 }
