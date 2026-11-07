@@ -170,7 +170,7 @@ function closePhotoOnEscape(e) {
 
 // ---- Add window ----
 
-function openAddMaterial(classId, presetAssignmentId = "") {
+function openAddMaterial(classId, presetAssignmentId = "", existing = null) {
   if (document.getElementById("alma-plus-modal-overlay")) return;
   const assignments = getPageAssignments();
 
@@ -229,6 +229,31 @@ function openAddMaterial(classId, presetAssignmentId = "") {
   assignSelect.value = presetAssignmentId;
   const save = modal.querySelector(".alma-plus-save");
 
+  // Edit mode: same window, filled in. Links can change their address; files and
+  // photos can be replaced with a new one. Name and assignment can always change.
+  if (existing) {
+    modal.querySelector(".yui3-widget-hd").firstChild.nodeValue = "Edit Material";
+    save.textContent = "Save";
+    titleInput.value = existing.title || "";
+    if (existing.assignmentId && ![...assignSelect.options].some((o) => o.value === existing.assignmentId)) {
+      const kept = mEl("option", "", existing.assignmentName || "Assignment");
+      kept.value = existing.assignmentId;
+      assignSelect.appendChild(kept);
+    }
+    assignSelect.value = existing.assignmentId || "";
+    if (existing.kind === "link") {
+      linkInput.value = existing.url;
+      fileInput.closest(".section").hidden = true;
+    } else {
+      linkInput.closest(".section").hidden = true;
+      fileInput.multiple = false;
+      fileInput.closest(".section").querySelector(".section-label").textContent =
+        existing.kind === "photo" ? "Replace Photo:" : "Replace File:";
+      fileInput.closest(".section").querySelector(".helper").textContent =
+        `Optional. Now: ${existing.fileName || existing.title}`;
+    }
+  }
+
   document.body.append(overlay, modal);
   mLockScroll();
   const closeOnEscape = (e) => {
@@ -253,6 +278,54 @@ function openAddMaterial(classId, presetAssignmentId = "") {
     const files = [...fileInput.files];
     const title = titleInput.value.trim();
     const assignment = assignments.find((a) => a.id === assignSelect.value);
+
+    if (existing) {
+      const keepOld = assignSelect.value && assignSelect.value === existing.assignmentId && !assignment;
+      const updated = {
+        ...existing,
+        assignmentId: assignSelect.value || "",
+        assignmentName: keepOld ? existing.assignmentName : assignment?.name || "",
+      };
+      if (existing.kind === "link") {
+        if (!url || !/^https?:\/\//i.test(url) || !hostOf(url).includes(".")) {
+          alert("That doesn't look like a web link. Try something like docs.google.com/...");
+          return;
+        }
+        updated.url = url;
+        updated.title = title || hostOf(url);
+      } else {
+        const file = files[0];
+        if (file) {
+          if (file.size > MAX_FILE_MB * 1024 * 1024) {
+            alert(`"${file.name}" is bigger than ${MAX_FILE_MB} MB.`);
+            return;
+          }
+          save.disabled = true;
+          save.textContent = "Saving…";
+          Object.assign(updated, {
+            kind: file.type.startsWith("image/") ? "photo" : "file",
+            fileName: file.name,
+            mime: file.type,
+            size: file.size,
+            data: await readFileAsDataUrl(file),
+          });
+        }
+        updated.title = title || (file ? file.name : existing.title);
+      }
+      try {
+        const items = await loadMaterials(classId);
+        await saveMaterials(classId, items.map((i) => (i.id === existing.id ? updated : i)));
+      } catch (error) {
+        alert(`Couldn't save: ${error.message}`);
+        save.disabled = false;
+        save.textContent = "Save";
+        return;
+      }
+      closeModal();
+      renderMaterials();
+      return;
+    }
+
     if (!url && !files.length) {
       alert("Add a link or choose at least one file.");
       return;
@@ -303,7 +376,7 @@ function openAddMaterial(classId, presetAssignmentId = "") {
     renderMaterials();
   });
 
-  linkInput.focus();
+  (existing && existing.kind !== "link" ? titleInput : linkInput).focus();
 }
 
 // ---- Materials section and paperclips ----
@@ -349,6 +422,10 @@ function materialRow(classId, item, assignments) {
   }
 
   const actionCell = mEl("td", "alma-plus-material-actions");
+  const edit = mEl("button", "", "Edit");
+  edit.type = "button";
+  edit.addEventListener("click", () => openAddMaterial(classId, "", item));
+  actionCell.appendChild(edit);
   const remove = mEl("button", "", "Remove");
   remove.type = "button";
   remove.addEventListener("click", async () => {

@@ -81,6 +81,9 @@
   color: #999;
   cursor: pointer;
 }
+.alma-plus-material-actions button + button {
+  margin-left: 10px;
+}
 .alma-plus-material-actions button:hover {
   color: #333;
   text-decoration: underline;
