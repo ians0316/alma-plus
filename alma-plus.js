@@ -450,7 +450,6 @@ async function renderCustomRows() {
 
     ensureCalendarButtons(tbody);
     applyAssignmentFilter(tbody);
-    addDaysLeftBadges(table);
   } finally {
     bodyObserver?.observe(document.body, { childList: true, subtree: true });
   }
@@ -459,7 +458,6 @@ async function renderCustomRows() {
 function buildAddButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-add-btn";
-  btn.className = "pure-button pure-button-primary";
   btn.type = "button";
   btn.textContent = "+ Add my own task";
   btn.addEventListener("click", () => openModal());
@@ -469,7 +467,6 @@ function buildAddButton() {
 function buildExportButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-export-btn";
-  btn.className = "pure-button";
   btn.type = "button";
   btn.textContent = "Export to calendar (.ics)";
   btn.title = "Download all assignments as a calendar file you can import into Google Calendar";
@@ -480,7 +477,6 @@ function buildExportButton() {
 function buildBackupButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-backup-btn";
-  btn.className = "pure-button";
   btn.type = "button";
   btn.textContent = "Back up tasks";
   btn.title = "Download your custom tasks as a JSON backup";
@@ -491,7 +487,6 @@ function buildBackupButton() {
 function buildImportButton() {
   const btn = document.createElement("button");
   btn.id = "alma-plus-import-btn";
-  btn.className = "pure-button";
   btn.type = "button";
   btn.textContent = "Restore tasks";
   btn.title = "Import custom tasks from a JSON backup";
@@ -621,7 +616,6 @@ function ensureAddButton() {
   if (table && !document.getElementById("alma-plus-add-btn")) {
     const toolbar = document.createElement("div");
     toolbar.id = "alma-plus-toolbar";
-    toolbar.className = "pure-form";
     toolbar.appendChild(buildAddButton());
     toolbar.appendChild(buildExportButton());
     toolbar.appendChild(buildBackupButton());
