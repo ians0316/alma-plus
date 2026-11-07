@@ -652,6 +652,38 @@ function unlockPageScroll() {
   }
 }
 
+// Alma's Classes page lists every class with its teacher ("Bai, Samuel").
+// Fetched once per page load and used for the popup's "Class • Teacher" line
+// and for class name suggestions in the add-task window.
+let classesPromise = null;
+function getClasses() {
+  if (!classesPromise) {
+    classesPromise = fetch("/home/schedule", { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.text() : ""))
+      .then((html) => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        return [...doc.querySelectorAll("table.current-classes tr.result-set-item")].map((tr) => {
+          const link = tr.querySelector("th.name a");
+          const raw = tr.querySelector("td.teacher")?.textContent.replace(/\s+/g, " ").trim() || "";
+          // "Bai, Samuel" -> "Samuel Bai", the way Alma's popup shows it
+          const [last, first] = raw.split(", ");
+          return {
+            name: link?.textContent.trim() || "",
+            url: (link?.getAttribute("href") || "").split("?")[0],
+            teacher: first ? `${first} ${last}` : raw,
+          };
+        }).filter((c) => c.name);
+      })
+      .catch(() => []);
+  }
+  return classesPromise;
+}
+
+function findClass(classes, name) {
+  const key = (name || "").trim().toLowerCase();
+  return key ? classes.find((c) => c.name.toLowerCase() === key) : undefined;
+}
+
 function openModal(existingTask = null) {
   if (document.getElementById("alma-plus-modal-overlay")) return;
 
@@ -667,7 +699,8 @@ function openModal(existingTask = null) {
       <input type="text" id="alma-plus-input-name" placeholder="e.g. Study for chem quiz">
     </label>
     <label>Class / category (optional)
-      <input type="text" id="alma-plus-input-category" placeholder="e.g. P5 AP Biology">
+      <input type="text" id="alma-plus-input-category" list="alma-plus-class-list" autocomplete="off" placeholder="e.g. P4 Algebra 1">
+      <datalist id="alma-plus-class-list"></datalist>
     </label>
     <label>Description (optional)
       <textarea id="alma-plus-input-notes" rows="5" placeholder="Details, instructions, links..."></textarea>
@@ -703,6 +736,14 @@ function openModal(existingTask = null) {
   modal.querySelector("#alma-plus-save").textContent = existingTask ? "Save" : "Add";
   modal.querySelector("#alma-plus-input-name").value = existingTask?.name || "";
   modal.querySelector("#alma-plus-input-category").value = existingTask?.category || "";
+  getClasses().then((classes) => {
+    const list = modal.querySelector("#alma-plus-class-list");
+    for (const c of classes) {
+      const option = document.createElement("option");
+      option.value = c.name;
+      list.appendChild(option);
+    }
+  });
   modal.querySelector("#alma-plus-input-notes").value = existingTask?.notes || "";
   modal.querySelector("#alma-plus-input-priority").value = existingTask?.priority || "normal";
   modal.querySelector("#alma-plus-input-date").value = existingTask?.due || "";
@@ -827,7 +868,6 @@ function openDetails(task) {
   loading.appendChild(spinner);
   const header = el("header");
   const classDiv = el("div", "class");
-  classDiv.appendChild(el("h3", "", task.category || "My task"));
   const assignment = el("div", "assignment");
   assignment.appendChild(el("h3", "assignment-name", task.name));
   // "My task" already shows on the class line when there's no class.
@@ -854,11 +894,31 @@ function openDetails(task) {
   const details = [header, dl];
   if (task.notes) details.push(buildDescription(task.notes));
   bd.appendChild(loading);
-  setTimeout(() => {
+  // Like Alma's popup: "P4 Algebra 1 • Simon Pei", the class name linking to the class.
+  const minimumWait = new Promise((resolve) => setTimeout(resolve, 500));
+  const classesOrGiveUp = Promise.race([getClasses(), new Promise((resolve) => setTimeout(() => resolve([]), 3000))]);
+  Promise.all([classesOrGiveUp, minimumWait]).then(([classes]) => {
     if (!panel.isConnected) return;
+    const h3 = el("h3");
+    const match = findClass(classes, task.category);
+    if (match) {
+      const a = el("a", "", match.name);
+      a.href = match.url;
+      h3.appendChild(a);
+      classDiv.appendChild(h3);
+      if (match.teacher) {
+        classDiv.append(" • ");
+        const teacher = el("span", "teacher");
+        teacher.appendChild(el("span", "fn", match.teacher));
+        classDiv.appendChild(teacher);
+      }
+    } else {
+      h3.textContent = task.category || "My task";
+      classDiv.appendChild(h3);
+    }
     hdText.nodeValue = "Task Details";
     bd.replaceChildren(...details);
-  }, 500);
+  });
 
 
   content.append(hd, bd);
@@ -894,6 +954,7 @@ function isToDoPage() {
 
 function init() {
   if (!isToDoPage()) return;
+  getClasses(); // start loading so suggestions and teacher names are ready
   ensureAddButton();
   renderCustomRows();
   startObserving();
