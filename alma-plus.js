@@ -380,14 +380,12 @@ function buildCustomRow(task, columnCount) {
   nameCell.append(classLine, title);
   // Filled in below; sits on the right of the class line so the row stays Alma's height.
 
-  const details = [];
-  if (priorityValue !== "normal") details.push(`${priorityValue[0].toUpperCase()}${priorityValue.slice(1)} priority`);
-  if (task.notes) details.push(task.notes);
-  if (details.length) {
+  // Like Alma's rows, the description only shows in the details popup.
+  if (priorityValue !== "normal") {
     const metadata = document.createElement("small");
     metadata.className = "alma-plus-metadata";
     if (priorityValue === "high") metadata.classList.add("alma-plus-priority-high");
-    metadata.textContent = details.join(" · ");
+    metadata.textContent = `${priorityValue[0].toUpperCase()}${priorityValue.slice(1)} priority`;
     nameCell.appendChild(metadata);
   }
 
@@ -655,8 +653,8 @@ function openModal(existingTask = null) {
     <label>Class / category (optional)
       <input type="text" id="alma-plus-input-category" placeholder="e.g. P5 AP Biology">
     </label>
-    <label>Notes (optional)
-      <textarea id="alma-plus-input-notes" rows="3" placeholder="Add a reminder"></textarea>
+    <label>Description (optional)
+      <textarea id="alma-plus-input-notes" rows="5" placeholder="Details, instructions, links..."></textarea>
     </label>
     <label>Priority
       <select id="alma-plus-input-priority">
@@ -753,6 +751,24 @@ function el(tag, className, text) {
   return node;
 }
 
+// Description paragraph like Alma's: keeps line breaks and makes web links clickable.
+function buildDescription(text) {
+  const p = el("p", "alma-plus-details-notes");
+  const urlPattern = /https?:\/\/[^\s<>"]+[^\s<>".,;:!?)\]]/g;
+  let last = 0;
+  for (const match of text.matchAll(urlPattern)) {
+    p.append(text.slice(last, match.index));
+    const a = el("a", "", match[0]);
+    a.href = match[0];
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    p.appendChild(a);
+    last = match.index + match[0].length;
+  }
+  p.append(text.slice(last));
+  return p;
+}
+
 function openDetails(task) {
   closeDetails();
   const completed = Boolean(task.completed);
@@ -800,7 +816,7 @@ function openDetails(task) {
     hasRange ? `${formatShortDate(task.due)} – ${formatShortDate(task.end)}` : formatShortDate(task.due));
 
   bd.append(header, dl);
-  if (task.notes) bd.appendChild(el("p", "alma-plus-details-notes", task.notes));
+  if (task.notes) bd.appendChild(buildDescription(task.notes));
 
   const actions = el("div", "alma-plus-details-actions");
   const action = (text, primary, onClick) => {

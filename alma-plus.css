@@ -216,6 +216,10 @@
 .alma-plus-details-notes {
   white-space: pre-wrap;
 }
+.alma-plus-details-notes a {
+  text-decoration: underline;
+  word-break: break-all;
+}
 
 .alma-plus-details-actions {
   display: flex;
