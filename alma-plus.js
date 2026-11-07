@@ -58,6 +58,7 @@ function normalizeTask(task) {
   if (task.notes !== undefined && typeof task.notes !== "string") return null;
   if (task.completed !== undefined && typeof task.completed !== "boolean") return null;
   if (task.priority !== undefined && !["low", "normal", "high"].includes(task.priority)) return null;
+  if (task.end !== undefined && task.end !== "" && (typeof task.end !== "string" || !isValidDate(task.end) || task.end < task.due)) return null;
   return {
     id: task.id,
     name: task.name.trim(),
@@ -66,6 +67,7 @@ function normalizeTask(task) {
     notes: task.notes?.trim() || "",
     completed: task.completed ?? false,
     priority: task.priority || "normal",
+    end: task.end || "",
   };
 }
 
@@ -190,6 +192,7 @@ function getRowAssignment(row) {
     category,
     due,
     link,
+    end: task?.end && task.end > task.due ? new Date(task.end + "T00:00:00") : due,
     custom,
     notes: task?.notes || "",
   };
@@ -213,7 +216,7 @@ function buildGoogleCalendarUrl(a) {
   const params = new URLSearchParams({
     action: "TEMPLATE",
     text: buildEventTitle(a),
-    dates: `${toCalendarDate(a.due)}/${toCalendarDate(nextDay(a.due))}`,
+    dates: `${toCalendarDate(a.due)}/${toCalendarDate(nextDay(a.end))}`,
     details: buildEventDetails(a),
   });
   return `https://calendar.google.com/calendar/render?${params}`;
@@ -298,7 +301,7 @@ function buildIcs(assignments) {
       `UID:${uid}`,
       `DTSTAMP:${stamp}`,
       `DTSTART;VALUE=DATE:${toCalendarDate(a.due)}`,
-      `DTEND;VALUE=DATE:${toCalendarDate(nextDay(a.due))}`,
+      `DTEND;VALUE=DATE:${toCalendarDate(nextDay(a.end))}`,
       `SUMMARY:${escapeIcsText(buildEventTitle(a))}`,
       `DESCRIPTION:${escapeIcsText(buildEventDetails(a))}`,
       ...(a.link ? [`URL:${a.link}`] : []),
@@ -344,11 +347,16 @@ function buildCustomRow(task, columnCount) {
 
   const dueCell = document.createElement("td");
   dueCell.dataset.sortableVal = String(Math.floor(dueDate.getTime() / 1000));
-  dueCell.append(
-    dueDate.toLocaleDateString("en-US", { month: "short" }),
-    document.createElement("br"),
-    String(dueDate.getDate()).padStart(2, "0")
-  );
+  const month = (d) => d.toLocaleDateString("en-US", { month: "short" });
+  const day = (d) => String(d.getDate()).padStart(2, "0");
+  const endDate = task.end && task.end > task.due ? new Date(task.end + "T00:00:00") : null;
+  if (!endDate) {
+    dueCell.append(month(dueDate), document.createElement("br"), day(dueDate));
+  } else if (month(endDate) === month(dueDate) && endDate.getFullYear() === dueDate.getFullYear()) {
+    dueCell.append(month(dueDate), document.createElement("br"), `${day(dueDate)}–${day(endDate)}`);
+  } else {
+    dueCell.append(`${month(dueDate)} ${day(dueDate)} –`, document.createElement("br"), `${month(endDate)} ${day(endDate)}`);
+  }
 
   const nameCell = document.createElement("td");
   nameCell.className = "alma-plus-name-cell";
@@ -532,15 +540,13 @@ function applyAssignmentFilter(tbody) {
   for (const row of tbody.rows) {
     const assignment = getRowAssignment(row);
     if (!assignment) continue;
-    const due = new Date(
-      assignment.due.getFullYear(),
-      assignment.due.getMonth(),
-      assignment.due.getDate()
-    );
+    const dayOf = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const start = dayOf(assignment.due);
+    const end = dayOf(assignment.end);
     const show = activeFilter === "all" ||
-      (activeFilter === "today" && due.getTime() === today.getTime()) ||
-      (activeFilter === "week" && due >= weekStart && due < weekEnd) ||
-      (activeFilter === "overdue" && due < today);
+      (activeFilter === "today" && start <= today && end >= today) ||
+      (activeFilter === "week" && start < weekEnd && end >= weekStart) ||
+      (activeFilter === "overdue" && end < today);
     row.hidden = !show;
   }
 }
@@ -653,8 +659,11 @@ function openModal(existingTask = null) {
         <option value="high">High</option>
       </select>
     </label>
-    <label>Due date
+    <label>Due date (or start date)
       <input type="date" id="alma-plus-input-date">
+    </label>
+    <label>End date (optional, for more than one day)
+      <input type="date" id="alma-plus-input-end">
     </label>
     <div class="alma-plus-modal-actions">
       <button type="button" id="alma-plus-cancel" class="pure-button">Cancel</button>
@@ -672,6 +681,7 @@ function openModal(existingTask = null) {
   modal.querySelector("#alma-plus-input-notes").value = existingTask?.notes || "";
   modal.querySelector("#alma-plus-input-priority").value = existingTask?.priority || "normal";
   modal.querySelector("#alma-plus-input-date").value = existingTask?.due || "";
+  modal.querySelector("#alma-plus-input-end").value = existingTask?.end || "";
 
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) overlay.remove();
@@ -683,11 +693,17 @@ function openModal(existingTask = null) {
     const notes = modal.querySelector("#alma-plus-input-notes").value.trim();
     const priority = modal.querySelector("#alma-plus-input-priority").value;
     const due = modal.querySelector("#alma-plus-input-date").value;
+    let end = modal.querySelector("#alma-plus-input-end").value;
 
     if (!name || !due || !isValidDate(due)) {
       alert("Please enter a task name and a valid due date.");
       return;
     }
+    if (end && (!isValidDate(end) || end < due)) {
+      alert("The end date has to be on or after the due date.");
+      return;
+    }
+    if (end === due) end = "";
 
     const task = {
       ...(existingTask || {}),
@@ -696,6 +712,7 @@ function openModal(existingTask = null) {
       notes,
       priority,
       due,
+      end,
     };
     if (existingTask) await updateTask(task);
     else await addTask(task);
