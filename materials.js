@@ -239,35 +239,48 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
         render();
         refreshAttachmentClips();
       });
-      tools.append(edit, del);
+      tools.append(edit, " ", del);
       line.append(a, tools);
       section.appendChild(line);
     }
 
-    if (editing === "new-link") section.appendChild(linkEditor(null));
+    if (editing === "new-link" || editing === "new-drive") section.appendChild(linkEditor(null, editing === "new-drive"));
 
     const add = mEl("div", "add");
     const upload = mEl("button", "pure-button upload");
     upload.type = "button";
     upload.append(mIcon("fa-upload"), " Upload File");
     upload.addEventListener("click", () => fileInput.click());
+    // Same three options and icons as Alma's "Submit your work here".
+    const drive = mEl("button", "pure-button gdrive");
+    drive.type = "button";
+    const driveIcon = mEl("img");
+    driveIcon.src = "/images/google-drive-16.png"; // Alma's own Drive icon
+    driveIcon.alt = "";
+    drive.append(driveIcon, " Add from Drive");
+    drive.addEventListener("click", () => {
+      window.open("https://drive.google.com/drive/my-drive", "_blank", "noopener");
+      render("new-drive");
+    });
     const link = mEl("button", "pure-button link");
     link.type = "button";
     link.append(mIcon("fa-link"), " Add Link");
     link.addEventListener("click", () => render("new-link"));
-    add.append(upload, link);
+    add.append(upload, " ", drive, " ", link);
     section.appendChild(add);
   }
 
   // Inline row for adding a link, or editing a link / renaming a file.
-  function linkEditor(item) {
+  function linkEditor(item, fromDrive = false) {
     const row = mEl("div", "new-file alma-plus-link-editor");
     const isFile = item && item.kind !== "link";
     let urlInput = null;
     if (!isFile) {
       urlInput = mEl("input", "pure-input-1");
       urlInput.type = "text";
-      urlInput.placeholder = "Link, e.g. docs.google.com/...";
+      urlInput.placeholder = fromDrive
+        ? "Paste the Google Drive link (Share → Copy link)"
+        : "Link, e.g. docs.google.com/...";
       urlInput.value = item?.url || "";
       row.appendChild(urlInput);
     }

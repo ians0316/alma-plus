@@ -18,19 +18,10 @@
   flex-shrink: 0;
   gap: 6px;
 }
-.alma-plus-attached-tools .pure-button {
-  padding: 6px 10px;
-  font-size: 13px;
-}
-
+/* Buttons keep Alma's own size (15px, 7.5px 15px padding) and spacing, exactly
+   like "Upload File / Add from Drive / Add Link" under "Submit your work here". */
 .alma-plus-attached .add {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: 10px;
-}
-.alma-plus-attached .add .pure-button {
-  font-size: 13px;
+  margin-top: 15px;
 }
 
 .alma-plus-link-editor {
@@ -47,8 +38,7 @@
   text-align: right;
 }
 .alma-plus-link-editor .buttons .pure-button {
-  margin-left: 8px;
-  font-size: 13px;
+  margin-left: 4px;
 }
 .alma-plus-link-editor .pure-button-link {
   background: none;
