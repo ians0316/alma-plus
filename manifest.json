@@ -1,20 +1,47 @@
 {
   "manifest_version": 3,
   "name": "Alma+ Custom Tasks",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Add your own custom tasks into Alma's To Do list and add assignments on Alma to your Google Calendar.",
-  "permissions": ["storage"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    },
+    "default_title": "Alma+ Custom Tasks"
+  },
+  "permissions": [
+    "storage"
+  ],
   "web_accessible_resources": [
     {
-      "resources": ["google-calendar.svg"],
-      "matches": ["https://*.getalma.com/*"]
+      "resources": [
+        "google-calendar.svg"
+      ],
+      "matches": [
+        "https://*.getalma.com/*"
+      ]
     }
   ],
   "content_scripts": [
     {
-      "matches": ["https://*.getalma.com/home/assignments*"],
-      "js": ["alma-plus.js"],
-      "css": ["alma-plus.css"],
+      "matches": [
+        "https://*.getalma.com/home/assignments*"
+      ],
+      "js": [
+        "alma-plus.js"
+      ],
+      "css": [
+        "alma-plus.css"
+      ],
       "run_at": "document_idle"
     }
   ]
