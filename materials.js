@@ -1,8 +1,11 @@
-// Class materials for Alma+: links, files, and photos saved per class, grouped
-// under that class's assignments. Runs only on class pages (/home/class/<id>).
-// Everything is stored in chrome.storage.local, in this browser only.
+// Attached files for Alma+: links, files, and photos attached to Alma assignments
+// and to your own tasks. Everything happens in the assignment/task popup, in an
+// "Attached files" section built like Alma's own "Submitted work" section. Rows
+// with attachments get a paperclip with a count, everywhere in Alma.
+// Stored in chrome.storage.local, in this browser only.
 
 const MATERIALS_KEY = "almaPlusMaterials";
+const TASKS_BUCKET = "__tasks__"; // attachments of custom tasks; other buckets are Alma class ids
 const MAX_FILE_MB = 25;
 
 function mEl(tag, className, text) {
@@ -22,8 +25,8 @@ function classIdFromUrl() {
   return location.pathname.match(/^\/home\/class\/([0-9a-f]+)/)?.[1] || null;
 }
 
-// Materials (photos and files included) are read from storage once and kept in
-// memory; re-reading them on every page change is what made the page lag.
+// ---- Storage (read once, kept in memory) ----
+
 let allMaterialsCache = null;
 async function loadAllMaterials() {
   if (!allMaterialsCache) {
@@ -33,43 +36,36 @@ async function loadAllMaterials() {
   return allMaterialsCache;
 }
 
-async function loadMaterials(classId) {
-  return (await loadAllMaterials())[classId] || [];
+async function loadMaterials(bucket) {
+  return (await loadAllMaterials())[bucket] || [];
 }
 
-async function saveMaterials(classId, items) {
-  const all = { ...(await loadAllMaterials()), [classId]: items };
+async function saveMaterials(bucket, items) {
+  const all = { ...(await loadAllMaterials()), [bucket]: items };
   await chrome.storage.local.set({ [MATERIALS_KEY]: all });
   allMaterialsCache = all;
 }
 
-// Another Alma tab changed materials: pick up the new list.
+async function attachmentsFor(bucket, ownerId) {
+  return (await loadMaterials(bucket)).filter((i) => i.assignmentId === ownerId);
+}
+
+// Called when a custom task is deleted, so its files don't linger.
+async function removeOwnerAttachments(bucket, ownerId) {
+  const items = await loadMaterials(bucket);
+  if (items.some((i) => i.assignmentId === ownerId)) {
+    await saveMaterials(bucket, items.filter((i) => i.assignmentId !== ownerId));
+  }
+}
+
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && changes[MATERIALS_KEY]) {
     allMaterialsCache = changes[MATERIALS_KEY].newValue || {};
-    if (classIdFromUrl()) renderMaterials();
+    refreshAttachmentClips();
   }
 });
 
-// Assignments listed on this class page: id, name, category, due date.
-function getPageAssignments() {
-  return [...document.querySelectorAll(".student-assignments table tbody tr")].map((row) => {
-    const link = row.querySelector("td.name a[href*='/home/assignment/']");
-    if (!link) return null;
-    const ts = Number(row.querySelector("td.due")?.dataset.sortableVal);
-    return {
-      id: link.getAttribute("href").split("/").pop(),
-      name: link.textContent.trim(),
-      category: row.querySelector("td.name small")?.textContent.trim() || "",
-      due: ts ? new Date(ts * 1000) : null,
-      row,
-    };
-  }).filter(Boolean);
-}
-
-function shortDue(date) {
-  return date ? date.toLocaleDateString("en-US", { month: "short", day: "2-digit" }) : "";
-}
+// ---- Small helpers ----
 
 function hostOf(url) {
   try {
@@ -77,6 +73,12 @@ function hostOf(url) {
   } catch {
     return url;
   }
+}
+
+function normalizeLink(text) {
+  let url = text.trim();
+  if (url && !/^[a-z][a-z0-9+.-]*:/i.test(url)) url = `https://${url.replace(/^\/+/, "")}`;
+  return /^https?:\/\//i.test(url) && hostOf(url).includes(".") ? url : null;
 }
 
 function readFileAsDataUrl(file) {
@@ -95,7 +97,6 @@ function dataUrlToBlobUrl(dataUrl) {
   return URL.createObjectURL(new Blob([bytes], { type: mime }));
 }
 
-// Same page-freeze behavior as Alma's popups.
 let mScrollLocks = 0;
 let mSavedOverflow = "";
 function mLockScroll() {
@@ -108,7 +109,7 @@ function mUnlockScroll() {
   if (mScrollLocks > 0 && --mScrollLocks === 0) document.body.style.overflow = mSavedOverflow;
 }
 
-// ---- Opening a material ----
+// ---- Opening an attachment ----
 
 function openMaterial(item) {
   if (item.kind === "link") {
@@ -117,8 +118,7 @@ function openMaterial(item) {
     openPhoto(item);
   } else {
     const url = dataUrlToBlobUrl(item.data);
-    const viewable = /^(application\/pdf|text\/|image\/|video\/|audio\/)/.test(item.mime || "");
-    if (viewable) {
+    if (/^(application\/pdf|text\/|image\/|video\/|audio\/)/.test(item.mime || "")) {
       window.open(url, "_blank", "noopener");
     } else {
       const a = mEl("a");
@@ -132,15 +132,15 @@ function openMaterial(item) {
   }
 }
 
-// Photo viewer built from the classes of Alma's own popups.
+// Photo viewer built from the classes of Alma's own popups, shown above them.
 function openPhoto(item) {
   closePhoto();
   const overlay = mEl("div");
-  overlay.id = "alma-plus-details-overlay";
+  overlay.id = "alma-plus-photo-overlay";
   overlay.addEventListener("click", closePhoto);
 
-  const panel = mEl("div", "alma-modal-base yui3-widget yui3-panel alma-plus-details alma-plus-photo-panel");
-  panel.id = "alma-plus-details";
+  const panel = mEl("div", "alma-modal-base yui3-widget yui3-panel alma-plus-photo-panel");
+  panel.id = "alma-plus-photo";
   panel.setAttribute("role", "dialog");
   panel.setAttribute("aria-label", item.title);
   const content = mEl("div", "yui3-panel-content yui3-widget-stdmod");
@@ -165,527 +165,326 @@ function openPhoto(item) {
   panel.appendChild(content);
   document.body.append(overlay, panel);
   mLockScroll();
-  document.addEventListener("keydown", closePhotoOnEscape);
+  document.addEventListener("keydown", closePhotoOnEscape, true);
   close.focus();
 }
 
 function closePhoto() {
-  const panel = document.getElementById("alma-plus-details");
+  const panel = document.getElementById("alma-plus-photo");
   if (!panel) return;
-  document.getElementById("alma-plus-details-overlay")?.remove();
+  document.getElementById("alma-plus-photo-overlay")?.remove();
   panel.remove();
   mUnlockScroll();
-  document.removeEventListener("keydown", closePhotoOnEscape);
+  document.removeEventListener("keydown", closePhotoOnEscape, true);
 }
 
 function closePhotoOnEscape(e) {
-  if (e.key === "Escape") closePhoto();
+  if (e.key === "Escape") {
+    e.stopPropagation(); // close only the photo, not the popup under it
+    closePhoto();
+  }
 }
 
-// ---- Add window ----
+// ---- "Attached files" section (used in Alma's popup and in the task popup) ----
 
-function openAddMaterial(classId, presetAssignmentId = "", existing = null) {
-  if (document.getElementById("alma-plus-modal-overlay")) return;
-  const assignments = getPageAssignments();
+// Same markup as Alma's "Submitted work": heading, one line per file with a
+// paperclip, and Alma-style "Upload File" / "Add Link" buttons.
+function buildAttachedSection(bucket, ownerId, ownerName = "") {
+  const section = mEl("div", "pure-form submitted-files alma-plus-attached");
+  section.dataset.owner = `${bucket}:${ownerId}`;
 
-  // Built like Alma's own form windows: dark header bar, gray boxes, Cancel + green button.
-  const overlay = mEl("div");
-  overlay.id = "alma-plus-modal-overlay";
-  const modal = mEl("div", "alma-message-modal alma-modal alma-modal-base yui3-widget yui3-panel alma-plus-form");
-  modal.id = "alma-plus-modal";
-  modal.setAttribute("role", "dialog");
-  modal.innerHTML = `
-    <div class="yui3-panel-content yui3-widget-stdmod">
-      <div class="yui3-widget-hd">Add Material<span class="yui3-widget-buttons"><button type="button" class="yui3-button yui3-button-close">Close</button></span></div>
-      <div class="yui3-widget-bd">
-        <form class="pure-form" novalidate>
-          <section class="container pure-form-stacked">
-            <div class="section">
-              <label class="section-label" for="alma-plus-material-link">Link:</label>
-              <input type="text" class="pure-input-1" id="alma-plus-material-link" autocomplete="off" placeholder="docs.google.com/...">
-            </div>
-            <div class="section">
-              <label class="section-label" for="alma-plus-material-files">Files and Photos:</label>
-              <p class="helper">Add a link, or choose files and photos (up to ${MAX_FILE_MB} MB each).</p>
-              <input type="file" id="alma-plus-material-files" multiple>
-            </div>
-          </section>
-          <section class="container pure-form-stacked message-container">
-            <div class="section">
-              <label class="section-label" for="alma-plus-material-title">Name:</label>
-              <input type="text" class="pure-input-1" id="alma-plus-material-title" placeholder="e.g. Chapter 3 notes (optional)">
-            </div>
-            <div class="section">
-              <label class="section-label" for="alma-plus-material-assignment">Assignment:</label>
-              <select class="pure-input-1" id="alma-plus-material-assignment"></select>
-            </div>
-          </section>
-          <div class="buttons">
-            <button type="button" class="pure-button pure-button-link alma-plus-cancel">Cancel</button>
-            <button type="submit" class="pure-button pure-button-primary alma-plus-save">Add</button>
-          </div>
-        </form>
-      </div>
-    </div>`;
+  const fileInput = mEl("input");
+  fileInput.type = "file";
+  fileInput.multiple = true;
+  fileInput.hidden = true;
 
-  const linkInput = modal.querySelector("#alma-plus-material-link");
-  const fileInput = modal.querySelector("#alma-plus-material-files");
-  const titleInput = modal.querySelector("#alma-plus-material-title");
-  const assignSelect = modal.querySelector("#alma-plus-material-assignment");
-  const general = mEl("option", "", "General (whole class)");
-  general.value = "";
-  assignSelect.appendChild(general);
-  for (const a of assignments) {
-    const o = mEl("option", "", `${a.name}${a.due ? ` (${shortDue(a.due)})` : ""}`);
-    o.value = a.id;
-    assignSelect.appendChild(o);
-  }
-  assignSelect.value = presetAssignmentId;
-  const save = modal.querySelector(".alma-plus-save");
+  async function render(editing = null) {
+    const items = await attachmentsFor(bucket, ownerId);
+    section.replaceChildren(mEl("h3", "", "Attached files"), fileInput);
 
-  // Edit mode: same window, filled in. Links can change their address; files and
-  // photos can be replaced with a new one. Name and assignment can always change.
-  if (existing) {
-    modal.querySelector(".yui3-widget-hd").firstChild.nodeValue = "Edit Material";
-    save.textContent = "Save";
-    titleInput.value = existing.title || "";
-    if (existing.assignmentId && ![...assignSelect.options].some((o) => o.value === existing.assignmentId)) {
-      const kept = mEl("option", "", existing.assignmentName || "Assignment");
-      kept.value = existing.assignmentId;
-      assignSelect.appendChild(kept);
+    for (const item of items) {
+      if (editing?.id === item.id) {
+        section.appendChild(linkEditor(item));
+        continue;
+      }
+      const line = mEl("div", "submitted-file split-flex");
+      const a = mEl("a");
+      a.href = item.kind === "link" ? item.url : "#";
+      if (item.kind === "link") {
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+      } else {
+        a.addEventListener("click", (e) => {
+          e.preventDefault();
+          openMaterial(item);
+        });
+      }
+      a.append(mIcon("fa-paperclip"), ` ${item.title}`);
+      const tools = mEl("span", "alma-plus-attached-tools");
+      const edit = mEl("button", "pure-button");
+      edit.type = "button";
+      edit.setAttribute("aria-label", item.kind === "link" ? "Edit link" : "Rename");
+      edit.title = item.kind === "link" ? "Edit link" : "Rename";
+      edit.appendChild(mIcon("fa-pencil-alt"));
+      edit.addEventListener("click", () => render(item));
+      const del = mEl("button", "pure-button delete");
+      del.type = "button";
+      del.setAttribute("aria-label", "Remove Item");
+      del.title = "Remove";
+      del.appendChild(mIcon("fa-trash"));
+      del.addEventListener("click", async () => {
+        if (!confirm(`Remove "${item.title}"?`)) return;
+        const all = await loadMaterials(bucket);
+        await saveMaterials(bucket, all.filter((i) => i.id !== item.id));
+        render();
+        refreshAttachmentClips();
+      });
+      tools.append(edit, del);
+      line.append(a, tools);
+      section.appendChild(line);
     }
-    assignSelect.value = existing.assignmentId || "";
-    if (existing.kind === "link") {
-      linkInput.value = existing.url;
-      fileInput.closest(".section").hidden = true;
-    } else {
-      linkInput.closest(".section").hidden = true;
-      fileInput.multiple = false;
-      fileInput.closest(".section").querySelector(".section-label").textContent =
-        existing.kind === "photo" ? "Replace Photo:" : "Replace File:";
-      fileInput.closest(".section").querySelector(".helper").textContent =
-        `Optional. Now: ${existing.fileName || existing.title}`;
-    }
+
+    if (editing === "new-link") section.appendChild(linkEditor(null));
+
+    const add = mEl("div", "add");
+    const upload = mEl("button", "pure-button upload");
+    upload.type = "button";
+    upload.append(mIcon("fa-upload"), " Upload File");
+    upload.addEventListener("click", () => fileInput.click());
+    const link = mEl("button", "pure-button link");
+    link.type = "button";
+    link.append(mIcon("fa-link"), " Add Link");
+    link.addEventListener("click", () => render("new-link"));
+    add.append(upload, link);
+    section.appendChild(add);
   }
 
-  document.body.append(overlay, modal);
-  mLockScroll();
-  const closeOnEscape = (e) => {
-    if (e.key === "Escape") closeModal();
-  };
-  const closeModal = () => {
-    overlay.remove();
-    modal.remove();
-    document.removeEventListener("keydown", closeOnEscape);
-    mUnlockScroll();
-  };
-  document.addEventListener("keydown", closeOnEscape);
-  overlay.addEventListener("click", closeModal);
-  modal.querySelector(".yui3-button-close").addEventListener("click", closeModal);
-  modal.querySelector(".alma-plus-cancel").addEventListener("click", closeModal);
+  // Inline row for adding a link, or editing a link / renaming a file.
+  function linkEditor(item) {
+    const row = mEl("div", "new-file alma-plus-link-editor");
+    const isFile = item && item.kind !== "link";
+    let urlInput = null;
+    if (!isFile) {
+      urlInput = mEl("input", "pure-input-1");
+      urlInput.type = "text";
+      urlInput.placeholder = "Link, e.g. docs.google.com/...";
+      urlInput.value = item?.url || "";
+      row.appendChild(urlInput);
+    }
+    const nameInput = mEl("input", "pure-input-1");
+    nameInput.type = "text";
+    nameInput.placeholder = isFile ? "Name" : "Name (optional)";
+    nameInput.value = item?.title || "";
+    row.appendChild(nameInput);
 
-  modal.querySelector("form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    // Typing "https://" is optional: "docs.google.com/..." works too.
-    let url = linkInput.value.trim();
-    if (url && !/^[a-z][a-z0-9+.-]*:/i.test(url)) url = `https://${url.replace(/^\/+/, "")}`;
-    const files = [...fileInput.files];
-    const title = titleInput.value.trim();
-    const assignment = assignments.find((a) => a.id === assignSelect.value);
-
-    if (existing) {
-      const keepOld = assignSelect.value && assignSelect.value === existing.assignmentId && !assignment;
-      const updated = {
-        ...existing,
-        updated: new Date().toISOString(),
-        assignmentId: assignSelect.value || "",
-        assignmentName: keepOld ? existing.assignmentName : assignment?.name || "",
-      };
-      if (existing.kind === "link") {
-        if (!url || !/^https?:\/\//i.test(url) || !hostOf(url).includes(".")) {
+    const buttons = mEl("div", "buttons");
+    const cancel = mEl("button", "pure-button pure-button-link", "Cancel");
+    cancel.type = "button";
+    cancel.addEventListener("click", () => render());
+    const save = mEl("button", "pure-button pure-button-primary", item ? "Save" : "Add");
+    save.type = "button";
+    const submit = async () => {
+      const all = await loadMaterials(bucket);
+      const name = nameInput.value.trim();
+      if (isFile) {
+        if (!name) return;
+        await saveMaterials(bucket, all.map((i) => (i.id === item.id ? { ...i, title: name, updated: new Date().toISOString() } : i)));
+      } else {
+        const url = normalizeLink(urlInput.value);
+        if (!url) {
           alert("That doesn't look like a web link. Try something like docs.google.com/...");
           return;
         }
-        updated.url = url;
-        updated.title = title || hostOf(url);
-      } else {
-        const file = files[0];
-        if (file) {
-          if (file.size > MAX_FILE_MB * 1024 * 1024) {
-            alert(`"${file.name}" is bigger than ${MAX_FILE_MB} MB.`);
-            return;
-          }
-          save.disabled = true;
-          save.textContent = "Saving…";
-          Object.assign(updated, {
-            kind: file.type.startsWith("image/") ? "photo" : "file",
-            fileName: file.name,
-            mime: file.type,
-            size: file.size,
-            data: await readFileAsDataUrl(file),
-          });
+        const entry = { kind: "link", url, title: name || hostOf(url), updated: new Date().toISOString() };
+        await saveMaterials(bucket, item
+          ? all.map((i) => (i.id === item.id ? { ...i, ...entry } : i))
+          : [...all, { ...entry, id: crypto.randomUUID(), assignmentId: ownerId, assignmentName: ownerName, added: entry.updated }]);
+      }
+      render();
+      refreshAttachmentClips();
+    };
+    save.addEventListener("click", submit);
+    for (const input of [urlInput, nameInput].filter(Boolean)) {
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          submit();
         }
-        updated.title = title || (file ? file.name : existing.title);
-      }
-      try {
-        const items = await loadMaterials(classId);
-        await saveMaterials(classId, items.map((i) => (i.id === existing.id ? updated : i)));
-      } catch (error) {
-        alert(`Couldn't save: ${error.message}`);
-        save.disabled = false;
-        save.textContent = "Save";
-        return;
-      }
-      closeModal();
-      renderMaterials();
-      return;
+      });
     }
+    buttons.append(cancel, save);
+    row.appendChild(buttons);
+    setTimeout(() => (urlInput || nameInput).focus(), 0);
+    return row;
+  }
 
-    if (!url && !files.length) {
-      alert("Add a link or choose at least one file.");
-      return;
-    }
-    if (url && (!/^https?:\/\//i.test(url) || !hostOf(url).includes("."))) {
-      alert("That doesn't look like a web link. Try something like docs.google.com/...");
-      return;
-    }
+  fileInput.addEventListener("change", async () => {
+    const files = [...fileInput.files];
+    fileInput.value = "";
     const tooBig = files.find((f) => f.size > MAX_FILE_MB * 1024 * 1024);
     if (tooBig) {
       alert(`"${tooBig.name}" is bigger than ${MAX_FILE_MB} MB. Try a smaller file, or save it to Google Drive and add the link.`);
       return;
     }
-
-    save.disabled = true;
-    save.textContent = "Adding…";
-    const base = {
-      assignmentId: assignment?.id || "",
-      assignmentName: assignment?.name || "",
-      added: new Date().toISOString(),
-    };
-    const newItems = [];
-    if (url) {
-      newItems.push({ ...base, id: crypto.randomUUID(), kind: "link", url, title: title || hostOf(url) });
-    }
+    if (!files.length) return;
+    const now = new Date().toISOString();
+    const added = [];
     for (const file of files) {
-      const data = await readFileAsDataUrl(file);
-      newItems.push({
-        ...base,
+      added.push({
         id: crypto.randomUUID(),
         kind: file.type.startsWith("image/") ? "photo" : "file",
-        title: files.length === 1 && !url && title ? title : file.name,
+        title: file.name,
         fileName: file.name,
         mime: file.type,
         size: file.size,
-        data,
+        data: await readFileAsDataUrl(file),
+        assignmentId: ownerId,
+        assignmentName: ownerName,
+        added: now,
       });
     }
     try {
-      await saveMaterials(classId, [...(await loadMaterials(classId)), ...newItems]);
+      await saveMaterials(bucket, [...(await loadMaterials(bucket)), ...added]);
     } catch (error) {
       alert(`Couldn't save: ${error.message}`);
-      save.disabled = false;
-      save.textContent = "Add";
       return;
     }
-    closeModal();
-    renderMaterials();
+    render();
+    refreshAttachmentClips();
   });
 
-  (existing && existing.kind !== "link" ? titleInput : linkInput).focus();
+  render();
+  return section;
 }
 
-// ---- Materials section and paperclips ----
-
-// One row, laid out like Alma's assignment rows: shaded "Nov / 07" cell (date
-// added), small bold type line over the name, then the assignment it belongs to.
-function materialRow(classId, item, assignments) {
-  const row = mEl("tr");
-  row.dataset.assignmentId = item.assignmentId || "";
-  const added = item.added ? new Date(item.added) : null;
-
-  const dateCell = mEl("td", "due");
-  if (added) {
-    dateCell.dataset.sortableVal = String(Math.floor(added.getTime() / 1000));
-    dateCell.append(added.toLocaleDateString("en-US", { month: "short" }), mEl("br"),
-      String(added.getDate()).padStart(2, "0"));
-  }
-
-  const nameCell = mEl("td", "name");
-  const kindText = item.kind === "link" ? `Link · ${hostOf(item.url)}`
-    : item.kind === "photo" ? "Photo"
-    : `File${item.fileName?.includes(".") ? ` · ${item.fileName.split(".").pop().toUpperCase()}` : ""}`;
-  nameCell.appendChild(mEl("small", "", kindText));
-  const open = mEl("a", "", item.title);
-  open.href = item.kind === "link" ? item.url : "#";
-  if (item.kind === "link") {
-    open.target = "_blank";
-    open.rel = "noopener noreferrer";
-  } else {
-    open.addEventListener("click", (e) => {
-      e.preventDefault();
-      openMaterial(item);
-    });
-  }
-  nameCell.appendChild(open);
-
-  const a = assignments.find((x) => x.id === item.assignmentId);
-  const forCell = mEl("td", "alma-plus-material-for");
-  if (item.assignmentId) {
-    forCell.appendChild(mEl("small", "", a?.category || "Assignment"));
-    forCell.append(a?.name || item.assignmentName || "Assignment");
-  } else {
-    forCell.textContent = "General";
-  }
-
-  // Like Alma's Updated column: short date of the last change (or when it was added).
-  const changed = item.updated || item.added;
-  const updatedCell = mEl("td", "updated");
-  if (changed) {
-    const d = new Date(changed);
-    updatedCell.textContent = `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
-  }
-
-  const actionCell = mEl("td", "alma-plus-material-actions");
-  const edit = mEl("button", "", "Edit");
-  edit.type = "button";
-  edit.addEventListener("click", () => openAddMaterial(classId, "", item));
-  actionCell.appendChild(edit);
-  const remove = mEl("button", "", "Remove");
-  remove.type = "button";
-  remove.addEventListener("click", async () => {
-    if (!confirm(`Remove "${item.title}"?`)) return;
-    const items = await loadMaterials(classId);
-    await saveMaterials(classId, items.filter((i) => i.id !== item.id));
-    renderMaterials();
-  });
-  actionCell.appendChild(remove);
-
-  row.append(dateCell, nameCell, forCell, updatedCell, actionCell);
-  return row;
-}
-
-let rendering = false;
-
-async function renderMaterials() {
-  const classId = classIdFromUrl();
-  const assignmentsBlock = document.querySelector(".student-assignments");
-  if (!classId || !assignmentsBlock || rendering) return;
-  rendering = true;
-  try {
-    const items = await loadMaterials(classId);
-    const assignments = getPageAssignments();
-
-    let section = document.getElementById("alma-plus-materials");
-    if (!section) {
-      section = mEl("div");
-      section.id = "alma-plus-materials";
-      assignmentsBlock.before(section);
-    }
-    section.replaceChildren();
-
-    // Same heading style as Alma's "Past Assignments" / "Upcoming Assignments".
-    const heading = mEl("h4", "module-heading", "Materials");
-    const add = mEl("button", "pure-button pure-button-primary alma-plus-add-material", "+ Add material");
-    add.type = "button";
-    add.addEventListener("click", () => openAddMaterial(classId));
-    const head = mEl("div", "alma-plus-materials-head");
-    head.append(heading, add);
-    section.appendChild(head);
-
-    if (!items.length) {
-      section.appendChild(mEl("p", "alma-plus-materials-empty",
-        "Save links, files, and photos for this class with + Add material."));
-    } else {
-      // General first, then by the order assignments appear on the page, newest added first within each.
-      const order = ["", ...assignments.map((x) => x.id)];
-      const rank = (item) => {
-        const i = order.indexOf(item.assignmentId || "");
-        return i === -1 ? 1e9 : i;
-      };
-      const sorted = [...items].sort((x, y) => rank(x) - rank(y) || String(y.added).localeCompare(String(x.added)));
-
-      const table = mEl("table", "pure-table pure-table-horizontal assignment-grades alma-plus-materials-table");
-      const thead = mEl("thead");
-      const hr = mEl("tr");
-      for (const [cls, text] of [["due snug", "Added"], ["name", "Material Name"], ["", "For"], ["updated", "Updated"], ["", ""]]) {
-        hr.appendChild(mEl("th", cls, text));
-      }
-      thead.appendChild(hr);
-      const tbody = mEl("tbody");
-      for (const item of sorted) tbody.appendChild(materialRow(classId, item, assignments));
-      table.append(thead, tbody);
-      section.appendChild(table);
-    }
-
-    updateClips(items, assignments);
-    ensureAssignmentsHeading(assignmentsBlock);
-  } finally {
-    rendering = false;
-  }
-}
-
-// Paperclip with a count, only on assignments that have materials. Clicking it
-// scrolls up to the Materials table and highlights that assignment's rows.
-// Rows are only touched when their count changes, to keep the page quick.
-function updateClips(items, assignments) {
-  for (const a of assignments) {
-    const nameCell = a.row.querySelector("td.name");
-    const existing = nameCell.querySelector(".alma-plus-clip");
-    const count = items.filter((i) => i.assignmentId === a.id).length;
-    if (!count) {
-      existing?.remove();
-      continue;
-    }
-    if (existing?.dataset.count === String(count)) continue;
-    existing?.remove();
-    const clip = mEl("button", "alma-plus-clip");
-    clip.type = "button";
-    clip.dataset.count = String(count);
-    clip.title = `${count} material${count === 1 ? "" : "s"}. Click to see ${count === 1 ? "it" : "them"}.`;
-    clip.append(mIcon("fa-paperclip"), ` ${count}`);
-    clip.addEventListener("click", (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      showMaterialsFor(a.id);
-    });
-    // On the small category line ("Unit Tests 📎1"), so it never covers the name.
-    (nameCell.querySelector("small") || nameCell).appendChild(clip);
-  }
-}
-
-// Alma hides the "Past Assignments" heading when a class only has a Past list.
-// With Materials sitting right above, the table would look like part of it, so
-// show the same heading Alma uses on classes that have both lists.
-function ensureAssignmentsHeading(assignmentsBlock) {
-  const almaHeadings = [...assignmentsBlock.querySelectorAll(".segment-content > h4.module-heading")];
-  const ours = document.getElementById("alma-plus-assignments-heading");
-  if (almaHeadings.some((h) => h.offsetParent !== null)) {
-    ours?.remove();
-    return;
-  }
-  if (ours) return;
-  const heading = mEl("h4", "module-heading", almaHeadings[0]?.textContent.trim() || "Past Assignments");
-  heading.id = "alma-plus-assignments-heading";
-  const firstTable = assignmentsBlock.querySelector(".segmented-control, table");
-  if (firstTable) firstTable.before(heading);
-}
-
-function showMaterialsFor(assignmentId) {
-  const section = document.getElementById("alma-plus-materials");
-  if (!section) return;
-  section.scrollIntoView({ behavior: "smooth", block: "start" });
-  const rows = section.querySelectorAll(`tbody tr[data-assignment-id="${CSS.escape(assignmentId)}"]`);
-  rows.forEach((r) => r.classList.add("alma-plus-flash"));
-  setTimeout(() => rows.forEach((r) => r.classList.remove("alma-plus-flash")), 1600);
-}
-
-// Cheap refresh after Alma changes its own table (sorting, switching terms):
-// only the paperclips need checking, unless the Materials section is gone.
-async function refreshAfterAlmaChange() {
-  const classId = classIdFromUrl();
-  if (!classId) return;
-  if (!document.getElementById("alma-plus-materials")) {
-    renderMaterials();
-    return;
-  }
-  updateClips(await loadMaterials(classId), getPageAssignments());
-  ensureAssignmentsHeading(document.querySelector(".student-assignments"));
-}
-
-function startMaterials() {
-  if (!classIdFromUrl()) return;
-  renderMaterials();
-  // Alma rebuilds the assignment table when switching terms or sorting.
-  let timer = null;
-  const observer = new MutationObserver((mutations) => {
-    // Ignore changes from this section and from the custom task rows.
-    const OURS = ".alma-plus-attached, #alma-plus-assignments-heading, .alma-plus-clip, #alma-plus-materials, #alma-plus-modal-overlay, #alma-plus-details, #alma-plus-details-overlay, [data-alma-plus-row], .alma-plus-cal-btn, #alma-plus-toolbar, #alma-plus-import-input";
-    const ours = mutations.every((m) => m.target.closest?.("#alma-plus-materials, .alma-plus-clip, [data-alma-plus-row], #alma-plus-toolbar") ||
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(OURS)));
-    if (ours) return;
-    clearTimeout(timer);
-    timer = setTimeout(refreshAfterAlmaChange, 150);
-  });
-  observer.observe(document.body, { childList: true, subtree: true });
-}
-
-// ---- "Attached files" in Alma's Assignment Details popup ----
-// Same markup as Alma's own "Submitted work" section (divider, h3 heading, one
-// line per file with an icon), listing this assignment's materials.
+// ---- Alma's Assignment Details popup ----
 
 let lastClickedAssignmentId = null;
 
-function assignmentIdFromClick(target) {
-  const link = target.closest?.("a[data-alma-modal='StudentAssignmentDetailsModal']") ||
-    target.closest?.("tr")?.querySelector("a[data-alma-modal='StudentAssignmentDetailsModal']");
+function assignmentLinkIn(row) {
+  return row?.querySelector("a[data-alma-modal='StudentAssignmentDetailsModal']") || null;
+}
+
+function assignmentIdOf(link) {
   return link?.getAttribute("href")?.match(/\/home\/assignment\/([0-9a-f]+)/)?.[1] || null;
 }
 
-function materialIcon(item) {
-  return item.kind === "link" ? "fa-link" : item.kind === "photo" ? "fa-image" : "fa-file-alt";
-}
-
-async function addAttachedFilesToPopup() {
-  const bd = document.querySelector(".alma-student-assignment-details-modal .yui3-widget-bd");
+function addAttachedFilesToPopup() {
+  const bd = document.querySelector(".alma-student-assignment-details-modal:not(.alma-plus-details) .yui3-widget-bd");
   const header = bd?.querySelector(":scope > header");
   if (!header || !lastClickedAssignmentId) return;
-  const existing = bd.querySelector(".alma-plus-attached");
-  if (existing?.dataset.assignmentId === lastClickedAssignmentId) return;
-  existing?.remove();
-
   const classId = header.querySelector(".class a[href*='/home/class/']")
     ?.getAttribute("href").match(/\/home\/class\/([0-9a-f]+)/)?.[1];
   if (!classId) return;
-  const assignmentId = lastClickedAssignmentId;
-  const items = (await loadMaterials(classId)).filter((i) => i.assignmentId === assignmentId);
-  if (!items.length || !bd.isConnected || bd.querySelector(".alma-plus-attached")) return;
-
-  const section = mEl("div", "pure-form submitted-files alma-plus-attached");
-  section.dataset.assignmentId = assignmentId;
-  section.appendChild(mEl("h3", "", "Attached files"));
-  for (const item of items) {
-    const line = mEl("div", "submitted-file split-flex");
-    const a = mEl("a");
-    a.href = item.kind === "link" ? item.url : "#";
-    if (item.kind === "link") {
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-    } else {
-      a.addEventListener("click", (e) => {
-        e.preventDefault();
-        openMaterial(item);
-      });
-    }
-    a.append(mIcon(materialIcon(item)), ` ${item.title}`);
-    line.appendChild(a);
-    section.appendChild(line);
-  }
-  bd.appendChild(section);
+  const owner = `${classId}:${lastClickedAssignmentId}`;
+  const existing = bd.querySelector(".alma-plus-attached");
+  if (existing?.dataset.owner === owner) return;
+  existing?.remove();
+  const name = header.querySelector(".assignment-name")?.textContent.trim() || "";
+  bd.appendChild(buildAttachedSection(classId, lastClickedAssignmentId, name));
 }
 
-function startAttachedFilesInPopup() {
+// ---- Paperclips on rows (Alma assignments and custom tasks), everywhere ----
+
+function setClip(container, count, onClick) {
+  const existing = container.querySelector(":scope > .alma-plus-clip");
+  if (!count) {
+    existing?.remove();
+    return;
+  }
+  if (existing?.dataset.count === String(count)) return;
+  existing?.remove();
+  const clip = mEl("button", "alma-plus-clip");
+  clip.type = "button";
+  clip.dataset.count = String(count);
+  clip.title = `${count} attached file${count === 1 ? "" : "s"}`;
+  clip.append(mIcon("fa-paperclip"), ` ${count}`);
+  clip.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  });
+  container.appendChild(clip);
+}
+
+let refreshing = false;
+async function refreshAttachmentClips() {
+  if (refreshing) return;
+  refreshing = true;
+  try {
+    const all = await loadAllMaterials();
+    const pageClass = classIdFromUrl();
+
+    // Alma's assignment rows (class pages and the To Do page).
+    for (const row of document.querySelectorAll("table tbody tr:not([data-alma-plus-row])")) {
+      const link = assignmentLinkIn(row);
+      const id = assignmentIdOf(link);
+      if (!id) continue;
+      const cell = link.closest("td");
+      const classLink = cell.querySelector("small a[href*='/home/class/']");
+      const classId = pageClass || classLink?.getAttribute("href").match(/\/home\/class\/([0-9a-f]+)/)?.[1];
+      if (!classId) continue;
+      const count = (all[classId] || []).filter((i) => i.assignmentId === id).length;
+      const line = cell.querySelector("small");
+      if (line) {
+        setClip(line, count, () => {
+          lastClickedAssignmentId = id;
+          link.click();
+        });
+      }
+    }
+
+    // Custom task rows.
+    const taskItems = all[TASKS_BUCKET] || [];
+    for (const row of document.querySelectorAll("tr[data-alma-plus-row]")) {
+      const id = row.dataset.almaPlusId;
+      const line = row.querySelector("small.alma-plus-class");
+      if (!id || !line) continue;
+      const count = taskItems.filter((i) => i.assignmentId === id).length;
+      setClip(line, count, () => {
+        if (typeof openDetails === "function" && row._almaPlusTask) openDetails(row._almaPlusTask);
+      });
+    }
+  } finally {
+    refreshing = false;
+  }
+}
+
+// ---- Start ----
+
+function startAttachments() {
+  // Remember which assignment was clicked (its name or anywhere on its row).
   document.addEventListener("click", (e) => {
-    const id = assignmentIdFromClick(e.target);
+    if (e.target.closest?.(".alma-plus-clip")) return;
+    const link = e.target.closest?.("a[data-alma-modal='StudentAssignmentDetailsModal']") ||
+      assignmentLinkIn(e.target.closest?.("tr"));
+    const id = assignmentIdOf(link);
     if (id) lastClickedAssignmentId = id;
   }, true);
-  // Alma fills the popup after loading; add the section once its header appears.
-  let pending = false;
-  new MutationObserver(() => {
-    if (pending) return;
-    pending = true;
-    requestAnimationFrame(() => {
-      pending = false;
-      addAttachedFilesToPopup();
-    });
+
+  refreshAttachmentClips();
+  const OURS = ".alma-plus-clip, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
+  let popupPending = false;
+  let clipTimer = null;
+  new MutationObserver((mutations) => {
+    const ours = mutations.every((m) => m.target.closest?.(OURS) ||
+      ([...m.addedNodes, ...m.removedNodes].length > 0 &&
+        [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(OURS))));
+    if (ours) return;
+    if (!popupPending) {
+      popupPending = true;
+      requestAnimationFrame(() => {
+        popupPending = false;
+        addAttachedFilesToPopup();
+      });
+    }
+    clearTimeout(clipTimer);
+    clipTimer = setTimeout(refreshAttachmentClips, 150);
   }).observe(document.body, { childList: true, subtree: true });
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
-    startMaterials();
-    startAttachedFilesInPopup();
-  });
+  document.addEventListener("DOMContentLoaded", startAttachments);
 } else {
-  startMaterials();
-  startAttachedFilesInPopup();
+  startAttachments();
 }

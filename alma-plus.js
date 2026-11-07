@@ -31,6 +31,8 @@ async function updateTask(updatedTask) {
 async function deleteTask(id) {
   const tasks = await loadTasks();
   await saveTasks(tasks.filter((t) => t.id !== id));
+  // Its attached files go too (materials.js).
+  if (typeof removeOwnerAttachments === "function") await removeOwnerAttachments("__tasks__", id);
 }
 
 async function setTaskCompleted(id, completed) {
@@ -492,6 +494,8 @@ async function renderCustomRows() {
 
     ensureCalendarButtons(tbody);
     applyAssignmentFilter(tbody);
+    // Paperclip counts on task rows (materials.js).
+    if (typeof refreshAttachmentClips === "function") refreshAttachmentClips();
   } finally {
     bodyObserver?.observe(document.body, { childList: true, subtree: true });
   }
@@ -950,6 +954,8 @@ function openDetails(task) {
 
   const details = [header, dl];
   if (task.notes) details.push(buildDescription(task.notes));
+  // Same "Attached files" section as Alma assignments get (materials.js).
+  if (typeof buildAttachedSection === "function") details.push(buildAttachedSection("__tasks__", task.id, task.name));
   bd.appendChild(loading);
   // Like Alma's popup: "P4 Algebra 1 • Simon Pei", the class name linking to the class.
   const minimumWait = new Promise((resolve) => setTimeout(resolve, 500));
@@ -1014,9 +1020,9 @@ function scheduleRender() {
 // Changes made by the class materials section don't need a re-render.
 function onlyMaterialsChanges(mutations) {
   return mutations.every((m) =>
-    m.target.closest?.("#alma-plus-materials, .alma-plus-clip, .alma-plus-attached") ||
+    m.target.closest?.(".alma-plus-clip, .alma-plus-attached, #alma-plus-photo") ||
     ([...m.addedNodes, ...m.removedNodes].length > 0 &&
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.("#alma-plus-materials, .alma-plus-clip, #alma-plus-assignments-heading, .alma-plus-attached"))));
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay"))));
 }
 
 function startObserving() {

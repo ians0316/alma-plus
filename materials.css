@@ -1,103 +1,62 @@
-/* Class materials. The heading, table, buttons, and windows use Alma's own classes
-   (module-heading, assignment-grades, pure-button, yui3-panel); these rules only
-   fill the gaps so it reads like the assignments table below it. */
+/* Attached files. The section uses the markup and classes of Alma's own
+   "Submitted work" section (submitted-files, submitted-file, add, pure-button),
+   so Alma's stylesheet does most of the work; these rules fill the gaps. */
 
-#alma-plus-materials {
-  margin-bottom: 24px;
-}
-
-.alma-plus-materials-head {
+.alma-plus-attached .submitted-file {
   display: flex;
   align-items: center;
-  gap: 12px;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 0;
 }
-.alma-plus-materials-head .module-heading {
-  margin: 0;
+.alma-plus-attached .submitted-file a {
+  overflow-wrap: anywhere;
 }
 
-.alma-plus-add-material {
+.alma-plus-attached-tools {
+  display: flex;
+  flex-shrink: 0;
+  gap: 6px;
+}
+.alma-plus-attached-tools .pure-button {
+  padding: 6px 10px;
   font-size: 13px;
 }
 
-.alma-plus-materials-empty {
-  margin: 8px 0 0;
+.alma-plus-attached .add {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+.alma-plus-attached .add .pure-button {
   font-size: 13px;
-  color: #777;
 }
 
-.alma-plus-materials-table {
+.alma-plus-link-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.alma-plus-link-editor .pure-input-1 {
+  box-sizing: border-box;
   width: 100%;
-  margin-top: 12px;
 }
-
-/* Same light uppercase header as Alma's assignment tables */
-.alma-plus-materials-table thead {
-  background: transparent;
-  border: 1px solid transparent;
-  color: #333;
-  font-size: 80%;
-  text-transform: uppercase;
-}
-#alma-plus-materials .alma-plus-materials-table thead,
-#alma-plus-materials .alma-plus-materials-table thead th {
-  background: transparent !important;
-  color: #333 !important;
-}
-.alma-plus-materials-table thead th {
-  font-weight: 700;
-  border-bottom: 1px solid #cbcbcb;
-}
-.alma-plus-materials-table tbody {
-  background: #fff;
-  border: 1px solid #cbcbcb;
-}
-
-/* Same shaded date cell as Alma's due column */
-.alma-plus-materials-table td.due {
-  width: 1%;
-  background: #eee;
-  border-right: 1px solid #cbcbcb;
-  text-align: center;
-}
-
-.alma-plus-materials-table td small,
-.alma-plus-material-for small {
-  display: block;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-/* Same small date as Alma's Updated column */
-.alma-plus-materials-table td.updated {
-  width: 1%;
-  white-space: nowrap;
-  font-size: 12px;
-}
-
-.alma-plus-material-actions {
-  width: 1%;
-  white-space: nowrap;
+.alma-plus-link-editor .buttons {
   text-align: right;
 }
-.alma-plus-material-actions button {
-  padding: 0;
-  border: none;
+.alma-plus-link-editor .buttons .pure-button {
+  margin-left: 8px;
+  font-size: 13px;
+}
+.alma-plus-link-editor .pure-button-link {
   background: none;
-  font: inherit;
-  font-size: 12px;
-  color: #999;
-  cursor: pointer;
-}
-.alma-plus-material-actions button + button {
-  margin-left: 10px;
-}
-.alma-plus-material-actions button:hover {
   color: #333;
-  text-decoration: underline;
 }
 
-/* Paperclip with a count, only on assignments that have materials. It sits on the
-   small category line ("Unit Tests 📎1"), so it never covers the assignment name. */
+/* Paperclip with a count on rows that have attachments: sits on the small line
+   above the name ("Unit Tests 📎1"), so it never covers the name. */
 .alma-plus-clip {
   margin-left: 6px;
   padding: 0 2px;
@@ -114,17 +73,21 @@
   text-decoration: underline;
 }
 
-/* Brief highlight when a paperclip jumps to its materials */
-.alma-plus-materials-table tbody tr td {
-  transition: background-color 0.4s;
+/* Photo viewer, above Alma's popup */
+#alma-plus-photo-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(65, 66, 67, 0.5);
+  z-index: 1000000;
 }
-.alma-plus-materials-table tbody tr.alma-plus-flash td {
-  background-color: #fff6d5;
-}
-
-/* Photo viewer */
-.alma-plus-photo-panel {
-  width: 720px !important;
+#alma-plus-photo {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 720px;
+  max-width: calc(100vw - 32px);
+  z-index: 1000001;
 }
 .alma-plus-photo-full {
   display: block;
