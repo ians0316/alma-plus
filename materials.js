@@ -599,7 +599,7 @@ function startMaterials() {
   let timer = null;
   const observer = new MutationObserver((mutations) => {
     // Ignore changes from this section and from the custom task rows.
-    const OURS = "#alma-plus-assignments-heading, .alma-plus-clip, #alma-plus-materials, #alma-plus-modal-overlay, #alma-plus-details, #alma-plus-details-overlay, [data-alma-plus-row], .alma-plus-cal-btn, #alma-plus-toolbar, #alma-plus-import-input";
+    const OURS = ".alma-plus-attached, #alma-plus-assignments-heading, .alma-plus-clip, #alma-plus-materials, #alma-plus-modal-overlay, #alma-plus-details, #alma-plus-details-overlay, [data-alma-plus-row], .alma-plus-cal-btn, #alma-plus-toolbar, #alma-plus-import-input";
     const ours = mutations.every((m) => m.target.closest?.("#alma-plus-materials, .alma-plus-clip, [data-alma-plus-row], #alma-plus-toolbar") ||
       [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(OURS)));
     if (ours) return;
@@ -609,8 +609,83 @@ function startMaterials() {
   observer.observe(document.body, { childList: true, subtree: true });
 }
 
+// ---- "Attached files" in Alma's Assignment Details popup ----
+// Same markup as Alma's own "Submitted work" section (divider, h3 heading, one
+// line per file with an icon), listing this assignment's materials.
+
+let lastClickedAssignmentId = null;
+
+function assignmentIdFromClick(target) {
+  const link = target.closest?.("a[data-alma-modal='StudentAssignmentDetailsModal']") ||
+    target.closest?.("tr")?.querySelector("a[data-alma-modal='StudentAssignmentDetailsModal']");
+  return link?.getAttribute("href")?.match(/\/home\/assignment\/([0-9a-f]+)/)?.[1] || null;
+}
+
+function materialIcon(item) {
+  return item.kind === "link" ? "fa-link" : item.kind === "photo" ? "fa-image" : "fa-file-alt";
+}
+
+async function addAttachedFilesToPopup() {
+  const bd = document.querySelector(".alma-student-assignment-details-modal .yui3-widget-bd");
+  const header = bd?.querySelector(":scope > header");
+  if (!header || !lastClickedAssignmentId) return;
+  const existing = bd.querySelector(".alma-plus-attached");
+  if (existing?.dataset.assignmentId === lastClickedAssignmentId) return;
+  existing?.remove();
+
+  const classId = header.querySelector(".class a[href*='/home/class/']")
+    ?.getAttribute("href").match(/\/home\/class\/([0-9a-f]+)/)?.[1];
+  if (!classId) return;
+  const assignmentId = lastClickedAssignmentId;
+  const items = (await loadMaterials(classId)).filter((i) => i.assignmentId === assignmentId);
+  if (!items.length || !bd.isConnected || bd.querySelector(".alma-plus-attached")) return;
+
+  const section = mEl("div", "pure-form submitted-files alma-plus-attached");
+  section.dataset.assignmentId = assignmentId;
+  section.appendChild(mEl("h3", "", "Attached files"));
+  for (const item of items) {
+    const line = mEl("div", "submitted-file split-flex");
+    const a = mEl("a");
+    a.href = item.kind === "link" ? item.url : "#";
+    if (item.kind === "link") {
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+    } else {
+      a.addEventListener("click", (e) => {
+        e.preventDefault();
+        openMaterial(item);
+      });
+    }
+    a.append(mIcon(materialIcon(item)), ` ${item.title}`);
+    line.appendChild(a);
+    section.appendChild(line);
+  }
+  bd.appendChild(section);
+}
+
+function startAttachedFilesInPopup() {
+  document.addEventListener("click", (e) => {
+    const id = assignmentIdFromClick(e.target);
+    if (id) lastClickedAssignmentId = id;
+  }, true);
+  // Alma fills the popup after loading; add the section once its header appears.
+  let pending = false;
+  new MutationObserver(() => {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(() => {
+      pending = false;
+      addAttachedFilesToPopup();
+    });
+  }).observe(document.body, { childList: true, subtree: true });
+}
+
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", startMaterials);
+  document.addEventListener("DOMContentLoaded", () => {
+    startMaterials();
+    startAttachedFilesInPopup();
+  });
 } else {
   startMaterials();
+  startAttachedFilesInPopup();
 }

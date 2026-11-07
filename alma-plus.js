@@ -1014,9 +1014,9 @@ function scheduleRender() {
 // Changes made by the class materials section don't need a re-render.
 function onlyMaterialsChanges(mutations) {
   return mutations.every((m) =>
-    m.target.closest?.("#alma-plus-materials, .alma-plus-clip") ||
+    m.target.closest?.("#alma-plus-materials, .alma-plus-clip, .alma-plus-attached") ||
     ([...m.addedNodes, ...m.removedNodes].length > 0 &&
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.("#alma-plus-materials, .alma-plus-clip, #alma-plus-assignments-heading"))));
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.("#alma-plus-materials, .alma-plus-clip, #alma-plus-assignments-heading, .alma-plus-attached"))));
 }
 
 function startObserving() {
