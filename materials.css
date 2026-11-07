@@ -96,32 +96,25 @@
   text-decoration: underline;
 }
 
-/* Paperclip on assignment rows. It floats at the right edge of the name cell so it
-   never pushes text onto a new line; rows stay exactly Alma's height. It shows on
-   hover, and always when something is attached. */
-.student-assignments td.name:has(.alma-plus-clip) {
-  position: relative;
-}
+/* Paperclip on assignment rows: part of the small category line ("Unit Tests 📎1"),
+   so it never covers the assignment name. Hidden (taking no space) until you hover
+   the row, and always shown when something is attached. */
 .alma-plus-clip {
-  position: absolute;
-  top: 50%;
-  right: 6px;
-  transform: translateY(-50%);
-  padding: 2px 4px;
+  display: none;
+  margin-left: 6px;
+  padding: 0 2px;
   border: none;
-  border-radius: 2px;
-  background: #fff;
+  background: none;
   font: inherit;
-  font-size: 12px;
-  line-height: 1;
+  font-weight: 400;
+  line-height: inherit;
   color: #999;
   cursor: pointer;
-  visibility: hidden;
 }
 .student-assignments tr:hover .alma-plus-clip,
 .alma-plus-clip:focus,
 .alma-plus-clip.has-items {
-  visibility: visible;
+  display: inline;
 }
 .alma-plus-clip:hover,
 .alma-plus-clip.has-items {

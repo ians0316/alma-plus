@@ -517,7 +517,11 @@ async function renderMaterials() {
         e.stopPropagation();
         openAddMaterial(classId, a.id);
       });
-      nameCell.appendChild(clip);
+      // On the small category line, right after the words ("Unit Tests 📎1"), so it
+      // never covers the assignment name.
+      const categoryLine = nameCell.querySelector("small");
+      if (categoryLine) categoryLine.appendChild(clip);
+      else nameCell.appendChild(clip);
     }
   } finally {
     rendering = false;
