@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Alma+ Custom Tasks",
-  "version": "2.4.6",
+  "version": "2.5.0",
   "description": "Your own tasks, attached files, and notes inside Alma, styled like Alma, plus Google Calendar buttons.",
   "icons": {
     "16": "icons/icon16.png",
@@ -28,7 +28,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "google-calendar.svg"
+        "google-calendar.svg",
+        "icons/seoul-academy.png"
       ],
       "matches": [
         "https://*.getalma.com/*"
@@ -89,6 +90,23 @@
         "rounded.css"
       ],
       "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://*.getalma.com/calendar*"
+      ],
+      "js": [
+        "alma-plus.js",
+        "materials.js",
+        "official-calendar.js",
+        "calendar.js"
+      ],
+      "css": [
+        "alma-plus.css",
+        "materials.css",
+        "calendar.css"
+      ],
+      "run_at": "document_idle"
     }
   ],
   "background": {

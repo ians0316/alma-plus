@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS = {
   clips: true,
   notes: true,
   dashboard: true,
+  calendar: true,
   syncTasks: true,
 };
 

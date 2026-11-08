@@ -14,6 +14,7 @@ const DEFAULT_SETTINGS = {
   clips: true,            // paperclip counts on rows
   notes: true,            // "My notes" on Alma assignments
   dashboard: true,        // Due Today / Due Tomorrow / New Grades on Overview
+  calendar: true,         // assignments and tasks on Alma's Academic Calendar
   syncTasks: true,        // send tasks to Alma Sync -> Notion + Google Calendar (background.js)
 };
 let settings = { ...DEFAULT_SETTINGS };
@@ -837,7 +838,7 @@ function findClass(classes, name) {
   return key ? classes.find((c) => c.name.toLowerCase() === key) : undefined;
 }
 
-function openModal(existingTask = null) {
+function openModal(existingTask = null, preset = {}) {
   if (document.getElementById("alma-plus-modal-overlay")) return;
 
   // Built like Alma's own form windows (New Message): dark header bar with a
@@ -926,7 +927,7 @@ function openModal(existingTask = null) {
   });
   modal.querySelector("#alma-plus-input-notes").value = existingTask?.notes || "";
   modal.querySelector("#alma-plus-input-priority").value = existingTask?.priority || "normal";
-  modal.querySelector("#alma-plus-input-date").value = existingTask?.due || "";
+  modal.querySelector("#alma-plus-input-date").value = existingTask?.due || preset.due || "";
   modal.querySelector("#alma-plus-input-end").value = existingTask?.end || "";
 
   overlay.addEventListener("click", closeModal);
