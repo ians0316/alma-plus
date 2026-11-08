@@ -77,6 +77,12 @@ span.tooltip {
   border-radius: 4px;
 }
 
+/* Directory: people cards and the A-Z letter buttons */
+.vcard,
+.directory-letters a {
+  border-radius: 4px !important;
+}
+
 /* My Info boxes */
 dl.inline {
   border-radius: 4px !important;
