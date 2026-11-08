@@ -82,6 +82,19 @@ dl.inline {
   border-radius: 4px !important;
 }
 
+/* Dropdown menus everywhere (profile menu, Language submenu, ...) and the
+   date picker calendar */
+.pure-menu-children,
+.yui3-calendar-content {
+  border-radius: 4px !important;
+}
+.pure-menu-children > li:first-child > .pure-menu-link {
+  border-radius: 4px 4px 0 0;
+}
+.pure-menu-children > li:last-child > .pure-menu-link {
+  border-radius: 0 0 4px 4px;
+}
+
 /* Page tabs (overview / to do / classes ...): top corners, like tabs */
 .pure-menu-horizontal .pure-menu-link {
   border-radius: 4px 4px 0 0;
