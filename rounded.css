@@ -197,3 +197,11 @@ h1 > span.school-name::before {
   height: 35px;
   background: url("chrome-extension://__MSG_@@extension_id__/icons/seoul-academy.png") center / contain no-repeat;
 }
+
+/* Top bar (Seoul Academy + page title) stays at the top while scrolling */
+#header {
+  position: sticky !important;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+}
