@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Alma+ Custom Tasks</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header>
+    <img src="icons/icon32.png" alt="" width="20" height="20">
+    <span>Alma+ Custom Tasks</span>
+  </header>
+
+  <main>
+    <section>
+      <h2>Your tasks</h2>
+      <label class="setting">
+        <span class="text"><strong>On the To Do page</strong><small>Your own tasks in Upcoming Assignments</small></span>
+        <input type="checkbox" data-setting="tasksTodo"><span class="switch" aria-hidden="true"></span>
+      </label>
+      <label class="setting">
+        <span class="text"><strong>On class pages</strong><small>Each class's tasks in its Upcoming list</small></span>
+        <input type="checkbox" data-setting="tasksClass"><span class="switch" aria-hidden="true"></span>
+      </label>
+      <label class="setting">
+        <span class="text"><strong>Extra buttons</strong><small>Export, Back up, Restore, and Show next to "+ Add my own task"</small></span>
+        <input type="checkbox" data-setting="toolbarExtras"><span class="switch" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <section>
+      <h2>Assignments</h2>
+      <label class="setting">
+        <span class="text"><strong>Google Calendar button</strong><small>Add an assignment or task to Google Calendar</small></span>
+        <input type="checkbox" data-setting="calendarButtons"><span class="switch" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <section>
+      <h2>Attached files</h2>
+      <label class="setting">
+        <span class="text"><strong>In popups</strong><small>Upload File, Add from Drive, Add Link in assignment and task popups</small></span>
+        <input type="checkbox" data-setting="attachments"><span class="switch" aria-hidden="true"></span>
+      </label>
+      <label class="setting">
+        <span class="text"><strong>Paperclip counts</strong><small>📎 on rows that have attached files</small></span>
+        <input type="checkbox" data-setting="clips"><span class="switch" aria-hidden="true"></span>
+      </label>
+    </section>
+
+    <p class="saved" id="saved" hidden>Saved. Alma reloaded with your changes.</p>
+  </main>
+
+  <footer>
+    <span id="stats">&nbsp;</span>
+    <span id="version"></span>
+  </footer>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -382,7 +382,12 @@ function assignmentIdOf(link) {
   return link?.getAttribute("href")?.match(/\/home\/assignment\/([0-9a-f]+)/)?.[1] || null;
 }
 
+function attachSettings() {
+  return typeof settings === "object" ? settings : { attachments: true, clips: true };
+}
+
 function addAttachedFilesToPopup() {
+  if (!attachSettings().attachments) return;
   const bd = document.querySelector(".alma-student-assignment-details-modal:not(.alma-plus-details) .yui3-widget-bd");
   const header = bd?.querySelector(":scope > header");
   if (!header || !lastClickedAssignmentId) return;
@@ -423,6 +428,10 @@ function setClip(container, count, onClick) {
 let refreshing = false;
 async function refreshAttachmentClips() {
   if (refreshing) return;
+  if (!attachSettings().clips) {
+    document.querySelectorAll(".alma-plus-clip").forEach((c) => c.remove());
+    return;
+  }
   refreshing = true;
   try {
     const all = await loadAllMaterials();
@@ -465,7 +474,8 @@ async function refreshAttachmentClips() {
 
 // ---- Start ----
 
-function startAttachments() {
+async function startAttachments() {
+  if (typeof loadSettings === "function") await loadSettings();
   // Remember which assignment was clicked (its name or anywhere on its row).
   document.addEventListener("click", (e) => {
     if (e.target.closest?.(".alma-plus-clip")) return;

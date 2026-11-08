@@ -1,0 +1,120 @@
+/* Toolbar menu, in Alma's style: dark header bar, light gray section labels,
+   Alma's green for "on". Alma's font (proxima-nova) isn't available here, so
+   the closest system font is used. */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  width: 340px;
+  margin: 0;
+  background: #fff;
+  color: #333;
+  font: 14px/1.35 -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 15px;
+  background: #414243;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+main {
+  padding: 4px 15px 10px;
+}
+
+section + section {
+  border-top: 1px solid #ddd;
+}
+
+h2 {
+  margin: 12px 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #5f6163;
+}
+
+.setting {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 0;
+  cursor: pointer;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+}
+.text strong {
+  font-weight: 600;
+}
+.text small {
+  margin-top: 1px;
+  font-size: 12px;
+  color: #777;
+}
+
+/* Switch */
+.setting input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: #ccc;
+  transition: background 0.15s;
+}
+.switch::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s;
+}
+.setting input:checked + .switch {
+  background: #9ec583;
+}
+.setting input:checked + .switch::after {
+  transform: translateX(16px);
+}
+.setting input:focus-visible + .switch {
+  outline: 2px solid #3fc1c8;
+  outline-offset: 2px;
+}
+
+.saved {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: #5c8a3e;
+}
+
+footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 15px;
+  background: #f7f8f8;
+  border-top: 1px solid #ddd;
+  font-size: 11px;
+  color: #777;
+}

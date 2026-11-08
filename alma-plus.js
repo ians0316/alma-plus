@@ -2,6 +2,26 @@
 // Included with the authors' permission.
 
 const STORAGE_KEY = "almaPlusCustomTasks";
+
+// Settings from the toolbar menu (popup.html). materials.js uses these too.
+const SETTINGS_KEY = "almaPlusSettings";
+const DEFAULT_SETTINGS = {
+  tasksTodo: true,        // your tasks on the To Do page
+  tasksClass: true,       // your tasks on class pages
+  toolbarExtras: true,    // Export / Back up / Restore / Show next to "+ Add my own task"
+  calendarButtons: true,  // Google Calendar button on assignments
+  attachments: true,      // "Attached files" in assignment and task popups
+  clips: true,            // paperclip counts on rows
+};
+let settings = { ...DEFAULT_SETTINGS };
+async function loadSettings() {
+  const result = await chrome.storage.local.get(SETTINGS_KEY);
+  settings = { ...DEFAULT_SETTINGS, ...(result[SETTINGS_KEY] || {}) };
+  return settings;
+}
+function tasksOnThisPage() {
+  return isClassPage() ? settings.tasksClass : settings.tasksTodo;
+}
 const BACKUP_FORMAT = "alma-plus-task-backup";
 
 let bodyObserver = null;
@@ -271,6 +291,7 @@ function buildCalendarButton(row) {
 }
 
 function ensureCalendarButtons(tbody) {
+  if (!settings.calendarButtons) return;
   for (const row of tbody.rows) {
     const nameCell = getNameCell(row);
     if (!nameCell || nameCell.querySelector(".alma-plus-cal-btn")) continue;
@@ -462,7 +483,7 @@ async function renderCustomRows() {
   const table = findAssignmentsTable();
   if (!table) return;
   const tbody = getTbody(table);
-  const tasks = (await loadTasks()).filter(taskBelongsHere);
+  const tasks = tasksOnThisPage() ? (await loadTasks()).filter(taskBelongsHere) : [];
   const sort = getActiveSort(table);
   const nameIndex = getNameColumnIndex(table);
 
@@ -656,11 +677,16 @@ function buildImportInput() {
 }
 
 function ensureAddButton() {
+  if (!tasksOnThisPage()) return;
   const table = findAssignmentsTable();
   if (table && !document.getElementById("alma-plus-add-btn")) {
     const toolbar = document.createElement("div");
     toolbar.id = "alma-plus-toolbar";
     toolbar.appendChild(buildAddButton());
+    if (!settings.toolbarExtras) {
+      table.before(toolbar);
+      return;
+    }
     toolbar.appendChild(buildExportButton());
     toolbar.appendChild(buildBackupButton());
     toolbar.appendChild(buildImportButton());
@@ -955,7 +981,7 @@ function openDetails(task) {
   const details = [header, dl];
   if (task.notes) details.push(buildDescription(task.notes));
   // Same "Attached files" section as Alma assignments get (materials.js).
-  if (typeof buildAttachedSection === "function") details.push(buildAttachedSection("__tasks__", task.id, task.name));
+  if (settings.attachments && typeof buildAttachedSection === "function") details.push(buildAttachedSection("__tasks__", task.id, task.name));
   bd.appendChild(loading);
   // Like Alma's popup: "P4 Algebra 1 • Simon Pei", the class name linking to the class.
   const minimumWait = new Promise((resolve) => setTimeout(resolve, 500));
@@ -1038,8 +1064,9 @@ function isTaskPage() {
   return location.pathname.startsWith("/home/assignments") || isClassPage();
 }
 
-function init() {
+async function init() {
   if (!isTaskPage()) return;
+  await loadSettings();
   getClasses(); // start loading so suggestions and teacher names are ready
   ensureAddButton();
   renderCustomRows();
