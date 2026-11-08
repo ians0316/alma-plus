@@ -385,7 +385,7 @@ function exportIcs() {
 
 // Built the same way as Alma's own rows: "Nov / 09" in the shaded due cell, a small
 // bold class line, and the name at normal size. Alma's stylesheet does the rest.
-function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null) {
+function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null, statusIndex = -1) {
   const row = document.createElement("tr");
   row.dataset.almaPlusRow = "true";
   row.dataset.almaPlusId = task.id;
@@ -476,46 +476,98 @@ function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null) {
   for (let i = 0; i < columnCount; i++) {
     row.appendChild(i === 0 ? dueCell : i === nameAt ? nameCell : document.createElement("td"));
   }
+  // Past and Missing tables have a Status column: Alma's green check for done,
+  // Alma's red-orange "Missing" icon for not done.
+  if (statusIndex > 0 && row.cells[statusIndex]) {
+    const statusCell = row.cells[statusIndex];
+    if (templateRow?.cells[statusIndex]?.classList.contains("status")) statusCell.classList.add("status");
+    statusCell.style.textAlign = "center";
+    statusCell.dataset.sortableVal = completed ? "0" : "2";
+    const icon = document.createElement("i");
+    icon.className = completed ? "fa fa-check green" : "fa fa-ban red-orange";
+    icon.title = completed ? "Done" : "Missing";
+    statusCell.appendChild(icon);
+  }
 
   return row;
 }
 
-async function renderCustomRows() {
-  const table = findAssignmentsTable();
-  if (!table) return;
+// A task is past once its last day (end date, or due date) is before today.
+function todayString() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+function isPastTask(task) {
+  const last = task.end && task.end > task.due ? task.end : task.due;
+  return last < todayString();
+}
+
+function getStatusColumnIndex(table) {
+  const ths = [...(table?.querySelectorAll("thead th") || [])];
+  return ths.findIndex((th) => th.classList.contains("status") || /^status$/i.test(th.textContent.trim()));
+}
+
+// Like Alma's own assignments:
+//   To Do page: upcoming -> Upcoming Assignments; past and not done -> Missing or
+//     Revision Needed; past and done -> off the To Do page.
+//   Class page: upcoming -> Upcoming list; past (done or not) -> Past Assignments.
+function taskPlacements(tasks) {
+  const upcomingTable = findAssignmentsTable();
+  const upcoming = tasks.filter((t) => !isPastTask(t));
+  const past = tasks.filter(isPastTask);
+  const placements = [];
+  if (isClassPage()) {
+    const pastTable = document.querySelector(".student-assignments table.assignment-grades");
+    if (upcomingTable) placements.push({ table: upcomingTable, tasks: upcoming });
+    if (pastTable) placements.push({ table: pastTable, tasks: past });
+  } else {
+    const missingTable = document.querySelector("table.missing-assignments");
+    const missing = past.filter((t) => !t.completed);
+    if (missingTable) {
+      if (upcomingTable) placements.push({ table: upcomingTable, tasks: upcoming });
+      placements.push({ table: missingTable, tasks: missing });
+    } else if (upcomingTable) {
+      // No Missing table on the page right now: keep late tasks in Upcoming so they aren't lost.
+      placements.push({ table: upcomingTable, tasks: [...upcoming, ...missing] });
+    }
+  }
+  return placements;
+}
+
+function placeRows(table, tasks, withCalendar) {
   const tbody = getTbody(table);
-  const tasks = tasksOnThisPage() ? (await loadTasks()).filter(taskBelongsHere) : [];
   const sort = getActiveSort(table);
   const nameIndex = getNameColumnIndex(table);
+  const statusIndex = getStatusColumnIndex(table);
+  const existingRows = [...tbody.querySelectorAll("tr:not([data-alma-plus-row])")];
+  const columnCount =
+    existingRows[0]?.cells.length ||
+    table.querySelector("thead tr")?.cells.length ||
+    2;
+
+  for (const task of tasks) {
+    const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0], statusIndex);
+    const rowValue = getCellSortValue(row, sort.columnIndex);
+    const target = existingRows.find((r) => {
+      const cmp = compareSortValues(rowValue, getCellSortValue(r, sort.columnIndex), sort.numeric);
+      return cmp * sort.direction < 0;
+    });
+    if (target) target.before(row);
+    else tbody.appendChild(row);
+  }
+  // Calendar buttons only in Upcoming lists, as before (not in Past or Missing).
+  if (withCalendar) ensureCalendarButtons(tbody);
+}
+
+async function renderCustomRows() {
+  const upcomingTable = findAssignmentsTable();
+  const tasks = tasksOnThisPage() ? (await loadTasks()).filter(taskBelongsHere) : [];
 
   bodyObserver?.disconnect();
   try {
-    tbody.querySelectorAll("[data-alma-plus-row]").forEach((el) => el.remove());
-
-    const existingRows = [...tbody.querySelectorAll("tr:not([data-alma-plus-row])")];
-    const columnCount =
-      existingRows[0]?.cells.length ||
-      table.querySelector("thead tr")?.cells.length ||
-      2;
-
-    for (const task of tasks) {
-      const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0]);
-      const rowValue = getCellSortValue(row, sort.columnIndex);
-
-      const target = existingRows.find((r) => {
-        const cmp = compareSortValues(rowValue, getCellSortValue(r, sort.columnIndex), sort.numeric);
-        return cmp * sort.direction < 0;
-      });
-
-      if (target) {
-        target.before(row);
-      } else {
-        tbody.appendChild(row);
-      }
-    }
-
-    ensureCalendarButtons(tbody);
-    applyAssignmentFilter(tbody);
+    document.querySelectorAll("tr[data-alma-plus-row]").forEach((el) => el.remove());
+    for (const { table, tasks: here } of taskPlacements(tasks)) placeRows(table, here, table === upcomingTable);
+    if (upcomingTable) applyAssignmentFilter(getTbody(upcomingTable));
     // Paperclip counts on task rows (materials.js).
     if (typeof refreshAttachmentClips === "function") refreshAttachmentClips();
   } finally {

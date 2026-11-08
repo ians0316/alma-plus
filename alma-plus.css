@@ -231,3 +231,28 @@
   line-height: 150px;
   text-align: center;
 }
+
+/* Past and Missing tables: Done / Edit / Remove only appear when you hover the
+   row, floating at the top right of the name cell, so narrow columns don't grow. */
+table.assignment-grades tr[data-alma-plus-row] td.alma-plus-name-cell,
+table.missing-assignments tr[data-alma-plus-row] td.alma-plus-name-cell {
+  position: relative;
+}
+table.assignment-grades .alma-plus-name-cell .alma-plus-task-actions,
+table.missing-assignments .alma-plus-name-cell .alma-plus-task-actions {
+  display: none;
+  float: none;
+  position: absolute;
+  top: 4px;
+  right: 6px;
+  margin: 0;
+  padding: 0 2px;
+  background: #fff;
+  white-space: nowrap;
+}
+table.assignment-grades tr[data-alma-plus-row]:hover .alma-plus-task-actions,
+table.missing-assignments tr[data-alma-plus-row]:hover .alma-plus-task-actions,
+table.assignment-grades .alma-plus-task-actions:focus-within,
+table.missing-assignments .alma-plus-task-actions:focus-within {
+  display: block;
+}
