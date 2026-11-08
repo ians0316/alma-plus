@@ -267,10 +267,12 @@ table.upcoming-assignments tbody td,
 table.assignment-grades tbody td {
   border-bottom: 1px solid #ccc !important;
 }
+/* The top edge is the thicker line that used to sit under the column
+   headings, now part of the box so it follows the rounded corners. */
 table.missing-assignments tbody tr:first-child td,
 table.upcoming-assignments tbody tr:first-child td,
 table.assignment-grades tbody tr:first-child td {
-  border-top: 1px solid #ccc !important;
+  border-top: 2px solid #cbcbcb !important;
 }
 table.missing-assignments tbody td:first-child,
 table.upcoming-assignments tbody td:first-child,
@@ -311,4 +313,16 @@ table.missing-assignments tbody td:not(:first-child),
 table.upcoming-assignments tbody td:not(:first-child),
 table.assignment-grades tbody td:not(:first-child) {
   background-color: #fff;
+}
+
+/* Alma's straight line under the column headings is replaced by the box's
+   thicker, rounded top edge above. */
+table.missing-assignments thead,
+table.upcoming-assignments thead,
+table.assignment-grades thead,
+table.missing-assignments thead th,
+table.upcoming-assignments thead th,
+table.assignment-grades thead th {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
 }
