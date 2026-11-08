@@ -476,17 +476,19 @@ function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null, s
   for (let i = 0; i < columnCount; i++) {
     row.appendChild(i === 0 ? dueCell : i === nameAt ? nameCell : document.createElement("td"));
   }
-  // Past and Missing tables have a Status column: Alma's green check for done,
-  // Alma's red-orange "Missing" icon for not done.
+  // The Past table has a Status column: Alma's green check if you marked the task
+  // done, otherwise left empty (never "Missing").
   if (statusIndex > 0 && row.cells[statusIndex]) {
     const statusCell = row.cells[statusIndex];
     if (templateRow?.cells[statusIndex]?.classList.contains("status")) statusCell.classList.add("status");
     statusCell.style.textAlign = "center";
-    statusCell.dataset.sortableVal = completed ? "0" : "2";
-    const icon = document.createElement("i");
-    icon.className = completed ? "fa fa-check green" : "fa fa-ban red-orange";
-    icon.title = completed ? "Done" : "Missing";
-    statusCell.appendChild(icon);
+    statusCell.dataset.sortableVal = completed ? "0" : "1";
+    if (completed) {
+      const icon = document.createElement("i");
+      icon.className = "fa fa-check green";
+      icon.title = "Done";
+      statusCell.appendChild(icon);
+    }
   }
 
   return row;
@@ -507,10 +509,10 @@ function getStatusColumnIndex(table) {
   return ths.findIndex((th) => th.classList.contains("status") || /^status$/i.test(th.textContent.trim()));
 }
 
-// Like Alma's own assignments:
-//   To Do page: upcoming -> Upcoming Assignments; past and not done -> Missing or
-//     Revision Needed; past and done -> off the To Do page.
-//   Class page: upcoming -> Upcoming list; past (done or not) -> Past Assignments.
+// Where tasks show:
+//   To Do page: upcoming -> Upcoming Assignments; past -> off the To Do page.
+//   Class page: upcoming -> Upcoming list; past -> Past Assignments.
+// Past tasks never go to Missing; marking them done isn't needed.
 function taskPlacements(tasks) {
   const upcomingTable = findAssignmentsTable();
   const upcoming = tasks.filter((t) => !isPastTask(t));
@@ -520,16 +522,8 @@ function taskPlacements(tasks) {
     const pastTable = document.querySelector(".student-assignments table.assignment-grades");
     if (upcomingTable) placements.push({ table: upcomingTable, tasks: upcoming });
     if (pastTable) placements.push({ table: pastTable, tasks: past });
-  } else {
-    const missingTable = document.querySelector("table.missing-assignments");
-    const missing = past.filter((t) => !t.completed);
-    if (missingTable) {
-      if (upcomingTable) placements.push({ table: upcomingTable, tasks: upcoming });
-      placements.push({ table: missingTable, tasks: missing });
-    } else if (upcomingTable) {
-      // No Missing table on the page right now: keep late tasks in Upcoming so they aren't lost.
-      placements.push({ table: upcomingTable, tasks: [...upcoming, ...missing] });
-    }
+  } else if (upcomingTable) {
+    placements.push({ table: upcomingTable, tasks: upcoming });
   }
   return placements;
 }
