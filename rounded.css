@@ -233,3 +233,8 @@ body.has-nav #header > #user-menu {
 #nav .nav-alma-plus-assignments a:hover i {
   background-position: -30px -3330px;
 }
+
+/* Login page: white crest on the orange bar, like the white title */
+body:not(.has-nav) h1 > span.school-name::before {
+  filter: brightness(0) invert(1);
+}
