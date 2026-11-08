@@ -479,9 +479,11 @@ function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null, s
     row.appendChild(i === 0 ? dueCell : i === nameAt ? nameCell : document.createElement("td"));
   }
   // The Past table has an Updated column: the day the task last changed.
-  if (updatedIndex > 0 && row.cells[updatedIndex] && task.updated) {
+  // Tasks saved before dates were tracked use their own (last) date instead.
+  const changed = task.updated || `${task.end && task.end > task.due ? task.end : task.due}T00:00:00`;
+  if (updatedIndex > 0 && row.cells[updatedIndex] && changed) {
     const cell = row.cells[updatedIndex];
-    const d = new Date(task.updated);
+    const d = new Date(changed);
     if (templateRow?.cells[updatedIndex]?.classList.contains("updated")) cell.classList.add("updated");
     cell.dataset.sortableVal = String(Math.floor(d.getTime() / 1000));
     cell.textContent = `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
