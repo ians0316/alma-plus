@@ -14,6 +14,7 @@ const DEFAULT_SETTINGS = {
   clips: true,            // paperclip counts on rows
   notes: true,            // "My notes" on Alma assignments
   dashboard: true,        // Due Today / Due Tomorrow / New Grades on Overview
+  syncTasks: true,        // send tasks to Alma Sync -> Notion + Google Calendar (background.js)
 };
 let settings = { ...DEFAULT_SETTINGS };
 async function loadSettings() {

@@ -118,3 +118,32 @@ footer {
   font-size: 11px;
   color: #777;
 }
+
+.sync-status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin: 2px 0 8px;
+  font-size: 12px;
+  color: #777;
+}
+.sync-status .ok {
+  color: #5c8a3e;
+}
+.sync-status .bad {
+  color: #b42318;
+}
+#sync-now {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 0;
+  border-radius: 2px;
+  background: #e6e6e6;
+  color: rgba(0, 0, 0, 0.8);
+  font: inherit;
+  cursor: pointer;
+}
+#sync-now:disabled {
+  opacity: 0.6;
+}

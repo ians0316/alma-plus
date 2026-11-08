@@ -48,6 +48,14 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 
 All updates to Google Calendar are one-time, so if an assignment changes you will have to add it again.
 
+### Today dashboard
+
+Alma's Overview page gets **Due Today**, **Due Tomorrow**, and **New Grades** under your schedule, in the same card style as Alma's schedule.
+
+### Notion & Google Calendar
+
+With [alma-sync](https://github.com/ians0316/alma-sync) set up on your Mac (run `./install_task_bridge.sh` once in its `alma_sync` folder), your tasks also show up in Notion and Google Calendar within seconds of adding or editing them. The settings menu shows when they last synced.
+
 ### Settings
 
 Click the extension's icon in Chrome's toolbar to turn features on or off: tasks on the To Do page, tasks on class pages, the extra buttons, Google Calendar buttons, My notes, attached files, and paperclip counts. The menu also shows how many tasks and files are saved.
@@ -59,6 +67,8 @@ Click the extension's icon in Chrome's toolbar to turn features on or off: tasks
 | `manifest.json` | Extension name, version, icons, and where it runs |
 | `alma-plus.js`, `alma-plus.css` | Custom tasks, task popup, add/edit window, filters, calendar tools, backup |
 | `materials.js`, `materials.css` | Attached files, My notes, paperclip and note icons, Files Saved message |
+| `dashboard.js`, `dashboard.css` | Today dashboard on the Overview page |
+| `background.js` | Sends your tasks to Alma Sync for Notion and Google Calendar |
 | `popup.html`, `popup.css`, `popup.js` | Settings menu |
 | `google-calendar.svg` | Calendar button icon |
 | `icons/` | Extension icons |

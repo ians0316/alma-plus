@@ -11,6 +11,7 @@ const DEFAULT_SETTINGS = {
   clips: true,
   notes: true,
   dashboard: true,
+  syncTasks: true,
 };
 
 async function loadSettings() {
@@ -38,6 +39,32 @@ async function showStats() {
     `${tasks} task${tasks === 1 ? "" : "s"} · ${files} attached file${files === 1 ? "" : "s"} · ${size}`;
 }
 
+function timeAgo(ms) {
+  const mins = Math.round((Date.now() - ms) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins} min ago`;
+  const hours = Math.round(mins / 60);
+  return hours < 24 ? `${hours} hr ago` : `${Math.round(hours / 24)} days ago`;
+}
+
+async function showSyncStatus() {
+  const status = (await chrome.storage.local.get("almaPlusSyncStatus")).almaPlusSyncStatus;
+  const el = document.getElementById("sync-status");
+  el.className = "";
+  if (!status) {
+    el.textContent = "Not synced yet";
+  } else if (status.ok) {
+    el.textContent = `Synced ${status.count} task${status.count === 1 ? "" : "s"} ${timeAgo(status.time)}`;
+    el.className = "ok";
+  } else if (status.error === "not-installed") {
+    el.textContent = "Alma Sync helper isn't set up on this Mac yet";
+    el.className = "bad";
+  } else {
+    el.textContent = `Couldn't sync: ${status.error}`;
+    el.className = "bad";
+  }
+}
+
 async function start() {
   document.getElementById("version").textContent = `Version ${chrome.runtime.getManifest().version}`;
   const settings = await loadSettings();
@@ -54,6 +81,18 @@ async function start() {
     });
   }
   showStats();
+  showSyncStatus();
+  chrome.storage.onChanged.addListener((changes) => {
+    if (changes.almaPlusSyncStatus) showSyncStatus();
+  });
+  document.getElementById("sync-now").addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    e.target.textContent = "Syncing…";
+    await chrome.runtime.sendMessage({ type: "sync-tasks-now" });
+    e.target.disabled = false;
+    e.target.textContent = "Sync now";
+    showSyncStatus();
+  });
 }
 
 start();
