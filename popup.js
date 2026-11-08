@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   notes: true,
   dashboard: true,
   calendar: true,
+  sidebarTabs: true,
   syncTasks: true,
 };
 

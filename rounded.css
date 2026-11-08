@@ -218,3 +218,12 @@ h1 > span.school-name::before {
   right: 0;
   z-index: 101;
 }
+
+/* Assignments tab in the sidebar (sidebar.js): checklist icon from Alma's icon sheet */
+#nav .nav-alma-plus-assignments i {
+  background-position: -30px -3230px;
+}
+#nav .nav-alma-plus-assignments.nav-active a i,
+#nav .nav-alma-plus-assignments a:hover i {
+  background-position: -30px -3330px;
+}

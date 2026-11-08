@@ -15,6 +15,7 @@ const DEFAULT_SETTINGS = {
   notes: true,            // "My notes" on Alma assignments
   dashboard: true,        // Due Today / Due Tomorrow / New Grades on Overview
   calendar: true,         // assignments and tasks on Alma's Academic Calendar
+  sidebarTabs: true,       // extra tabs in Alma's left menu (sidebar.js)
   syncTasks: true,        // send tasks to Alma Sync -> Notion + Google Calendar (background.js)
 };
 let settings = { ...DEFAULT_SETTINGS };
