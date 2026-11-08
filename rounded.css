@@ -40,7 +40,88 @@
   border-radius: 4px;
 }
 
-/* Buttons: Alma uses 2px corners, which look nearly square next to the boxes */
-.pure-button {
-  border-radius: 4px;
+/* Buttons and the small period boxes (P1, CC...) */
+.pure-button,
+a.pure-button,
+button.pure-button,
+.sc-box {
+  border-radius: 4px !important;
+}
+
+/* Every Alma table gets the same box as the Schedule cards: 1px #ccc border,
+   4px rounded corners. (Attendance calendars, .cal, are grids of rounded day
+   squares instead and are left alone.) */
+table.upcoming-assignments,
+table.missing-assignments,
+table.assignment-grades,
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) {
+  border: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+table.upcoming-assignments tbody tr > *,
+table.missing-assignments tbody tr > *,
+table.assignment-grades tbody tr > *,
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) tbody tr > * {
+  border-bottom: 1px solid #ccc !important;
+}
+table.upcoming-assignments tbody tr > :first-child,
+table.missing-assignments tbody tr > :first-child,
+table.assignment-grades tbody tr > :first-child,
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) tbody tr > :first-child {
+  border-left: 1px solid #ccc !important;
+}
+table.upcoming-assignments tbody tr > :last-child,
+table.missing-assignments tbody tr > :last-child,
+table.assignment-grades tbody tr > :last-child,
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) tbody tr > :last-child {
+  border-right: 1px solid #ccc !important;
+}
+table.upcoming-assignments tbody tr:last-child > :first-child,
+table.missing-assignments tbody tr:last-child > :first-child,
+table.assignment-grades tbody tr:last-child > :first-child,
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) tbody tr:last-child > :first-child {
+  border-bottom-left-radius: 4px;
+}
+table.upcoming-assignments tbody tr:last-child > :last-child,
+table.missing-assignments tbody tr:last-child > :last-child,
+table.assignment-grades tbody tr:last-child > :last-child,
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) tbody tr:last-child > :last-child {
+  border-bottom-right-radius: 4px;
+}
+
+/* Tables with plain headings (To Do, class page assignments): the thicker line
+   under the headings becomes the box's rounded top edge. */
+table.upcoming-assignments thead,
+table.missing-assignments thead,
+table.assignment-grades thead,
+table.upcoming-assignments thead th,
+table.missing-assignments thead th,
+table.assignment-grades thead th {
+  border-bottom: 0 !important;
+  box-shadow: none !important;
+}
+table.upcoming-assignments tbody tr:first-child > *,
+table.missing-assignments tbody tr:first-child > *,
+table.assignment-grades tbody tr:first-child > * {
+  border-top: 2px solid #cbcbcb !important;
+}
+table.upcoming-assignments tbody tr:first-child > :first-child,
+table.missing-assignments tbody tr:first-child > :first-child,
+table.assignment-grades tbody tr:first-child > :first-child {
+  border-top-left-radius: 4px;
+}
+table.upcoming-assignments tbody tr:first-child > :last-child,
+table.missing-assignments tbody tr:first-child > :last-child,
+table.assignment-grades tbody tr:first-child > :last-child {
+  border-top-right-radius: 4px;
+}
+
+/* Tables with a dark header bar (Classes, attendance list...): the bar gets the
+   rounded top corners and the rows connect straight to it. */
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) thead tr:first-child > :first-child {
+  border-top-left-radius: 4px;
+}
+table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):not(.assignment-grades) thead tr:first-child > :last-child {
+  border-top-right-radius: 4px;
 }
