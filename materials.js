@@ -301,7 +301,6 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
       del.title = "Remove";
       del.appendChild(mIcon("fa-trash"));
       del.addEventListener("click", async () => {
-        if (!confirm(`Remove "${item.title}"?`)) return;
         const all = await loadMaterials(bucket);
         await saveMaterials(bucket, all.filter((i) => i.id !== item.id));
         render();
