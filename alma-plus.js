@@ -12,6 +12,7 @@ const DEFAULT_SETTINGS = {
   calendarButtons: true,  // Google Calendar button on assignments
   attachments: true,      // "Attached files" in assignment and task popups
   clips: true,            // paperclip counts on rows
+  notes: true,            // "My notes" on Alma assignments
 };
 let settings = { ...DEFAULT_SETTINGS };
 async function loadSettings() {
@@ -1046,9 +1047,9 @@ function scheduleRender() {
 // Changes made by the class materials section don't need a re-render.
 function onlyMaterialsChanges(mutations) {
   return mutations.every((m) =>
-    m.target.closest?.(".alma-plus-clip, .alma-plus-attached, #alma-plus-photo") ||
+    m.target.closest?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo") ||
     ([...m.addedNodes, ...m.removedNodes].length > 0 &&
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay"))));
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay"))));
 }
 
 function startObserving() {

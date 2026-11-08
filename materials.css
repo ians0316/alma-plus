@@ -90,3 +90,38 @@
   margin-top: 10px;
   font-size: 13px;
 }
+
+/* My notes: same layout as Attached files */
+.alma-plus-note-line {
+  align-items: flex-start !important;
+}
+.alma-plus-note-text {
+  flex: 1;
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.alma-plus-note-text a {
+  text-decoration: underline;
+}
+.alma-plus-notes .add {
+  margin-top: 0;
+}
+.alma-plus-note-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.alma-plus-note-editor .pure-input-1 {
+  box-sizing: border-box;
+  width: 100%;
+  font-family: inherit;
+  resize: vertical;
+}
+.alma-plus-note-editor .buttons {
+  text-align: right;
+}
+.alma-plus-note-editor .pure-button-link {
+  background: none;
+  color: #333;
+}

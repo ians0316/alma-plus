@@ -9,6 +9,7 @@ const DEFAULT_SETTINGS = {
   calendarButtons: true,
   attachments: true,
   clips: true,
+  notes: true,
 };
 
 async function loadSettings() {

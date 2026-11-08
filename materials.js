@@ -58,6 +58,33 @@ async function removeOwnerAttachments(bucket, ownerId) {
   }
 }
 
+// ---- My notes on Alma assignments: { [assignmentId]: { text, updated } } ----
+
+const NOTES_KEY = "almaPlusNotes";
+let notesCache = null;
+async function loadNotes() {
+  if (!notesCache) {
+    const result = await chrome.storage.local.get(NOTES_KEY);
+    notesCache = result[NOTES_KEY] || {};
+  }
+  return notesCache;
+}
+
+async function saveNote(assignmentId, text) {
+  const notes = { ...(await loadNotes()) };
+  if (text) notes[assignmentId] = { text, updated: new Date().toISOString() };
+  else delete notes[assignmentId];
+  await chrome.storage.local.set({ [NOTES_KEY]: notes });
+  notesCache = notes;
+}
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area === "local" && changes[NOTES_KEY]) {
+    notesCache = changes[NOTES_KEY].newValue || {};
+    refreshAttachmentClips();
+  }
+});
+
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area === "local" && changes[MATERIALS_KEY]) {
     allMaterialsCache = changes[MATERIALS_KEY].newValue || {};
@@ -402,10 +429,133 @@ function addAttachedFilesToPopup() {
   bd.appendChild(buildAttachedSection(classId, lastClickedAssignmentId, name));
 }
 
+// "My notes" section: same look as "Attached files" (divider, heading, Alma
+// buttons). The saved note shows as a paragraph with line breaks and clickable links.
+function linkifiedParagraph(text) {
+  const p = mEl("p", "alma-plus-note-text");
+  const urlPattern = /https?:\/\/[^\s<>"]+[^\s<>".,;:!?)\]]/g;
+  let last = 0;
+  for (const match of text.matchAll(urlPattern)) {
+    p.append(text.slice(last, match.index));
+    const a = mEl("a", "", match[0]);
+    a.href = match[0];
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    p.appendChild(a);
+    last = match.index + match[0].length;
+  }
+  p.append(text.slice(last));
+  return p;
+}
+
+function buildNotesSection(assignmentId) {
+  const section = mEl("div", "pure-form submitted-files alma-plus-notes");
+  section.dataset.owner = assignmentId;
+
+  async function render(editing = false) {
+    const note = (await loadNotes())[assignmentId];
+    section.replaceChildren(mEl("h3", "", "My notes"));
+
+    if (editing) {
+      const box = mEl("div", "new-file alma-plus-note-editor");
+      const textarea = mEl("textarea", "pure-input-1");
+      textarea.rows = 5;
+      textarea.placeholder = "Anything you want to remember about this assignment…";
+      textarea.value = note?.text || "";
+      const buttons = mEl("div", "buttons");
+      const cancel = mEl("button", "pure-button pure-button-link", "Cancel");
+      cancel.type = "button";
+      cancel.addEventListener("click", () => render());
+      const save = mEl("button", "pure-button pure-button-primary", "Save");
+      save.type = "button";
+      save.addEventListener("click", async () => {
+        await saveNote(assignmentId, textarea.value.trim());
+        render();
+        refreshAttachmentClips();
+      });
+      buttons.append(cancel, " ", save);
+      box.append(textarea, buttons);
+      section.appendChild(box);
+      setTimeout(() => textarea.focus(), 0);
+      return;
+    }
+
+    if (note) {
+      const line = mEl("div", "submitted-file split-flex alma-plus-note-line");
+      line.appendChild(linkifiedParagraph(note.text));
+      const tools = mEl("span", "alma-plus-attached-tools");
+      const edit = mEl("button", "pure-button");
+      edit.type = "button";
+      edit.title = "Edit note";
+      edit.setAttribute("aria-label", "Edit note");
+      edit.appendChild(mIcon("fa-pencil-alt"));
+      edit.addEventListener("click", () => render(true));
+      const del = mEl("button", "pure-button delete");
+      del.type = "button";
+      del.title = "Delete note";
+      del.setAttribute("aria-label", "Delete note");
+      del.appendChild(mIcon("fa-trash"));
+      del.addEventListener("click", async () => {
+        if (!confirm("Delete this note?")) return;
+        await saveNote(assignmentId, "");
+        render();
+        refreshAttachmentClips();
+      });
+      tools.append(edit, " ", del);
+      line.appendChild(tools);
+      section.appendChild(line);
+    } else {
+      const add = mEl("div", "add");
+      const btn = mEl("button", "pure-button");
+      btn.type = "button";
+      btn.append(mIcon("fa-sticky-note"), " Add Note");
+      btn.addEventListener("click", () => render(true));
+      add.appendChild(btn);
+      section.appendChild(add);
+    }
+  }
+
+  render();
+  return section;
+}
+
+function addNotesToPopup() {
+  if (attachSettings().notes === false) return;
+  const bd = document.querySelector(".alma-student-assignment-details-modal:not(.alma-plus-details) .yui3-widget-bd");
+  if (!bd?.querySelector(":scope > header") || !lastClickedAssignmentId) return;
+  const existing = bd.querySelector(".alma-plus-notes");
+  if (existing?.dataset.owner === lastClickedAssignmentId) return;
+  existing?.remove();
+  const section = buildNotesSection(lastClickedAssignmentId);
+  const attached = bd.querySelector(".alma-plus-attached");
+  if (attached) attached.before(section);
+  else bd.appendChild(section);
+}
+
+// Small sticky-note icon on rows of assignments you've written a note for.
+function setNoteIcon(container, hasNote, onClick) {
+  const existing = container.querySelector(":scope > .alma-plus-note-icon");
+  if (!hasNote) {
+    existing?.remove();
+    return;
+  }
+  if (existing) return;
+  const icon = mEl("button", "alma-plus-clip alma-plus-note-icon");
+  icon.type = "button";
+  icon.title = "You have a note on this assignment";
+  icon.appendChild(mIcon("fa-sticky-note"));
+  icon.addEventListener("click", (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onClick();
+  });
+  container.appendChild(icon);
+}
+
 // ---- Paperclips on rows (Alma assignments and custom tasks), everywhere ----
 
 function setClip(container, count, onClick) {
-  const existing = container.querySelector(":scope > .alma-plus-clip");
+  const existing = container.querySelector(":scope > .alma-plus-clip:not(.alma-plus-note-icon)");
   if (!count) {
     existing?.remove();
     return;
@@ -428,13 +578,15 @@ function setClip(container, count, onClick) {
 let refreshing = false;
 async function refreshAttachmentClips() {
   if (refreshing) return;
-  if (!attachSettings().clips) {
-    document.querySelectorAll(".alma-plus-clip").forEach((c) => c.remove());
-    return;
-  }
+  const showClips = attachSettings().clips !== false;
+  const showNotes = attachSettings().notes !== false;
+  if (!showClips) document.querySelectorAll(".alma-plus-clip:not(.alma-plus-note-icon)").forEach((c) => c.remove());
+  if (!showNotes) document.querySelectorAll(".alma-plus-note-icon").forEach((c) => c.remove());
+  if (!showClips && !showNotes) return;
   refreshing = true;
   try {
     const all = await loadAllMaterials();
+    const notes = await loadNotes();
     const pageClass = classIdFromUrl();
 
     // Alma's assignment rows (class pages and the To Do page).
@@ -449,10 +601,12 @@ async function refreshAttachmentClips() {
       const count = (all[classId] || []).filter((i) => i.assignmentId === id).length;
       const line = cell.querySelector("small");
       if (line) {
-        setClip(line, count, () => {
+        const open = () => {
           lastClickedAssignmentId = id;
           link.click();
-        });
+        };
+        if (showNotes) setNoteIcon(line, Boolean(notes[id]), open);
+        if (showClips) setClip(line, count, open);
       }
     }
 
@@ -462,7 +616,7 @@ async function refreshAttachmentClips() {
       const id = row.dataset.almaPlusId;
       const line = row.querySelector("small.alma-plus-class");
       if (!id || !line) continue;
-      const count = taskItems.filter((i) => i.assignmentId === id).length;
+      const count = showClips ? taskItems.filter((i) => i.assignmentId === id).length : 0;
       setClip(line, count, () => {
         if (typeof openDetails === "function" && row._almaPlusTask) openDetails(row._almaPlusTask);
       });
@@ -486,7 +640,7 @@ async function startAttachments() {
   }, true);
 
   refreshAttachmentClips();
-  const OURS = ".alma-plus-clip, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
+  const OURS = ".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
   let popupPending = false;
   let clipTimer = null;
   new MutationObserver((mutations) => {
@@ -498,6 +652,7 @@ async function startAttachments() {
       popupPending = true;
       requestAnimationFrame(() => {
         popupPending = false;
+        addNotesToPopup();
         addAttachedFilesToPopup();
       });
     }
