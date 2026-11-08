@@ -50,6 +50,23 @@ async function attachmentsFor(bucket, ownerId) {
   return (await loadMaterials(bucket)).filter((i) => i.assignmentId === ownerId);
 }
 
+// Link shortcut files uploaded before shortcuts were recognized: turn them into
+// links (keeping their name), so clicking opens the website instead of downloading.
+async function convertSavedShortcuts(bucket) {
+  const items = await loadMaterials(bucket);
+  let changed = false;
+  const fixed = items.map((i) => {
+    if (i.kind !== "file" || !i.data) return i;
+    const looksLikeShortcut = SHORTCUT_FILE.test(i.fileName || "") || (!i.mime && (i.size || 0) < 4096);
+    const url = looksLikeShortcut && urlInsideShortcut(i.data, i.fileName || "");
+    if (!url) return i;
+    changed = true;
+    const { data, mime, size, fileName, ...rest } = i;
+    return { ...rest, kind: "link", url, title: i.title === fileName ? shortcutTitle(fileName) : i.title };
+  });
+  if (changed) await saveMaterials(bucket, fixed);
+}
+
 // Called when a custom task is deleted, so its files don't linger.
 async function removeOwnerAttachments(bucket, ownerId) {
   const items = await loadMaterials(bucket);
@@ -106,6 +123,31 @@ function normalizeLink(text) {
   let url = text.trim();
   if (url && !/^[a-z][a-z0-9+.-]*:/i.test(url)) url = `https://${url.replace(/^\/+/, "")}`;
   return /^https?:\/\//i.test(url) && hostOf(url).includes(".") ? url : null;
+}
+
+// Link shortcut files (.webloc from dragging a link on a Mac, .url on Windows,
+// .desktop on Linux) hold just a web address. Find it so they can be saved as links.
+const SHORTCUT_FILE = /\.(webloc|url|desktop|inetloc)$/i;
+
+function urlInsideShortcut(dataUrl, fileName = "") {
+  if (!dataUrl?.startsWith("data:")) return null;
+  const [meta, body] = dataUrl.split(",");
+  let text;
+  try {
+    text = /;base64/.test(meta) ? atob(body) : decodeURIComponent(body);
+  } catch {
+    return null;
+  }
+  if (text.length > 20000) return null;
+  // XML .webloc: <string>URL</string>; .url / .desktop: URL=...; binary plist: the URL bytes as text.
+  const match = text.match(/<string>\s*(https?:\/\/[^<\s]+)\s*<\/string>/i) ||
+    text.match(/^\s*URL\s*=\s*(https?:\/\/\S+)/im) ||
+    (SHORTCUT_FILE.test(fileName) && text.match(/https?:\/\/[\x21-\x7e]+/));
+  return match ? match[1] || match[0] : null;
+}
+
+function shortcutTitle(fileName) {
+  return fileName.replace(SHORTCUT_FILE, "");
 }
 
 function readFileAsDataUrl(file) {
@@ -267,6 +309,7 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
   fileInput.hidden = true;
 
   async function render(editing = null) {
+    await convertSavedShortcuts(bucket);
     const items = await attachmentsFor(bucket, ownerId);
     section.replaceChildren(mEl("h3", "", "Attached files"), fileInput);
 
@@ -411,6 +454,21 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
     const now = new Date().toISOString();
     const added = [];
     for (const file of files) {
+      const data = await readFileAsDataUrl(file);
+      // A link shortcut becomes a real link that opens the website.
+      const shortcutUrl = (SHORTCUT_FILE.test(file.name) || file.size < 4096) && urlInsideShortcut(data, file.name);
+      if (shortcutUrl && (SHORTCUT_FILE.test(file.name) || !file.type)) {
+        added.push({
+          id: crypto.randomUUID(),
+          kind: "link",
+          url: shortcutUrl,
+          title: shortcutTitle(file.name) || hostOf(shortcutUrl),
+          assignmentId: ownerId,
+          assignmentName: ownerName,
+          added: now,
+        });
+        continue;
+      }
       added.push({
         id: crypto.randomUUID(),
         kind: file.type.startsWith("image/") ? "photo" : "file",
@@ -418,7 +476,7 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
         fileName: file.name,
         mime: file.type,
         size: file.size,
-        data: await readFileAsDataUrl(file),
+        data,
         assignmentId: ownerId,
         assignmentName: ownerName,
         added: now,

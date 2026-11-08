@@ -4,12 +4,16 @@
 
 .alma-plus-attached .submitted-file {
   display: flex;
+  flex-wrap: nowrap !important;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
   padding: 4px 0;
 }
+/* Long names wrap beside the edit/delete buttons instead of pushing them down. */
 .alma-plus-attached .submitted-file a {
+  flex: 1;
+  min-width: 0;
   overflow-wrap: anywhere;
 }
 
