@@ -1049,7 +1049,7 @@ function onlyMaterialsChanges(mutations) {
   return mutations.every((m) =>
     m.target.closest?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo") ||
     ([...m.addedNodes, ...m.removedNodes].length > 0 &&
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay"))));
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay, #alma-plus-message, #alma-plus-message-mask"))));
 }
 
 function startObserving() {

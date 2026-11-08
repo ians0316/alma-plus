@@ -125,3 +125,21 @@
   background: none;
   color: #333;
 }
+
+/* "Files Saved" message: Alma's own alma-dialog alma-message classes style it;
+   this only centers it above everything, like Alma does. */
+#alma-plus-message-mask {
+  position: fixed;
+  inset: 0;
+  background: rgba(65, 66, 67, 0.4);
+  z-index: 1000002;
+}
+#alma-plus-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 400px;
+  max-width: calc(100vw - 32px);
+  z-index: 1000003;
+}

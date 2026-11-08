@@ -136,6 +136,47 @@ function mUnlockScroll() {
   if (mScrollLocks > 0 && --mScrollLocks === 0) document.body.style.overflow = mSavedOverflow;
 }
 
+// ---- Alma's "Files Saved" message box ----
+// Same markup and classes as Alma's own message (Y.Alma.Dialog.message), so the
+// thumbs-up icon, size, and green Ok button come from Alma's stylesheet.
+function showAlmaMessage(text) {
+  document.getElementById("alma-plus-message")?.remove();
+  document.getElementById("alma-plus-message-mask")?.remove();
+  const mask = mEl("div");
+  mask.id = "alma-plus-message-mask";
+  const panel = mEl("div", "yui3-widget yui3-panel yui3-widget-modal alma-dialog alma-message");
+  panel.id = "alma-plus-message";
+  panel.setAttribute("role", "alertdialog");
+  panel.setAttribute("aria-label", text);
+  const content = mEl("div", "yui3-panel-content yui3-widget-stdmod");
+  const bd = mEl("div", "yui3-widget-bd", text);
+  const ft = mEl("div", "yui3-widget-ft");
+  const buttons = mEl("span", "yui3-widget-buttons");
+  const ok = mEl("button", "pure-button pure-button-primary", "Ok");
+  ok.type = "button";
+  buttons.appendChild(ok);
+  ft.appendChild(buttons);
+  content.append(bd, ft);
+  panel.appendChild(content);
+  document.body.append(mask, panel);
+  const close = () => {
+    panel.remove();
+    mask.remove();
+    document.removeEventListener("keydown", onKey, true);
+  };
+  const onKey = (e) => {
+    if (e.key === "Escape" || e.key === "Enter") {
+      e.preventDefault();
+      e.stopPropagation(); // don't also close the popup underneath
+      close();
+    }
+  };
+  ok.addEventListener("click", close);
+  mask.addEventListener("click", close);
+  document.addEventListener("keydown", onKey, true);
+  ok.focus();
+}
+
 // ---- Opening an attachment ----
 
 function openMaterial(item) {
@@ -342,6 +383,7 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
       }
       render();
       refreshAttachmentClips();
+      showAlmaMessage("Files Saved");
     };
     save.addEventListener("click", submit);
     for (const input of [urlInput, nameInput].filter(Boolean)) {
@@ -391,6 +433,7 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
     }
     render();
     refreshAttachmentClips();
+    showAlmaMessage("Files Saved");
   });
 
   render();
@@ -469,9 +512,11 @@ function buildNotesSection(assignmentId) {
       const save = mEl("button", "pure-button pure-button-primary", "Save");
       save.type = "button";
       save.addEventListener("click", async () => {
-        await saveNote(assignmentId, textarea.value.trim());
+        const text = textarea.value.trim();
+        await saveNote(assignmentId, text);
         render();
         refreshAttachmentClips();
+        if (text) showAlmaMessage("Note Saved");
       });
       buttons.append(cancel, " ", save);
       box.append(textarea, buttons);
@@ -639,7 +684,7 @@ async function startAttachments() {
   }, true);
 
   refreshAttachmentClips();
-  const OURS = ".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
+  const OURS = "#alma-plus-message, #alma-plus-message-mask, .alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
   let popupPending = false;
   let clipTimer = null;
   new MutationObserver((mutations) => {
