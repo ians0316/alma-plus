@@ -100,6 +100,8 @@ function row({ classLine, title, href, onOpen, grade }) {
   name.appendChild(dEl("small", "", classLine));
   const a = dEl("a", "", title);
   a.href = href || "#";
+  // Same marker as Alma's own assignment links, so clicking opens Alma's popup.
+  if (href && /\/home\/assignment\//.test(href)) a.dataset.almaModal = "StudentAssignmentDetailsModal";
   if (onOpen) {
     a.addEventListener("click", (e) => {
       e.preventDefault();
