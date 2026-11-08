@@ -299,11 +299,9 @@ function ensureCalendarButtons(tbody) {
     const nameCell = getNameCell(row);
     if (!nameCell || nameCell.querySelector(".alma-plus-cal-btn")) continue;
     if (!getRowAssignment(row)) continue;
-    // On the small category line ("HOMEWORK 📅"), like the paperclip, so a long
-    // assignment name never pushes the icon onto its own line.
-    const line = nameCell.querySelector("small.alma-plus-class") ||
-      nameCell.querySelector("small:not(.alma-plus-task-actions):not(.alma-plus-metadata)");
-    if (line) line.appendChild(buildCalendarButton(row));
+    // In custom rows the icon goes right after the name, as in Alma's rows.
+    const title = nameCell.querySelector(".alma-plus-title");
+    if (title) title.after(buildCalendarButton(row));
     else nameCell.appendChild(buildCalendarButton(row));
   }
 }

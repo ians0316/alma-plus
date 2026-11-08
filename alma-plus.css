@@ -250,24 +250,3 @@ table.assignment-grades .alma-plus-task-actions:focus-within,
 table.missing-assignments .alma-plus-task-actions:focus-within {
   display: block;
 }
-
-/* Calendar icon: sits in the cell's empty right margin, level with the small
-   category line, so it takes no space from the text and rows/columns stay
-   exactly Alma's size. */
-td:has(> small > .alma-plus-cal-btn) {
-  position: relative;
-}
-small > .alma-plus-cal-btn {
-  position: absolute;
-  top: 12px;
-  right: 2px;
-  width: 11px;
-  height: 11px;
-  margin: 0;
-  padding: 0;
-  line-height: 0;
-}
-small > .alma-plus-cal-btn img {
-  width: 11px;
-  height: 11px;
-}
