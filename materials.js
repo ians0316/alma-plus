@@ -496,7 +496,6 @@ function buildNotesSection(assignmentId) {
       del.setAttribute("aria-label", "Delete note");
       del.appendChild(mIcon("fa-trash"));
       del.addEventListener("click", async () => {
-        if (!confirm("Delete this note?")) return;
         await saveNote(assignmentId, "");
         render();
         refreshAttachmentClips();
