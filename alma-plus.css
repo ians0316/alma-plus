@@ -113,12 +113,6 @@
   text-decoration: underline;
 }
 
-.alma-plus-completed-row td {
-  opacity: 0.55;
-}
-.alma-plus-completed-title {
-  text-decoration: line-through;
-}
 
 /* Add/edit window: Alma's own panel and form classes do the styling; this only
    places it like Alma's popups (top center) and dims the page behind it. */

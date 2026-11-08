@@ -683,7 +683,7 @@ async function startAttachments() {
   }, true);
 
   refreshAttachmentClips();
-  const OURS = "#alma-plus-message, #alma-plus-message-mask, .alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
+  const OURS = "#alma-plus-assignments-heading, #alma-plus-message, #alma-plus-message-mask, .alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
   let popupPending = false;
   let clipTimer = null;
   new MutationObserver((mutations) => {

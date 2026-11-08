@@ -40,13 +40,14 @@ async function saveTasks(tasks) {
 
 async function addTask(task) {
   const tasks = await loadTasks();
-  tasks.push({ id: crypto.randomUUID(), completed: false, priority: "normal", ...task });
+  tasks.push({ id: crypto.randomUUID(), completed: false, priority: "normal", ...task, updated: new Date().toISOString() });
   await saveTasks(tasks);
 }
 
 async function updateTask(updatedTask) {
   const tasks = await loadTasks();
-  await saveTasks(tasks.map((task) => task.id === updatedTask.id ? updatedTask : task));
+  const stamped = { ...updatedTask, updated: new Date().toISOString() };
+  await saveTasks(tasks.map((task) => task.id === updatedTask.id ? stamped : task));
 }
 
 async function deleteTask(id) {
@@ -58,7 +59,7 @@ async function deleteTask(id) {
 
 async function setTaskCompleted(id, completed) {
   const tasks = await loadTasks();
-  await saveTasks(tasks.map((task) => task.id === id ? { ...task, completed } : task));
+  await saveTasks(tasks.map((task) => task.id === id ? { ...task, completed, updated: new Date().toISOString() } : task));
 }
 
 function isValidDate(value) {
@@ -91,6 +92,7 @@ function normalizeTask(task) {
     completed: task.completed ?? false,
     priority: task.priority || "normal",
     end: task.end || "",
+    ...(typeof task.updated === "string" ? { updated: task.updated } : {}),
   };
 }
 
@@ -385,7 +387,7 @@ function exportIcs() {
 
 // Built the same way as Alma's own rows: "Nov / 09" in the shaded due cell, a small
 // bold class line, and the name at normal size. Alma's stylesheet does the rest.
-function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null, statusIndex = -1) {
+function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null, statusIndex = -1, updatedIndex = -1) {
   const row = document.createElement("tr");
   row.dataset.almaPlusRow = "true";
   row.dataset.almaPlusId = task.id;
@@ -476,6 +478,14 @@ function buildCustomRow(task, columnCount, nameIndex = -1, templateRow = null, s
   for (let i = 0; i < columnCount; i++) {
     row.appendChild(i === 0 ? dueCell : i === nameAt ? nameCell : document.createElement("td"));
   }
+  // The Past table has an Updated column: the day the task last changed.
+  if (updatedIndex > 0 && row.cells[updatedIndex] && task.updated) {
+    const cell = row.cells[updatedIndex];
+    const d = new Date(task.updated);
+    if (templateRow?.cells[updatedIndex]?.classList.contains("updated")) cell.classList.add("updated");
+    cell.dataset.sortableVal = String(Math.floor(d.getTime() / 1000));
+    cell.textContent = `${d.getMonth() + 1}/${d.getDate()}/${String(d.getFullYear()).slice(-2)}`;
+  }
   // The Past table has a Status column: Alma's green check if you marked the task
   // done, otherwise left empty (never "Missing").
   if (statusIndex > 0 && row.cells[statusIndex]) {
@@ -502,6 +512,11 @@ function todayString() {
 function isPastTask(task) {
   const last = task.end && task.end > task.due ? task.end : task.due;
   return last < todayString();
+}
+
+function getUpdatedColumnIndex(table) {
+  const ths = [...(table?.querySelectorAll("thead th") || [])];
+  return ths.findIndex((th) => th.classList.contains("updated") || /^updated$/i.test(th.textContent.trim()));
 }
 
 function getStatusColumnIndex(table) {
@@ -536,6 +551,7 @@ function placeRows(table, tasks, withCalendar) {
   const sort = getActiveSort(table);
   const nameIndex = getNameColumnIndex(table);
   const statusIndex = getStatusColumnIndex(table);
+  const updatedIndex = getUpdatedColumnIndex(table);
   const existingRows = [...tbody.querySelectorAll("tr:not([data-alma-plus-row])")];
   const columnCount =
     existingRows[0]?.cells.length ||
@@ -543,7 +559,7 @@ function placeRows(table, tasks, withCalendar) {
     2;
 
   for (const task of tasks) {
-    const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0], statusIndex);
+    const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0], statusIndex, updatedIndex);
     const rowValue = getCellSortValue(row, sort.columnIndex);
     const target = existingRows.find((r) => {
       const cmp = compareSortValues(rowValue, getCellSortValue(r, sort.columnIndex), sort.numeric);
@@ -1081,6 +1097,27 @@ function openDetails(task) {
   close.focus();
 }
 
+// Alma hides the "Past Assignments" heading when a class only has a Past list.
+// Your past tasks live in that table, so show the same heading Alma uses on
+// classes that have both lists.
+function ensureAssignmentsHeading() {
+  if (!isClassPage()) return;
+  const block = document.querySelector(".student-assignments");
+  if (!block) return;
+  const almaHeadings = [...block.querySelectorAll(".segment-content > h4.module-heading")];
+  const ours = document.getElementById("alma-plus-assignments-heading");
+  if (almaHeadings.some((h) => h.offsetParent !== null)) {
+    ours?.remove();
+    return;
+  }
+  if (ours) return;
+  const heading = document.createElement("h4");
+  heading.className = "module-heading";
+  heading.id = "alma-plus-assignments-heading";
+  heading.textContent = almaHeadings[0]?.textContent.trim() || "Past Assignments";
+  block.querySelector(".segmented-control, table")?.before(heading);
+}
+
 function scheduleRender() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
@@ -1090,6 +1127,7 @@ function scheduleRender() {
     }
     ensureAddButton();
     renderCustomRows();
+    ensureAssignmentsHeading();
   }, 80);
 }
 
@@ -1098,7 +1136,7 @@ function onlyMaterialsChanges(mutations) {
   return mutations.every((m) =>
     m.target.closest?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo") ||
     ([...m.addedNodes, ...m.removedNodes].length > 0 &&
-      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay, #alma-plus-message, #alma-plus-message-mask"))));
+      [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay, #alma-plus-message, #alma-plus-message-mask, #alma-plus-assignments-heading"))));
 }
 
 function startObserving() {
@@ -1120,6 +1158,7 @@ async function init() {
   getClasses(); // start loading so suggestions and teacher names are ready
   ensureAddButton();
   renderCustomRows();
+  ensureAssignmentsHeading();
   startObserving();
 }
 
