@@ -184,14 +184,16 @@ table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):
   border-top-right-radius: 4px;
 }
 
-/* School crest left of "Seoul Academy" in the top bar, on every page. The text
-   keeps Alma's own layout; the crest just sits in front of it. */
+/* School crest left of "Seoul Academy" in the top bar, on every page */
+h1 > span.school-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 h1 > span.school-name::before {
   content: "";
-  display: inline-block;
-  width: 30px;
-  height: 28px;
-  margin-right: 10px;
-  vertical-align: -5px;
+  flex-shrink: 0;
+  width: 38px;
+  height: 35px;
   background: url("chrome-extension://__MSG_@@extension_id__/icons/seoul-academy.png") center / contain no-repeat;
 }
