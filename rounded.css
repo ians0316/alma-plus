@@ -185,7 +185,7 @@ table.pure-table:not(.cal):not(.upcoming-assignments):not(.missing-assignments):
 }
 
 /* School crest left of "Seoul Academy" in the top bar, on every page */
-h1 > span.school-name {
+body.has-nav h1 > span.school-name {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -193,6 +193,9 @@ h1 > span.school-name {
 h1 > span.school-name::before {
   content: "";
   flex-shrink: 0;
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 10px;
   width: 38px;
   height: 35px;
   background: url("chrome-extension://__MSG_@@extension_id__/icons/seoul-academy.png") center / contain no-repeat;
@@ -200,10 +203,13 @@ h1 > span.school-name::before {
 
 /* Top bar (crest, Seoul Academy, profile button) stays at the top while
    scrolling; the page title line under it scrolls normally. */
-#header {
+body.has-nav h1 > span.school-name::before {
+  margin-right: 0;
+}
+body.has-nav #header {
   padding-top: 48px;
 }
-#header > h1 {
+body.has-nav #header > h1 {
   position: fixed;
   top: 0;
   width: 100vw;
@@ -212,7 +218,7 @@ h1 > span.school-name::before {
   background: #fff;
   box-shadow: 0 1px 0 #ccc;
 }
-#header > #user-menu {
+body.has-nav #header > #user-menu {
   position: fixed !important;
   top: 0;
   right: 0;
