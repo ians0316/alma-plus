@@ -90,13 +90,13 @@ function tasksOnDay(tasks, day) {
   return tasks.filter((t) => !t.completed && t.due <= day && (t.end && t.end > t.due ? t.end : t.due) >= day);
 }
 
-// ---- Compact lists, styled like the rows of Alma's To Do tables ----
+// ---- Compact lists in the same box style as Alma's Schedule cards ----
 
 // One row: small bold class line over the name (like Alma's To Do rows), with an
 // optional grade on the right.
 function row({ classLine, title, href, onOpen, grade }) {
-  const tr = dEl("tr");
-  const name = dEl("td", "alma-plus-dash-name");
+  const tr = dEl("li", "alma-plus-dash-item");
+  const name = dEl("div", "alma-plus-dash-name");
   name.appendChild(dEl("small", "", classLine));
   const a = dEl("a", "", title);
   a.href = href || "#";
@@ -111,7 +111,7 @@ function row({ classLine, title, href, onOpen, grade }) {
   name.appendChild(a);
   tr.appendChild(name);
   if (grade) {
-    const g = dEl("td", "alma-plus-dash-grade");
+    const g = dEl("div", "alma-plus-dash-grade");
     g.append(grade.letter || "");
     if (grade.percent) g.append(dEl("small", "", `(${grade.percent})`));
     tr.appendChild(g);
@@ -127,11 +127,9 @@ function column(id, heading, rows, emptyText) {
   if (!rows.length) {
     box.appendChild(dEl("p", "alma-plus-dash-empty", emptyText));
   } else {
-    const table = dEl("table", "pure-table pure-table-horizontal alma-plus-dash-table");
-    const tbody = dEl("tbody");
-    rows.forEach((r) => tbody.appendChild(r));
-    table.appendChild(tbody);
-    box.appendChild(table);
+    const list = dEl("ul", "alma-plus-dash-list");
+    rows.forEach((r) => list.appendChild(r));
+    box.appendChild(list);
   }
   col.appendChild(box);
   return col;
