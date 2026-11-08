@@ -532,9 +532,12 @@ function getStatusColumnIndex(table) {
 //   Class page: upcoming and not done -> Upcoming list. Done, or past its
 //     date -> Past Assignments (with a check if done). Undo brings it back.
 // Past tasks never go to Missing; marking them done isn't needed.
-function taskPlacements(tasks) {
+function taskPlacements(tasks, classes = []) {
   const upcomingTable = findAssignmentsTable();
-  const finished = (t) => t.completed || isPastTask(t);
+  // A done/past task needs a class page to move to. Tasks with no class (or a
+  // class name that isn't one of yours) stay on the To Do page so they never vanish.
+  const hasClassPage = (t) => Boolean(findClass(classes, t.category));
+  const finished = (t) => (t.completed || isPastTask(t)) && (isClassPage() || hasClassPage(t));
   const upcoming = tasks.filter((t) => !finished(t));
   const past = tasks.filter(finished);
   const placements = [];
@@ -574,14 +577,34 @@ function placeRows(table, tasks, withCalendar) {
   if (withCalendar) ensureCalendarButtons(tbody);
 }
 
+let lastRenderKey = "";
+
 async function renderCustomRows() {
   const upcomingTable = findAssignmentsTable();
   const tasks = tasksOnThisPage() ? (await loadTasks()).filter(taskBelongsHere) : [];
+  const classes = isClassPage() ? [] : await getClasses();
+  const placements = taskPlacements(tasks, classes);
+
+  // Nothing about the tasks or tables changed and every row is still on the
+  // page: leave the rows alone (rebuilding them on every page change was the lag).
+  const tables = [...document.querySelectorAll("table")];
+  const key = JSON.stringify([
+    activeFilter,
+    placements.map(({ table, tasks: here }) => [tables.indexOf(table), getActiveSort(table), here]),
+  ]);
+  const expectedRows = placements.reduce((n, pl) => n + pl.tasks.length, 0);
+  const presentRows = [...document.querySelectorAll("tr[data-alma-plus-row]")]
+    .filter((r) => placements.some((pl) => pl.table.contains(r))).length;
+  if (key === lastRenderKey && presentRows === expectedRows &&
+      document.querySelectorAll("tr[data-alma-plus-row]").length === expectedRows) {
+    return;
+  }
+  lastRenderKey = key;
 
   bodyObserver?.disconnect();
   try {
     document.querySelectorAll("tr[data-alma-plus-row]").forEach((el) => el.remove());
-    for (const { table, tasks: here } of taskPlacements(tasks)) placeRows(table, here, table === upcomingTable);
+    for (const { table, tasks: here } of placements) placeRows(table, here, table === upcomingTable);
     if (upcomingTable) applyAssignmentFilter(getTbody(upcomingTable));
     // Paperclip counts on task rows (materials.js).
     if (typeof refreshAttachmentClips === "function") refreshAttachmentClips();
@@ -639,7 +662,6 @@ function buildFilter() {
     ["all", "All assignments"],
     ["today", "Due today"],
     ["week", "Due this week"],
-    ["overdue", "Overdue"],
   ]) {
     const option = document.createElement("option");
     option.value = value;
@@ -1141,9 +1163,23 @@ function onlyMaterialsChanges(mutations) {
       [...m.addedNodes, ...m.removedNodes].every((n) => n.nodeType === 1 && n.matches?.(".alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay, #alma-plus-message, #alma-plus-message-mask, #alma-plus-assignments-heading"))));
 }
 
+// Only Alma's assignment tables (or the page area holding them) matter for task
+// rows. Popups opening and closing, typing, and our own rows are ignored.
+const OWN_ROW_PARTS = "tr[data-alma-plus-row], .alma-plus-cal-btn, .alma-plus-clip, #alma-plus-toolbar, #alma-plus-import-input";
+function touchesAlmaTables(mutations) {
+  return mutations.some((m) => {
+    const nodes = [...m.addedNodes, ...m.removedNodes].filter((n) => n.nodeType === 1);
+    if (nodes.length && nodes.every((n) => n.matches?.(OWN_ROW_PARTS))) return false;
+    if (m.target.closest?.("tr[data-alma-plus-row], .yui3-panel, #alma-plus-modal, #alma-plus-details")) return false;
+    if (m.target.closest?.("table")) return true;
+    // Alma (re)building a table or the area around it, or our toolbar going away.
+    return nodes.some((n) => n.matches?.("table, #alma-plus-toolbar") || n.querySelector?.("table"));
+  });
+}
+
 function startObserving() {
   bodyObserver = new MutationObserver((mutations) => {
-    if (!onlyMaterialsChanges(mutations)) scheduleRender();
+    if (!onlyMaterialsChanges(mutations) && touchesAlmaTables(mutations)) scheduleRender();
   });
   bodyObserver.observe(document.body, { childList: true, subtree: true });
 }
