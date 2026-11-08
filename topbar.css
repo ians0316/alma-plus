@@ -1,0 +1,145 @@
+/* Search and mail buttons in the top bar (topbar.js) */
+#user-menu .alma-plus-topbtn {
+  position: relative;
+}
+#user-menu .alma-plus-drop {
+  display: block;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: auto;
+  width: 300px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 8px 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  z-index: 200;
+  text-align: left;
+  border-radius: 4px;
+  line-height: normal;
+}
+.alma-plus-drop[hidden] {
+  display: none !important;
+}
+.alma-plus-search {
+  padding: 4px 12px;
+}
+.alma-plus-search input[type="search"] {
+  font-size: 14px;
+}
+.alma-plus-teachers {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#user-menu .alma-plus-teacher-link {
+  display: block;
+  width: auto;
+  height: auto;
+  text-align: left;
+  padding: 6px 15px;
+  white-space: normal;
+  line-height: 1.3;
+  color: #333;
+}
+#user-menu .alma-plus-teacher-link:hover {
+  background: #eee;
+}
+.alma-plus-teacher-name {
+  display: block;
+  font-size: 15px;
+}
+.alma-plus-teachers small {
+  display: block;
+  font-size: 12px;
+  color: #777;
+}
+.alma-plus-drop-heading {
+  padding: 4px 15px 8px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 13px;
+  color: #333;
+}
+.alma-plus-drop-empty {
+  padding: 6px 15px;
+  color: #777;
+  font-size: 14px;
+}
+
+/* New Message window (same panel look as the calendar popups) */
+.alma-plus-cal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(65, 66, 67, 0.5);
+  z-index: 999998;
+}
+.alma-plus-cal-panel {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 500px;
+  max-width: calc(100vw - 32px);
+  max-height: 100vh;
+  overflow-y: auto;
+  z-index: 999999;
+}
+.alma-plus-msg-panel {
+  width: 600px;
+}
+.alma-plus-msg-panel .yui3-widget-hd {
+  position: relative;
+  padding-right: 48px;
+}
+.alma-plus-msg-panel .yui3-widget-buttons {
+  position: absolute;
+  top: 0;
+  right: 4px;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+}
+.alma-plus-msg-panel .yui3-button-close {
+  width: 44px !important;
+  min-width: 44px;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: transparent;
+  font-size: 0;
+  cursor: pointer;
+  position: relative;
+}
+.alma-plus-msg-panel .yui3-button-close::before {
+  content: "\00d7";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  color: #fff;
+  opacity: 0.8;
+}
+.alma-plus-msg-panel .alma-plus-details-loading {
+  padding: 40px 0;
+  text-align: center;
+  color: #ccc;
+}
+.alma-plus-msg-sent {
+  margin: 20px 0;
+  font-size: 15px;
+}
+.alma-plus-msg-error {
+  color: #d93a3a;
+  font-size: 14px;
+}
+.alma-plus-msg-note {
+  clear: both;
+  margin: 8px 0 0;
+  font-size: 14px;
+}

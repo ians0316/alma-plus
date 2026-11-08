@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Alma+ Custom Tasks",
-  "version": "2.6.1",
+  "version": "2.7.0",
   "description": "Your own tasks, attached files, and notes inside Alma, styled like Alma, plus Google Calendar buttons.",
   "icons": {
     "16": "icons/icon16.png",
@@ -113,9 +113,13 @@
         "https://*.getalma.com/*"
       ],
       "js": [
-        "sidebar.js"
+        "sidebar.js",
+        "topbar.js"
       ],
-      "run_at": "document_end"
+      "run_at": "document_end",
+      "css": [
+        "topbar.css"
+      ]
     }
   ],
   "background": {

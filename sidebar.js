@@ -39,3 +39,47 @@
     after = li;
   }
 })();
+
+// Extra small tabs in the row under the page title (Overview · To Do · Classes ·
+// Attendance · Report Cards): Announcements, My Info, Calendar, Directory. The
+// Announcements and My Info pages don't have the row, so it's added there too.
+(async () => {
+  const stored = (await chrome.storage.local.get("almaPlusSettings")).almaPlusSettings || {};
+  if (stored.sidebarTabs === false) return;
+  const content = document.getElementById("content");
+  if (!content || document.querySelector(".alma-plus-subtab")) return;
+
+  const path = location.pathname;
+  const base = [
+    ["Overview", "/home"], ["To Do", "/home/assignments"], ["Classes", "/home/schedule"],
+    ["Attendance", "/home/attendance"], ["Report Cards", "/home/report-cards"],
+  ];
+  const extra = [
+    ["Announcements", "/home/announcements"], ["My Info", "/home/bio"],
+    ["Calendar", "/calendar"], ["Directory", "/directory"],
+  ];
+  const item = ([label, href], mine) => {
+    const li = document.createElement("li");
+    li.className = "pure-menu-item" + (mine ? " alma-plus-subtab" : "") + (path === href ? " pure-menu-selected" : "");
+    const a = document.createElement("a");
+    a.className = "pure-menu-link";
+    a.href = href;
+    a.textContent = label;
+    li.append(a);
+    return li;
+  };
+
+  let list = [...document.querySelectorAll(".sc-tabmenu .pure-menu-list")]
+    .find((ul) => ul.querySelector('a[href="/home/report-cards"]'));
+  if (!list) {
+    if (!/^\/home\/(announcements|bio)\/?$/.test(path)) return;
+    const menu = document.createElement("div");
+    menu.className = "sc-tabmenu pure-menu pure-menu-horizontal";
+    list = document.createElement("ul");
+    list.className = "pure-menu-list";
+    for (const t of base) list.append(item(t, false));
+    menu.append(list);
+    content.prepend(menu);
+  }
+  for (const t of extra) list.append(item(t, true));
+})();
