@@ -222,7 +222,7 @@ body.has-nav #header > #user-menu {
   position: fixed !important;
   top: 0;
   right: 0;
-  z-index: 9;
+  z-index: 10; /* above the white bar (9), below Alma's popups (11) */
 }
 
 /* Assignments tab in the sidebar (sidebar.js): checklist icon from Alma's icon sheet */
