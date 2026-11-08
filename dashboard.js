@@ -1,5 +1,5 @@
 // Today dashboard for Alma+ on Alma's Overview page (/home): "Due Today",
-// "Due Tomorrow", and "New Grades" side by side under the Schedule, as compact
+// "Due Tomorrow", and "Recently Updated Grades" side by side under the Schedule, as compact
 // lists styled like the rows of Alma's To Do tables. Uses helpers from
 // alma-plus.js (loadTasks, loadSettings, getClasses, findClass, openDetails).
 
@@ -187,7 +187,7 @@ async function renderDashboard() {
     const dash = dEl("div", "pure-g alma-plus-dashboard");
     dash.id = "alma-plus-dashboard";
     const nextDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
-    const gradesSlot = column("alma-plus-dash-grades", "New Grades", [], "Loading…");
+    const gradesSlot = column("alma-plus-dash-grades", "Recently Updated Grades", [], "Loading…");
     dash.append(
       column("alma-plus-dash-today", dayHeading(date), dueRows(day, alma, tasksOnDay(allTasks, day)), "Nothing due."),
       column("alma-plus-dash-tomorrow", dayHeading(nextDate), dueRows(next, alma, tasksOnDay(allTasks, next)), "Nothing due."),
@@ -199,8 +199,8 @@ async function renderDashboard() {
     dashRenderedFor = day;
 
     recentGrades()
-      .then((grades) => gradesSlot.replaceWith(column("alma-plus-dash-grades", "New Grades", gradeRows(grades), `No new grades in the last ${NEW_GRADE_DAYS} days.`)))
-      .catch(() => gradesSlot.replaceWith(column("alma-plus-dash-grades", "New Grades", [], "Couldn't load grades.")));
+      .then((grades) => gradesSlot.replaceWith(column("alma-plus-dash-grades", "Recently Updated Grades", gradeRows(grades), `No grades updated in the last ${NEW_GRADE_DAYS} days.`)))
+      .catch(() => gradesSlot.replaceWith(column("alma-plus-dash-grades", "Recently Updated Grades", [], "Couldn't load grades.")));
   } finally {
     dashRendering = false;
   }

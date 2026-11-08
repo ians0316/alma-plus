@@ -50,7 +50,7 @@ All updates to Google Calendar are one-time, so if an assignment changes you wil
 
 ### Today dashboard
 
-Alma's Overview page gets **Due Today**, **Due Tomorrow**, and **New Grades** under your schedule, in the same card style as Alma's schedule.
+Alma's Overview page gets **Due Today**, **Due Tomorrow**, and **Recently Updated Grades** under your schedule, in the same card style as Alma's schedule.
 
 ### Notion & Google Calendar
 
