@@ -1,10 +1,12 @@
-// Extra sidebar tabs (Assignments, Classes, Attendance, Report Cards) linking to
+// Extra sidebar tabs (Classes, Assignments, Attendance, Report Cards), after
+// Directory and Calendar, linking to
 // student pages Alma already has under Home. Built with Alma's own sidebar
 // markup and icon sheet, so they look and highlight like the real tabs.
 
 (async () => {
   const nav = document.querySelector("#nav > ul");
   const home = nav?.querySelector("li.nav-home");
+  const last = nav?.querySelector("li.nav-calendar") || nav?.querySelector("li.nav-directory") || home;
   if (!home || nav.querySelector(".alma-plus-nav")) return;
 
   const stored = (await chrome.storage.local.get("almaPlusSettings")).almaPlusSettings || {};
@@ -12,13 +14,13 @@
 
   const path = location.pathname;
   const tabs = [
-    { cls: "nav-alma-plus-assignments", label: "Assignments", href: "/home/assignments", active: /^\/home\/assignments/ },
     { cls: "nav-classes", label: "Classes", href: "/home/schedule", active: /^\/home\/(schedule|class\/)/ },
+    { cls: "nav-alma-plus-assignments", label: "Assignments", href: "/home/assignments", active: /^\/home\/assignments/ },
     { cls: "nav-attendance", label: "Attendance", href: "/home/attendance", active: /^\/home\/attendance/ },
     { cls: "nav-reportcards", label: "Report Cards", href: "/home/report-cards", active: /^\/home\/report-cards/ },
   ];
 
-  let after = home;
+  let after = last;
   for (const t of tabs) {
     const li = document.createElement("li");
     li.className = `${t.cls} alma-plus-nav`;
