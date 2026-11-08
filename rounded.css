@@ -198,10 +198,23 @@ h1 > span.school-name::before {
   background: url("chrome-extension://__MSG_@@extension_id__/icons/seoul-academy.png") center / contain no-repeat;
 }
 
-/* Top bar (Seoul Academy + page title) stays at the top while scrolling */
+/* Top bar (crest, Seoul Academy, profile button) stays at the top while
+   scrolling; the page title line under it scrolls normally. */
 #header {
-  position: sticky !important;
+  padding-top: 48px;
+}
+#header > h1 {
+  position: fixed;
   top: 0;
+  width: 100vw;
+  height: 48px;
   z-index: 100;
   background: #fff;
+  box-shadow: 0 1px 0 #ccc;
+}
+#header > #user-menu {
+  position: fixed !important;
+  top: 0;
+  right: 0;
+  z-index: 101;
 }
