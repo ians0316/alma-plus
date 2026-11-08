@@ -1,24 +1,55 @@
-/* Today dashboard. Cards use Alma's own Schedule card classes (todays-classes,
-   pane, header, sc-box, content, class-grade); these rules only fill the gaps. */
+/* Today dashboard: Due Today | Due Tomorrow | New Grades side by side under
+   Alma's Schedule, each a compact list styled like the rows of Alma's To Do
+   tables (white rows, gray borders, small bold class line over the name). */
 
-.alma-plus-dash-section {
-  margin-top: 8px;
+.alma-plus-dashboard {
+  margin: 8px -10px 0;
+}
+.alma-plus-dash-col {
+  padding: 0 10px;
+}
+.alma-plus-dash-col .module-heading {
+  margin-top: 0.5em;
+}
+
+.alma-plus-dash-table {
+  width: 100%;
+  border: 1px solid #cbcbcb;
+  background: #fff;
+}
+.alma-plus-dash-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #cbcbcb;
+  vertical-align: middle;
+}
+.alma-plus-dash-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.alma-plus-dash-name small {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+.alma-plus-dash-name a {
+  color: #333;
+}
+
+.alma-plus-dash-grade {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 18px;
+}
+.alma-plus-dash-grade small {
+  display: block;
+  font-size: 12px;
+  color: #5f6163;
 }
 
 .alma-plus-dash-empty {
-  margin: 0 0 8px;
+  margin: 0;
   font-size: 13px;
   color: #777;
-}
-
-/* Header line: class name or "Updated today" instead of a time. */
-.alma-plus-dash-card .schedule-time {
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-/* No class-progress bar on these cards. */
-.alma-plus-dash-card .header progress {
-  display: none;
 }

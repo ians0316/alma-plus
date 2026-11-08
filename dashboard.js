@@ -1,6 +1,6 @@
 // Today dashboard for Alma+ on Alma's Overview page (/home): "Due Today",
-// "Due Tomorrow", and "New Grades", built from the same card markup as Alma's
-// Schedule cards so they look like part of the page. Uses helpers from
+// "Due Tomorrow", and "New Grades" side by side under the Schedule, as compact
+// lists styled like the rows of Alma's To Do tables. Uses helpers from
 // alma-plus.js (loadTasks, loadSettings, getClasses, findClass, openDetails).
 
 const GRADES_CACHE_KEY = "almaPlusGradesCache";
@@ -31,11 +31,6 @@ function dayHeading(date) {
   if (isoDay(date) === isoDay(today)) return "Due Today";
   if (isoDay(date) === isoDay(tomorrow)) return "Due Tomorrow";
   return `Due ${date.toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}`;
-}
-
-// "P3 Discussions" -> "P3"; "HS Advisory: Carmen" -> "HS".
-function classCode(name) {
-  return (name || "").match(/^(P\d+)\b/)?.[1] || (name || "").trim().split(/\s+/)[0]?.slice(0, 3) || "•";
 }
 
 // ---- Data ----
@@ -95,21 +90,14 @@ function tasksOnDay(tasks, day) {
   return tasks.filter((t) => !t.completed && t.due <= day && (t.end && t.end > t.due ? t.end : t.due) >= day);
 }
 
-// ---- Cards (same markup as Alma's Schedule cards) ----
+// ---- Compact lists, styled like the rows of Alma's To Do tables ----
 
-function card({ code, headerText, title, href, onOpen, sub, subHref, grade }) {
-  const li = dEl("li", "class pane alma-plus-dash-card");
-  const header = dEl("div", "header");
-  header.append(dEl("span", "sc-box", code), " ", dEl("span", "schedule-time", headerText));
-  const content = dEl("div", "content");
-  if (grade) {
-    const g = dEl("a", "class-grade");
-    if (href) g.href = href;
-    g.append(grade.letter || "");
-    if (grade.percent) g.append(" ", dEl("small", "dimmed percent", `(${grade.percent})`));
-    content.appendChild(g);
-  }
-  const h5 = dEl("h5");
+// One row: small bold class line over the name (like Alma's To Do rows), with an
+// optional grade on the right.
+function row({ classLine, title, href, onOpen, grade }) {
+  const tr = dEl("tr");
+  const name = dEl("td", "alma-plus-dash-name");
+  name.appendChild(dEl("small", "", classLine));
   const a = dEl("a", "", title);
   a.href = href || "#";
   if (onOpen) {
@@ -118,63 +106,56 @@ function card({ code, headerText, title, href, onOpen, sub, subHref, grade }) {
       onOpen();
     });
   }
-  h5.appendChild(a);
-  content.appendChild(h5);
-  if (sub) {
-    const line = dEl("span", "class-teacher");
-    if (subHref) {
-      const s = dEl("a", "", sub);
-      s.href = subHref;
-      line.appendChild(s);
-    } else {
-      line.textContent = sub;
-    }
-    content.appendChild(line);
+  name.appendChild(a);
+  tr.appendChild(name);
+  if (grade) {
+    const g = dEl("td", "alma-plus-dash-grade");
+    g.append(grade.letter || "");
+    if (grade.percent) g.append(dEl("small", "", `(${grade.percent})`));
+    tr.appendChild(g);
   }
-  li.append(header, content);
-  return li;
+  return tr;
 }
 
-function section(id, heading, cards, emptyText) {
-  const wrap = dEl("div", "todays-classes alma-plus-dash-section");
-  wrap.id = id;
-  wrap.appendChild(dEl("h4", "module-heading", heading));
-  if (!cards.length) {
-    wrap.appendChild(dEl("p", "alma-plus-dash-empty", emptyText));
-    return wrap;
+function column(id, heading, rows, emptyText) {
+  const col = dEl("div", "pure-u-1 pure-u-md-1-3");
+  const box = dEl("div", "alma-plus-dash-col");
+  box.id = id;
+  box.appendChild(dEl("h4", "module-heading", heading));
+  if (!rows.length) {
+    box.appendChild(dEl("p", "alma-plus-dash-empty", emptyText));
+  } else {
+    const table = dEl("table", "pure-table pure-table-horizontal alma-plus-dash-table");
+    const tbody = dEl("tbody");
+    rows.forEach((r) => tbody.appendChild(r));
+    table.appendChild(tbody);
+    box.appendChild(table);
   }
-  const list = dEl("ol", "scrollpane pane-stack-sm pane-sm-1-2 pane-md-1-3");
-  cards.forEach((c) => list.appendChild(c));
-  wrap.appendChild(list);
-  return wrap;
+  col.appendChild(box);
+  return col;
 }
 
-function dueCards(day, alma, tasks) {
-  const cards = [];
-  for (const a of alma.filter((x) => x.day === day)) {
-    cards.push(card({ code: classCode(a.className), headerText: a.className, title: a.name, href: a.href }));
-  }
+function dueRows(day, alma, tasks) {
+  const rows = alma.filter((x) => x.day === day).map((a) => row({ classLine: a.className, title: a.name, href: a.href }));
   for (const t of tasks) {
-    const range = t.end && t.end > t.due;
-    cards.push(card({
-      code: t.category ? classCode(t.category) : "•",
-      headerText: t.category || "My task",
+    const range = t.end && t.end > t.due ? ` · ${t.due.slice(5).replace("-", "/")}–${t.end.slice(5).replace("-", "/")}` : "";
+    rows.push(row({
+      classLine: `${t.category || "My task"}${t.category ? " · My task" : ""}${range}`,
       title: t.name,
       onOpen: () => typeof openDetails === "function" && openDetails(t),
-      sub: range ? `My task · ${t.due.slice(5).replace("-", "/")}–${t.end.slice(5).replace("-", "/")}` : "My task",
     }));
   }
-  return cards;
+  return rows;
 }
 
-function gradeCards(grades) {
+function gradeRows(grades) {
   const today = isoDay(new Date());
   const yesterday = isoDay(new Date(Date.now() - 86400000));
-  return grades.slice(0, 9).map((g) => {
+  return grades.slice(0, 8).map((g) => {
     const day = isoDay(new Date(g.updated * 1000));
-    const when = day === today ? "Updated today" : day === yesterday ? "Updated yesterday"
-      : `Updated ${new Date(g.updated * 1000).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}`;
-    return card({ code: classCode(g.className), headerText: when, title: g.name, href: g.href, sub: g.className, subHref: g.classHref, grade: g });
+    const when = day === today ? "today" : day === yesterday ? "yesterday"
+      : new Date(g.updated * 1000).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+    return row({ classLine: `${g.className} · ${when}`, title: g.name, href: g.href, grade: g });
   });
 }
 
@@ -203,24 +184,23 @@ async function renderDashboard() {
       settings.tasksTodo === false || typeof loadTasks !== "function" ? [] : loadTasks(),
     ]);
 
-    const dash = dEl("div", "alma-plus-dashboard");
+    const dash = dEl("div", "pure-g alma-plus-dashboard");
     dash.id = "alma-plus-dashboard";
+    const nextDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
+    const gradesSlot = column("alma-plus-dash-grades", "New Grades", [], "Loading…");
     dash.append(
-      section("alma-plus-dash-today", dayHeading(date), dueCards(day, alma, tasksOnDay(allTasks, day)), "Nothing due."),
-      section("alma-plus-dash-tomorrow", dayHeading(new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1)),
-        dueCards(next, alma, tasksOnDay(allTasks, next)), "Nothing due."),
+      column("alma-plus-dash-today", dayHeading(date), dueRows(day, alma, tasksOnDay(allTasks, day)), "Nothing due."),
+      column("alma-plus-dash-tomorrow", dayHeading(nextDate), dueRows(next, alma, tasksOnDay(allTasks, next)), "Nothing due."),
+      gradesSlot,
     );
-    const gradesSlot = dEl("div");
-    gradesSlot.appendChild(section("alma-plus-dash-grades", "New Grades", [], "Loading…"));
-    dash.appendChild(gradesSlot);
 
     document.getElementById("alma-plus-dashboard")?.remove();
     anchor.after(dash);
     dashRenderedFor = day;
 
     recentGrades()
-      .then((grades) => gradesSlot.replaceChildren(section("alma-plus-dash-grades", "New Grades", gradeCards(grades), `No new grades in the last ${NEW_GRADE_DAYS} days.`)))
-      .catch(() => gradesSlot.replaceChildren(section("alma-plus-dash-grades", "New Grades", [], "Couldn't load grades.")));
+      .then((grades) => gradesSlot.replaceWith(column("alma-plus-dash-grades", "New Grades", gradeRows(grades), `No new grades in the last ${NEW_GRADE_DAYS} days.`)))
+      .catch(() => gradesSlot.replaceWith(column("alma-plus-dash-grades", "New Grades", [], "Couldn't load grades.")));
   } finally {
     dashRendering = false;
   }
