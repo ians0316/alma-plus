@@ -2,14 +2,14 @@
    add the dots, list squares, and day popup layout. */
 
 /* Dots under a day number (positioned so the day squares don't change size) */
-.calendar-months td .has-tooltip {
+.calendar-months td button.pure-button {
   position: relative;
-  display: inline-block;
+  overflow: visible;
 }
-.calendar-months td i.alma-plus-dots {
+.calendar-months td button i.alma-plus-dots {
   position: absolute !important;
   left: 50%;
-  bottom: -5px;
+  bottom: -4px;
   transform: translateX(-50%);
   display: flex !important;
   flex-direction: row !important;
@@ -18,7 +18,7 @@
   padding: 0 !important;
   pointer-events: none;
 }
-.calendar-months td i.alma-plus-dot {
+.calendar-months td button i.alma-plus-dot {
   display: block !important;
   width: 5px !important;
   height: 5px !important;
@@ -113,21 +113,13 @@
   font-size: 13px;
 }
 
-/* Title with the school crest, and the official legend under it */
-.alma-plus-cal-title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.alma-plus-crest {
-  height: 1.6em;
-  width: auto;
-}
+/* Official calendar color legend under the heading */
 .alma-plus-cal-legend {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px 16px;
-  margin: 8px 0 4px;
+  justify-content: center;
+  gap: 6px 14px;
+  margin: 0 0 14px;
   font-size: 13px;
   color: #5f6163;
 }

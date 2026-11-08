@@ -292,7 +292,7 @@ function drawDots(dayMap) {
         dot.style.background = color;
         dots.appendChild(dot);
       }
-      (btn.parentElement || td).appendChild(dots);
+      btn.appendChild(dots);
       // Add them to the day's hover tooltip, under any school events.
       const tip = td.querySelector(".tooltip");
       if (tip) {
@@ -317,11 +317,7 @@ function drawEventList(assignments, tasks, official = []) {
   const months = [...document.querySelectorAll(".calendar-months table.cal[data-month]")].map((t) => t.dataset.month.slice(0, 7));
   const entries = [];
   for (const o of official) entries.push({ day: o.start, end: o.end || "", label: o.name, className: o.catLabel, color: o.color, item: { kind: "official" } });
-  for (const a of assignments) entries.push({ day: a.day, label: a.name, className: a.className, item: { kind: "assignment", ...a } });
-  for (const t of tasks) {
-    const range = t.end && t.end > t.due;
-    entries.push({ day: t.due, end: range ? t.end : "", label: t.name, className: t.category || "My task", item: { kind: "task", name: t.name, className: t.category || "My task", task: t } });
-  }
+  // Assignments and tasks stay on the calendar (dots and day popup), not in this list.
 
   for (const month of months) {
     const here = entries.filter((e) => e.day.slice(0, 7) === month).sort((a, b) => a.day.localeCompare(b.day));
@@ -377,25 +373,12 @@ function drawEventList(assignments, tasks, official = []) {
   }
 }
 
-// Title: "Seoul Academy Upper Division Academic Calendar", with the school crest
-// on the left when icons/seoul-academy.png is in the extension, and the official
-// legend underneath.
-async function drawTitle() {
-  if (typeof OFFICIAL_CALENDAR === "undefined" || document.getElementById("alma-plus-cal-title")) return;
-  const heading = [...document.querySelectorAll("h1, h2, h3")].find((h) => /^SY\s*\d{4}/.test(h.textContent.trim()));
-  if (!heading) return;
-  heading.id = "alma-plus-cal-title";
-  heading.dataset.original = heading.textContent.trim();
-  heading.textContent = OFFICIAL_CALENDAR.title;
-  heading.classList.add("alma-plus-cal-title");
-  const crestUrl = chrome.runtime.getURL("icons/seoul-academy.png");
-  const hasCrest = await fetch(crestUrl).then((r) => r.ok).catch(() => false);
-  if (hasCrest) {
-    const img = cEl("img", "alma-plus-crest");
-    img.src = crestUrl;
-    img.alt = "Seoul Academy";
-    heading.prepend(img);
-  }
+// The official calendar's color legend, at the top of the Events box.
+function drawTitle() {
+  if (typeof OFFICIAL_CALENDAR === "undefined" || document.querySelector(".alma-plus-cal-legend")) return;
+  const list = document.querySelector(".event-list");
+  const firstMonth = list?.querySelector(".event-list-month");
+  if (!firstMonth) return;
   const legend = cEl("div", "alma-plus-cal-legend");
   for (const [key, c] of Object.entries(OFFICIAL_CALENDAR.categories)) {
     if (key === "info") continue;
@@ -405,8 +388,7 @@ async function drawTitle() {
     item.append(sw, c.label);
     legend.appendChild(item);
   }
-  const sub = heading.nextElementSibling;
-  (sub && !/^H[1-4]$/.test(sub.tagName) ? sub : heading).after(legend);
+  firstMonth.before(legend);
 }
 
 let currentDayMap = new Map();
@@ -419,8 +401,6 @@ async function renderCalendar() {
     const settings = typeof loadSettings === "function" ? await loadSettings() : {};
     if (settings.calendar === false) {
       document.querySelectorAll(".alma-plus-dots, .alma-plus-tip, .alma-plus-ev, .alma-plus-month, .alma-plus-cal-legend").forEach((n) => n.remove());
-      const t = document.getElementById("alma-plus-cal-title");
-      if (t) { t.textContent = t.dataset.original; t.removeAttribute("id"); }
       currentDayMap = new Map();
       return;
     }
