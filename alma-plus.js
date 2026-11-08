@@ -510,13 +510,16 @@ function getStatusColumnIndex(table) {
 }
 
 // Where tasks show:
-//   To Do page: upcoming -> Upcoming Assignments; past -> off the To Do page.
-//   Class page: upcoming -> Upcoming list; past -> Past Assignments.
+//   To Do page: upcoming and not done -> Upcoming Assignments. Done, or past
+//     its date -> off the To Do page.
+//   Class page: upcoming and not done -> Upcoming list. Done, or past its
+//     date -> Past Assignments (with a check if done). Undo brings it back.
 // Past tasks never go to Missing; marking them done isn't needed.
 function taskPlacements(tasks) {
   const upcomingTable = findAssignmentsTable();
-  const upcoming = tasks.filter((t) => !isPastTask(t));
-  const past = tasks.filter(isPastTask);
+  const finished = (t) => t.completed || isPastTask(t);
+  const upcoming = tasks.filter((t) => !finished(t));
+  const past = tasks.filter(finished);
   const placements = [];
   if (isClassPage()) {
     const pastTable = document.querySelector(".student-assignments table.assignment-grades");
