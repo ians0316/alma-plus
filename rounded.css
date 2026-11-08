@@ -1,0 +1,46 @@
+/* Same 4px rounded corners as Alma's Schedule cards, everywhere in Alma.
+   Only corner shapes change; sizes, colors, and borders stay as Alma has them.
+   Applied on every Alma page (see manifest.json). */
+
+/* Overview: School Attendance box */
+.school-attendance-sub-block,
+.school-attendance-sub-block .attendance {
+  border-radius: 4px;
+}
+
+/* Class pages: In Progress Grade box; Category Totals (gray header + score) */
+.current-grade .grade {
+  border-radius: 4px;
+}
+.category-total h5.name {
+  border-radius: 4px 4px 0 0;
+}
+.category-total .score {
+  border-radius: 0 0 4px 4px;
+}
+
+/* Attendance page: stats box, calendars box, and the day squares */
+.stat-type,
+.attendance-calendars,
+.attendance-calendars .day {
+  border-radius: 4px;
+}
+
+/* Report Cards page */
+.report-card-box {
+  border-radius: 4px;
+}
+
+/* Popups (Alma's and the extension's): window, dark header bar, grade box */
+.yui3-panel .yui3-panel-content {
+  border-radius: 4px;
+  overflow: hidden;
+}
+.yui3-panel .yui3-widget-bd .grade {
+  border-radius: 4px;
+}
+
+/* Buttons: Alma uses 2px corners, which look nearly square next to the boxes */
+.pure-button {
+  border-radius: 4px;
+}
