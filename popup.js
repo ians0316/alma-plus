@@ -10,6 +10,7 @@ const DEFAULT_SETTINGS = {
   attachments: true,
   clips: true,
   notes: true,
+  dashboard: true,
 };
 
 async function loadSettings() {

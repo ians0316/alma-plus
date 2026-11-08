@@ -13,6 +13,7 @@ const DEFAULT_SETTINGS = {
   attachments: true,      // "Attached files" in assignment and task popups
   clips: true,            // paperclip counts on rows
   notes: true,            // "My notes" on Alma assignments
+  dashboard: true,        // Due Today / Due Tomorrow / New Grades on Overview
 };
 let settings = { ...DEFAULT_SETTINGS };
 async function loadSettings() {

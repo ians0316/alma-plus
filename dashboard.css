@@ -1,0 +1,24 @@
+/* Today dashboard. Cards use Alma's own Schedule card classes (todays-classes,
+   pane, header, sc-box, content, class-grade); these rules only fill the gaps. */
+
+.alma-plus-dash-section {
+  margin-top: 8px;
+}
+
+.alma-plus-dash-empty {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: #777;
+}
+
+/* Header line: class name or "Updated today" instead of a time. */
+.alma-plus-dash-card .schedule-time {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* No class-progress bar on these cards. */
+.alma-plus-dash-card .header progress {
+  display: none;
+}
