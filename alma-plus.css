@@ -250,3 +250,65 @@ table.assignment-grades .alma-plus-task-actions:focus-within,
 table.missing-assignments .alma-plus-task-actions:focus-within {
   display: block;
 }
+
+/* Alma's assignment tables (To Do: Missing + Upcoming; class pages: Past +
+   Upcoming) get the same box as the Schedule cards on the Overview page:
+   1px #ccc border with 4px rounded corners. The header row stays outside the
+   box, as before; only the outline changes. */
+table.missing-assignments,
+table.upcoming-assignments,
+table.assignment-grades {
+  border: 0 !important;
+  border-collapse: separate !important;
+  border-spacing: 0;
+}
+table.missing-assignments tbody td,
+table.upcoming-assignments tbody td,
+table.assignment-grades tbody td {
+  border-bottom: 1px solid #ccc !important;
+}
+table.missing-assignments tbody tr:first-child td,
+table.upcoming-assignments tbody tr:first-child td,
+table.assignment-grades tbody tr:first-child td {
+  border-top: 1px solid #ccc !important;
+}
+table.missing-assignments tbody td:first-child,
+table.upcoming-assignments tbody td:first-child,
+table.assignment-grades tbody td:first-child {
+  border-left: 1px solid #ccc !important;
+}
+table.missing-assignments tbody td:last-child,
+table.upcoming-assignments tbody td:last-child,
+table.assignment-grades tbody td:last-child {
+  border-right: 1px solid #ccc !important;
+}
+table.missing-assignments tbody tr:first-child td:first-child,
+table.upcoming-assignments tbody tr:first-child td:first-child,
+table.assignment-grades tbody tr:first-child td:first-child {
+  border-top-left-radius: 4px;
+}
+table.missing-assignments tbody tr:first-child td:last-child,
+table.upcoming-assignments tbody tr:first-child td:last-child,
+table.assignment-grades tbody tr:first-child td:last-child {
+  border-top-right-radius: 4px;
+}
+table.missing-assignments tbody tr:last-child td:first-child,
+table.upcoming-assignments tbody tr:last-child td:first-child,
+table.assignment-grades tbody tr:last-child td:first-child {
+  border-bottom-left-radius: 4px;
+}
+table.missing-assignments tbody tr:last-child td:last-child,
+table.upcoming-assignments tbody tr:last-child td:last-child,
+table.assignment-grades tbody tr:last-child td:last-child {
+  border-bottom-right-radius: 4px;
+}
+table.missing-assignments tbody,
+table.upcoming-assignments tbody,
+table.assignment-grades tbody {
+  background: transparent !important;
+}
+table.missing-assignments tbody td:not(:first-child),
+table.upcoming-assignments tbody td:not(:first-child),
+table.assignment-grades tbody td:not(:first-child) {
+  background-color: #fff;
+}
