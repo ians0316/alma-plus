@@ -48,6 +48,45 @@ button.pure-button,
   border-radius: 4px !important;
 }
 
+/* Calendar: Events box, months box, event color squares, tooltips */
+.event-list,
+.calendar-months,
+span.event::before,
+span.key-date::before,
+span.noschool::before,
+span.inservice::before,
+span.tooltip {
+  border-radius: 4px !important;
+}
+
+/* Attendance: legend squares; Week view cards, status bars, period blocks */
+.days-total::before,
+.day-status .school-attendance,
+.class-period .period,
+.attendance-status {
+  border-radius: 4px !important;
+}
+.pane > header {
+  border-radius: 4px 4px 0 0;
+}
+
+/* Classes page grid view: class rows and period blocks */
+.class-row,
+.cycleday .period,
+.class-period {
+  border-radius: 4px;
+}
+
+/* My Info boxes */
+dl.inline {
+  border-radius: 4px !important;
+}
+
+/* Page tabs (overview / to do / classes ...): top corners, like tabs */
+.pure-menu-horizontal .pure-menu-link {
+  border-radius: 4px 4px 0 0;
+}
+
 /* Every Alma table gets the same box as the Schedule cards: 1px #ccc border,
    4px rounded corners. (Attendance calendars, .cal, are grids of rounded day
    squares instead and are left alone.) */
