@@ -76,6 +76,9 @@ function taskDays(task) {
 
 // Official school calendar events (official-calendar.js), minus ones Alma's
 // own Events list already has that month (same distinctive word, e.g. "Hangul").
+// Same orange as Alma's own school events, so they all read as one kind of thing.
+const SCHOOL_EVENT_COLOR = "#eb6841";
+
 function officialEvents() {
   if (typeof OFFICIAL_CALENDAR === "undefined") return [];
   const almaByMonth = {};
@@ -87,7 +90,7 @@ function officialEvents() {
   return OFFICIAL_CALENDAR.events.filter((e) => {
     const alma = almaByMonth[e.start.slice(0, 7)] || "";
     return !words(e.name).some((w) => !["break", "classes", "school", "students", "first"].includes(w) && alma.includes(w));
-  }).map((e) => ({ ...e, color: OFFICIAL_CALENDAR.categories[e.cat]?.color || OTHER_COLOR, catLabel: OFFICIAL_CALENDAR.categories[e.cat]?.label || "" }));
+  }).map((e) => ({ ...e, color: SCHOOL_EVENT_COLOR, catLabel: "School event" }));
 }
 
 function eventDays(start, end) {
@@ -207,7 +210,7 @@ function openDay(day, items, schoolEvents) {
     const swatch = cEl("span", "alma-plus-day-swatch");
     swatch.style.background = item.color;
     const text = cEl("span");
-    text.append(cEl("small", "", item.className), item.name);
+    text.append(item.name);
     li.append(swatch, text);
     list.appendChild(li);
   }
@@ -342,7 +345,9 @@ function drawEventList(assignments, tasks, official = []) {
       const span = cEl("span", "alma-plus-ev-item");
       span.style.setProperty("--alma-plus-ev-color", e.color || colorFor(e.className));
       if (e.item.kind === "official") {
-        span.classList.add("alma-plus-ev-official");
+        // Alma's own "event" style: same orange square and spacing as Alma's school events.
+        span.className = "event alma-plus-ev-official";
+        span.style.removeProperty("--alma-plus-ev-color");
         span.append(e.label);
         span.title = e.className;
         dd.appendChild(span);
@@ -373,24 +378,6 @@ function drawEventList(assignments, tasks, official = []) {
   }
 }
 
-// The official calendar's color legend, at the top of the Events box.
-function drawTitle() {
-  if (typeof OFFICIAL_CALENDAR === "undefined" || document.querySelector(".alma-plus-cal-legend")) return;
-  const list = document.querySelector(".event-list");
-  const firstMonth = list?.querySelector(".event-list-month");
-  if (!firstMonth) return;
-  const legend = cEl("div", "alma-plus-cal-legend");
-  for (const [key, c] of Object.entries(OFFICIAL_CALENDAR.categories)) {
-    if (key === "info") continue;
-    const item = cEl("span", "alma-plus-cal-legend-item");
-    const sw = cEl("span", "alma-plus-day-swatch");
-    sw.style.background = c.color;
-    item.append(sw, c.label);
-    legend.appendChild(item);
-  }
-  firstMonth.before(legend);
-}
-
 let currentDayMap = new Map();
 let calRendering = false;
 
@@ -408,7 +395,6 @@ async function renderCalendar() {
       allAssignments().catch(() => []),
       settings.tasksTodo === false || typeof loadTasks !== "function" ? [] : loadTasks(),
     ]);
-    drawTitle();
     const official = officialEvents();
     currentDayMap = buildDayMap(assignments, tasks, official);
     drawDots(currentDayMap);

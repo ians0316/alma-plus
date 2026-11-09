@@ -113,25 +113,6 @@
   font-size: 13px;
 }
 
-/* Official calendar color legend under the heading */
-.alma-plus-cal-legend {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 6px 14px;
-  margin: 0 0 14px;
-  font-size: 13px;
-  color: #5f6163;
-}
-.alma-plus-cal-legend-item {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-.alma-plus-cal-legend .alma-plus-day-swatch {
-  margin-top: 0;
-}
-
 /* Header close "x", same as Alma's popups on other pages */
 .alma-plus-cal-panel .yui3-widget-hd {
   position: relative;
