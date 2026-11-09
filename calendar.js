@@ -76,8 +76,33 @@ function taskDays(task) {
 
 // Official school calendar events (official-calendar.js), minus ones Alma's
 // own Events list already has that month (same distinctive word, e.g. "Hangul").
-// Same orange as Alma's own school events, so they all read as one kind of thing.
-const SCHOOL_EVENT_COLOR = "#eb6841";
+// Alma's own event kinds (from Alma's Study Guide): black = holidays and breaks
+// (no school), yellow = in-service (teachers only), orange = other school events.
+// The official calendar's categories map onto them.
+const EVENT_KINDS = {
+  noschool: { cls: "noschool", cssVar: "--bg-inverse", fallback: "#333333" },
+  inservice: { cls: "inservice", cssVar: "--yellow", fallback: "#f5c242" },
+  event: { cls: "event", cssVar: "", fallback: "#eb6841" },
+};
+function kindOf(cat) {
+  return cat === "closed" || cat === "break" ? "noschool" : cat === "faculty" ? "inservice" : "event";
+}
+function kindColor(kind) {
+  const k = EVENT_KINDS[kind];
+  return (k.cssVar && getComputedStyle(document.documentElement).getPropertyValue(k.cssVar).trim()) || k.fallback;
+}
+// What kind of day each date is on the official calendar ("faculty" wins over a
+// break, e.g. teachers' workshop days at the end of winter break).
+function officialDayKinds() {
+  const map = new Map();
+  if (typeof OFFICIAL_CALENDAR === "undefined") return map;
+  for (const e of OFFICIAL_CALENDAR.events) {
+    const kind = kindOf(e.cat);
+    if (kind === "event") continue;
+    for (const day of eventDays(e.start, e.end)) if (map.get(day) !== "inservice") map.set(day, kind);
+  }
+  return map;
+}
 
 function officialEvents() {
   if (typeof OFFICIAL_CALENDAR === "undefined") return [];
@@ -86,11 +111,21 @@ function officialEvents() {
     almaByMonth[block.dataset.month.slice(0, 7)] = [...block.querySelectorAll("dd")]
       .filter((dd) => !dd.classList.contains("alma-plus-ev")).map((dd) => dd.textContent.toLowerCase()).join(" ");
   }
+  // Days Alma's own list already has an event starting on (e.g. "Samiljeol" on Mar 1).
+  const almaStarts = new Set();
+  for (const block of document.querySelectorAll(".event-list-month[data-month]:not(.alma-plus-month)")) {
+    const month = block.dataset.month.slice(0, 7);
+    for (const dt of block.querySelectorAll("dt:not(.alma-plus-ev)")) {
+      const n = dt.textContent.match(/\d+/)?.[0];
+      if (n) almaStarts.add(`${month}-${n.padStart(2, "0")}`);
+    }
+  }
   const words = (name) => name.toLowerCase().match(/[a-z]{5,}/g) || [];
   return OFFICIAL_CALENDAR.events.filter((e) => {
     const alma = almaByMonth[e.start.slice(0, 7)] || "";
+    if (kindOf(e.cat) === "noschool" && almaStarts.has(e.start)) return false;
     return !words(e.name).some((w) => !["break", "classes", "school", "students", "first"].includes(w) && alma.includes(w));
-  }).map((e) => ({ ...e, color: SCHOOL_EVENT_COLOR, catLabel: "School event" }));
+  }).map((e) => ({ ...e, kind: kindOf(e.cat), color: kindColor(kindOf(e.cat)), catLabel: "School event" }));
 }
 
 function eventDays(start, end) {
@@ -202,7 +237,10 @@ function openDay(day, items, schoolEvents) {
   const list = cEl("ul", "alma-plus-day-list");
   for (const ev of schoolEvents) {
     const li = cEl("li", "alma-plus-day-item");
-    li.append(cEl("span", "alma-plus-day-swatch alma-plus-day-swatch-school"), cEl("span", "", ev));
+    const sw = cEl("span", "alma-plus-day-swatch alma-plus-day-swatch-school");
+    const dayKind = officialDayKinds().get(day);
+    if (dayKind) sw.style.background = kindColor(dayKind);
+    li.append(sw, cEl("span", "", ev));
     list.appendChild(li);
   }
   for (const item of items.filter((i) => i.kind === "official")) {
@@ -319,7 +357,7 @@ function drawEventList(assignments, tasks, official = []) {
   // Only the school year's months shown on the page.
   const months = [...document.querySelectorAll(".calendar-months table.cal[data-month]")].map((t) => t.dataset.month.slice(0, 7));
   const entries = [];
-  for (const o of official) entries.push({ day: o.start, end: o.end || "", label: o.name, className: o.catLabel, color: o.color, item: { kind: "official" } });
+  for (const o of official) entries.push({ day: o.start, end: o.end || "", label: o.name, className: o.catLabel, color: o.color, item: { kind: "official", eventKind: o.kind } });
   // Assignments and tasks stay on the calendar (dots and day popup), not in this list.
 
   for (const month of months) {
@@ -346,7 +384,7 @@ function drawEventList(assignments, tasks, official = []) {
       span.style.setProperty("--alma-plus-ev-color", e.color || colorFor(e.className));
       if (e.item.kind === "official") {
         // Alma's own "event" style: same orange square and spacing as Alma's school events.
-        span.className = "event alma-plus-ev-official";
+        span.className = `${EVENT_KINDS[e.item.eventKind || "event"].cls} alma-plus-ev-official`;
         span.style.removeProperty("--alma-plus-ev-color");
         span.append(e.label);
         span.title = e.className;
@@ -398,9 +436,38 @@ async function renderCalendar() {
     const official = officialEvents();
     currentDayMap = buildDayMap(assignments, tasks, official);
     drawDots(currentDayMap);
+    recolorAlmaEvents();
     drawEventList(assignments, tasks, official);
   } finally {
     calRendering = false;
+  }
+}
+
+// Alma's own events and day squares that fall on official holidays/breaks turn
+// black, and on teacher-only days yellow, using Alma's own "noschool" and
+// "inservice" styles.
+function recolorAlmaEvents() {
+  const kinds = officialDayKinds();
+  for (const block of document.querySelectorAll(".event-list-month[data-month]")) {
+    const month = block.dataset.month.slice(0, 7);
+    let dayNum = null;
+    for (const node of block.querySelectorAll("dt, dd")) {
+      // Alma's labels read like "Sep 24-25" (the month is print-only): take the first number.
+      if (node.tagName === "DT") { dayNum = Number(node.textContent.match(/\d+/)?.[0]) || null; continue; }
+      if (node.classList.contains("alma-plus-ev") || !dayNum) continue;
+      const span = node.querySelector("span.event, span.noschool, span.inservice");
+      if (!span) continue;
+      const kind = kinds.get(`${month}-${String(dayNum).padStart(2, "0")}`);
+      if (!kind) continue;
+      span.classList.remove("event", "noschool", "inservice");
+      span.classList.add(EVENT_KINDS[kind].cls);
+    }
+  }
+  for (const { day, btn } of dayCells()) {
+    const kind = kinds.get(day);
+    if (!kind) continue;
+    btn.classList.remove("event", "noschool", "inservice");
+    btn.classList.add(EVENT_KINDS[kind].cls);
   }
 }
 
