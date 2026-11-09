@@ -77,29 +77,30 @@ function taskDays(task) {
 // Official school calendar events (official-calendar.js), minus ones Alma's
 // own Events list already has that month (same distinctive word, e.g. "Hangul").
 // Alma's own event kinds (from Alma's Study Guide): black = holidays and breaks
-// (no school), yellow = in-service (teachers only), orange = other school events.
-// The official calendar's categories map onto them.
+// (no school), orange = other school events. The official calendar's categories
+// map onto them.
 const EVENT_KINDS = {
   noschool: { cls: "noschool", cssVar: "--bg-inverse", fallback: "#333333" },
-  inservice: { cls: "inservice", cssVar: "--yellow", fallback: "#f5c242" },
   event: { cls: "event", cssVar: "", fallback: "#eb6841" },
 };
 function kindOf(cat) {
-  return cat === "closed" || cat === "break" ? "noschool" : cat === "faculty" ? "inservice" : "event";
+  return cat === "closed" || cat === "break" ? "noschool" : "event";
 }
 function kindColor(kind) {
   const k = EVENT_KINDS[kind];
   return (k.cssVar && getComputedStyle(document.documentElement).getPropertyValue(k.cssVar).trim()) || k.fallback;
 }
-// What kind of day each date is on the official calendar ("faculty" wins over a
-// break, e.g. teachers' workshop days at the end of winter break).
+// Which dates are holidays/breaks on the official calendar. Teacher-only days
+// (e.g. the workshop days at the end of winter break) stay as Alma shows them.
 function officialDayKinds() {
   const map = new Map();
   if (typeof OFFICIAL_CALENDAR === "undefined") return map;
   for (const e of OFFICIAL_CALENDAR.events) {
-    const kind = kindOf(e.cat);
-    if (kind === "event") continue;
-    for (const day of eventDays(e.start, e.end)) if (map.get(day) !== "inservice") map.set(day, kind);
+    if (kindOf(e.cat) !== "noschool") continue;
+    for (const day of eventDays(e.start, e.end)) map.set(day, "noschool");
+  }
+  if (typeof OFFICIAL_CALENDAR !== "undefined") {
+    for (const e of OFFICIAL_CALENDAR.events) if (e.cat === "faculty") for (const day of eventDays(e.start, e.end)) map.delete(day);
   }
   return map;
 }
@@ -444,8 +445,7 @@ async function renderCalendar() {
 }
 
 // Alma's own events and day squares that fall on official holidays/breaks turn
-// black, and on teacher-only days yellow, using Alma's own "noschool" and
-// "inservice" styles.
+// black, using Alma's own "noschool" style.
 function recolorAlmaEvents() {
   const kinds = officialDayKinds();
   for (const block of document.querySelectorAll(".event-list-month[data-month]")) {
