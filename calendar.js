@@ -84,7 +84,7 @@ const EVENT_KINDS = {
   event: { cls: "event", cssVar: "", fallback: "#eb6841" },
 };
 function kindOf(cat) {
-  return cat === "closed" || cat === "break" ? "noschool" : "event";
+  return "event";
 }
 function kindColor(kind) {
   const k = EVENT_KINDS[kind];
@@ -239,8 +239,6 @@ function openDay(day, items, schoolEvents) {
   for (const ev of schoolEvents) {
     const li = cEl("li", "alma-plus-day-item");
     const sw = cEl("span", "alma-plus-day-swatch alma-plus-day-swatch-school");
-    const dayKind = officialDayKinds().get(day);
-    if (dayKind) sw.style.background = kindColor(dayKind);
     li.append(sw, cEl("span", "", ev));
     list.appendChild(li);
   }
@@ -437,37 +435,9 @@ async function renderCalendar() {
     const official = officialEvents();
     currentDayMap = buildDayMap(assignments, tasks, official);
     drawDots(currentDayMap);
-    recolorAlmaEvents();
     drawEventList(assignments, tasks, official);
   } finally {
     calRendering = false;
-  }
-}
-
-// Alma's own events and day squares that fall on official holidays/breaks turn
-// black, using Alma's own "noschool" style.
-function recolorAlmaEvents() {
-  const kinds = officialDayKinds();
-  for (const block of document.querySelectorAll(".event-list-month[data-month]")) {
-    const month = block.dataset.month.slice(0, 7);
-    let dayNum = null;
-    for (const node of block.querySelectorAll("dt, dd")) {
-      // Alma's labels read like "Sep 24-25" (the month is print-only): take the first number.
-      if (node.tagName === "DT") { dayNum = Number(node.textContent.match(/\d+/)?.[0]) || null; continue; }
-      if (node.classList.contains("alma-plus-ev") || !dayNum) continue;
-      const span = node.querySelector("span.event, span.noschool, span.inservice");
-      if (!span) continue;
-      const kind = kinds.get(`${month}-${String(dayNum).padStart(2, "0")}`);
-      if (!kind) continue;
-      span.classList.remove("event", "noschool", "inservice");
-      span.classList.add(EVENT_KINDS[kind].cls);
-    }
-  }
-  for (const { day, btn } of dayCells()) {
-    const kind = kinds.get(day);
-    if (!kind) continue;
-    btn.classList.remove("event", "noschool", "inservice");
-    btn.classList.add(EVENT_KINDS[kind].cls);
   }
 }
 
