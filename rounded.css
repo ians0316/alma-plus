@@ -214,7 +214,7 @@ body.has-nav #header > h1 {
   top: 0;
   width: 100vw;
   height: 48px;
-  z-index: 9; /* above the page, below Alma's popups (11) */
+  z-index: 12; /* above Alma's dark popup background (11), so it stays bright */
   background: #fff;
   box-shadow: 0 1px 0 #ccc;
 }
@@ -222,7 +222,7 @@ body.has-nav #header > #user-menu {
   position: fixed !important;
   top: 0;
   right: 0;
-  z-index: 10; /* above the white bar (9), below Alma's popups (11) */
+  z-index: 13; /* above the white bar */
 }
 
 /* Assignments tab in the sidebar (sidebar.js): checklist icon from Alma's icon sheet */
@@ -237,4 +237,9 @@ body.has-nav #header > #user-menu {
 /* Login page: white crest on the orange bar, like the white title */
 body:not(.has-nav) h1 > span.school-name::before {
   filter: brightness(0) invert(1);
+}
+
+/* Alma's popups sit above the top bar, so their title bar and close button show */
+body.has-nav .yui3-panel {
+  z-index: 14 !important;
 }
