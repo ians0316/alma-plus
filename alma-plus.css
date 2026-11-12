@@ -251,8 +251,8 @@ table.missing-assignments .alma-plus-task-actions:focus-within {
   display: block;
 }
 
-/* Upcoming list the extension adds on classes without one: no empty table when
-   there are no tasks yet (the heading and the Add button still show). */
-[data-alma-plus-upcoming] table.upcoming-assignments:not(:has(tbody tr)) {
+/* Upcoming block the extension adds on classes without one: it only shows
+   while that class has a task in it, and hides itself again when empty. */
+[data-alma-plus-upcoming]:not(:has(tbody tr)) {
   display: none;
 }
