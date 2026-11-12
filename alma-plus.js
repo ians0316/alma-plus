@@ -568,7 +568,8 @@ function placeRows(table, tasks, withCalendar) {
     2;
 
   for (const task of tasks) {
-    const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0], statusIndex, updatedIndex);
+    // With no Alma row to copy cell classes from, the header row has the same ones.
+    const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0] || table.querySelector("thead tr"), statusIndex, updatedIndex);
     const rowValue = getCellSortValue(row, sort.columnIndex);
     const target = existingRows.find((r) => {
       const cmp = compareSortValues(rowValue, getCellSortValue(r, sort.columnIndex), sort.numeric);
@@ -1146,6 +1147,47 @@ function ensureAssignmentsHeading() {
   block.querySelector(".segmented-control, table")?.before(heading);
 }
 
+// Alma only draws "Upcoming Assignments" on a class page when the teacher has
+// upcoming work there. Without it your tasks (and the Add button) have nowhere
+// to go, so build the same block Alma uses: heading + table on the right, and
+// the "Past Assignments" heading on the left.
+function ensureUpcomingSection() {
+  if (!isClassPage() || !tasksOnThisPage()) return;
+  const control = document.querySelector(".student-assignments .segmented-control");
+  if (!control || control.querySelector("table.upcoming-assignments")) return;
+
+  const past = control.querySelector(".segment-content");
+  if (past && !past.querySelector("h4.module-heading")) {
+    const h = document.createElement("h4");
+    h.className = "module-heading";
+    h.textContent = "Past Assignments";
+    past.prepend(h);
+  }
+
+  const radio = document.createElement("input");
+  radio.type = "radio";
+  radio.name = "assignment-segments";
+  radio.id = "tab-assignments-upcoming";
+  const label = document.createElement("label");
+  label.htmlFor = radio.id;
+  label.textContent = "Upcoming";
+  const segment = document.createElement("div");
+  segment.className = "segment-content";
+  segment.dataset.almaPlusUpcoming = "1";
+  const heading = document.createElement("h4");
+  heading.className = "module-heading";
+  heading.textContent = "Upcoming Assignments";
+  const table = document.createElement("table");
+  table.className = "pure-table pure-table-horizontal upcoming-assignments";
+  table.innerHTML = `<thead><tr>
+      <th class="due snug sort-asc" data-sortable="numeric">Due</th>
+      <th class="snug">Submit</th>
+      <th class="name" data-sortable="ialpha">Assignment Name</th>
+    </tr></thead><tbody></tbody>`;
+  segment.append(heading, table);
+  control.append(radio, label, segment);
+}
+
 function scheduleRender() {
   clearTimeout(debounceTimer);
   debounceTimer = setTimeout(() => {
@@ -1153,6 +1195,7 @@ function scheduleRender() {
       document.querySelectorAll("[data-alma-plus-row], #alma-plus-toolbar").forEach((el) => el.remove());
       return;
     }
+    ensureUpcomingSection();
     ensureAddButton();
     renderCustomRows();
     ensureAssignmentsHeading();
@@ -1198,6 +1241,7 @@ async function init() {
   if (!isTaskPage()) return;
   await loadSettings();
   getClasses(); // start loading so suggestions and teacher names are ready
+  ensureUpcomingSection();
   ensureAddButton();
   renderCustomRows();
   ensureAssignmentsHeading();
