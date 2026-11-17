@@ -201,16 +201,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 
 ## Report a bug
 
-Email **ian.shin0316@gmail.com** with what you did, what you expected, and a screenshot if you can.
-
----
-
-## The Alma Suite
-
-| | Project | What it's for | Code |
-|:-:|---|---|---|
-| <img src="icons/icon32.png" alt="" width="32" height="32"> | **Alma+ Custom Tasks** | Your own tasks, files and notes inside Alma | [GitHub](https://github.com/ians0316/alma-plus) |
-| 🔄 | **Alma Sync** | Assignments and grades synced to Notion, Google Calendar and Google Sheets every hour | [GitHub](https://github.com/ians0316/alma-sync) |
+Email **ian.shin0316@gmail.com** 
 
 <p align="center">
   <sub>Made by a Seoul Academy student, for Seoul Academy students. Not affiliated with Alma or Seoul Academy.</sub>
