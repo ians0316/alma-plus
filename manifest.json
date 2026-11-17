@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Alma+ Custom Tasks",
-  "version": "2.8.6",
+  "version": "2.9.0",
   "description": "Your own tasks, attached files, and notes inside Alma, styled like Alma, plus Google Calendar buttons.",
   "icons": {
     "16": "icons/icon16.png",
@@ -17,7 +17,7 @@
       "128": "icons/icon128.png"
     },
     "default_title": "Alma+ Custom Tasks",
-    "default_popup": "popup.html"
+    "default_popup": "settings/popup.html"
   },
   "permissions": [
     "storage",
@@ -28,7 +28,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "google-calendar.svg",
+        "icons/google-calendar.svg",
         "icons/seoul-academy.png"
       ],
       "matches": [
@@ -42,12 +42,12 @@
         "https://*.getalma.com/home/assignments*"
       ],
       "js": [
-        "alma-plus.js",
-        "materials.js"
+        "tasks/alma-plus.js",
+        "files-and-notes/materials.js"
       ],
       "css": [
-        "alma-plus.css",
-        "materials.css"
+        "tasks/alma-plus.css",
+        "files-and-notes/materials.css"
       ],
       "run_at": "document_idle"
     },
@@ -56,12 +56,12 @@
         "https://*.getalma.com/home/class/*"
       ],
       "js": [
-        "alma-plus.js",
-        "materials.js"
+        "tasks/alma-plus.js",
+        "files-and-notes/materials.js"
       ],
       "css": [
-        "alma-plus.css",
-        "materials.css"
+        "tasks/alma-plus.css",
+        "files-and-notes/materials.css"
       ],
       "run_at": "document_idle"
     },
@@ -71,14 +71,14 @@
         "https://*.getalma.com/home?*"
       ],
       "js": [
-        "alma-plus.js",
-        "materials.js",
-        "dashboard.js"
+        "tasks/alma-plus.js",
+        "files-and-notes/materials.js",
+        "dashboard/dashboard.js"
       ],
       "css": [
-        "alma-plus.css",
-        "materials.css",
-        "dashboard.css"
+        "tasks/alma-plus.css",
+        "files-and-notes/materials.css",
+        "dashboard/dashboard.css"
       ],
       "run_at": "document_idle"
     },
@@ -87,7 +87,7 @@
         "https://*.getalma.com/*"
       ],
       "css": [
-        "rounded.css"
+        "layout/rounded.css"
       ],
       "run_at": "document_start"
     },
@@ -96,15 +96,15 @@
         "https://*.getalma.com/calendar*"
       ],
       "js": [
-        "alma-plus.js",
-        "materials.js",
-        "official-calendar.js",
-        "calendar.js"
+        "tasks/alma-plus.js",
+        "files-and-notes/materials.js",
+        "calendar/official-calendar.js",
+        "calendar/calendar.js"
       ],
       "css": [
-        "alma-plus.css",
-        "materials.css",
-        "calendar.css"
+        "tasks/alma-plus.css",
+        "files-and-notes/materials.css",
+        "calendar/calendar.css"
       ],
       "run_at": "document_idle"
     },
@@ -113,16 +113,16 @@
         "https://*.getalma.com/*"
       ],
       "js": [
-        "sidebar.js",
-        "topbar.js"
+        "layout/sidebar.js",
+        "layout/topbar.js"
       ],
       "run_at": "document_end",
       "css": [
-        "topbar.css"
+        "layout/topbar.css"
       ]
     }
   ],
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "sync/background.js"
   }
 }

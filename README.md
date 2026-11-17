@@ -122,20 +122,17 @@ The settings menu shows when tasks last synced, with a **Sync now** button.
 
 Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
 
-| File | What it does |
+| Folder / file | What it does |
 |---|---|
 | `manifest.json` | Name, version, icons, and which Alma pages each script runs on |
-| `alma-plus.js`, `alma-plus.css` | Custom tasks, task popup, add/edit window, filters, calendar tools, backup |
-| `materials.js`, `materials.css` | Attached files, My notes, paperclip and note icons, Files Saved message |
-| `dashboard.js`, `dashboard.css` | Today dashboard on the Overview page |
-| `calendar.js`, `calendar.css` | Your assignments and tasks on Alma's Calendar page |
-| `official-calendar.js` | The official school calendar (update each school year) |
-| `sidebar.js` | Extra sidebar tabs |
-| `topbar.js`, `topbar.css` | Search and mail buttons in the top bar |
-| `rounded.css` | Rounded corners across Alma |
-| `background.js` | Hands your tasks to Alma Sync for Notion and Google Calendar |
-| `popup.html`, `popup.css`, `popup.js` | The settings menu |
-| `google-calendar.svg`, `icons/` | Icons |
+| `tasks/` | `alma-plus.js`, `alma-plus.css`: custom tasks, task popup, add/edit window, filters, calendar tools, backup |
+| `files-and-notes/` | `materials.js`, `materials.css`: attached files, My notes, paperclip and note icons, Files Saved message |
+| `dashboard/` | `dashboard.js`, `dashboard.css`: Today dashboard on the Overview page |
+| `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year) |
+| `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma |
+| `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
+| `sync/` | `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
+| `icons/` | Extension icons, the school crest, and the Google Calendar icon |
 
 ## Status
 

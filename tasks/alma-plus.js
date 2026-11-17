@@ -282,7 +282,7 @@ function buildCalendarButton(row) {
   btn.type = "button";
   btn.className = "alma-plus-cal-btn";
   const icon = document.createElement("img");
-  icon.src = chrome.runtime.getURL("google-calendar.svg");
+  icon.src = chrome.runtime.getURL("icons/google-calendar.svg");
   icon.alt = "";
   icon.width = 18;
   icon.height = 18;
