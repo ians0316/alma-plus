@@ -170,7 +170,7 @@ The settings menu shows when tasks last synced, with a **Sync now** button.
 - Alma+ never asks for your Alma password; it reads Alma's pages with the sign-in you already have.
 - Besides Alma itself, the only place your data goes is Alma Sync on your own computer (your task list, if you set it up). The Google Calendar button just opens a pre-filled Google page; nothing is saved until you press Save.
 
-## Under the hood
+## Files
 
 Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
 
