@@ -1,8 +1,4 @@
-<p align="center">
-  <img src="icons/icon128.png" width="128" height="128" alt="Alma+ icon">
-</p>
-
-<h1 align="center">Alma+ Custom Tasks</h1>
+# Alma+ Custom Tasks
 
 <p align="center">
   <b>Your own tasks, files and notes inside Alma, looking just like Alma.</b><br>
