@@ -1,86 +1,221 @@
-# Alma+ Custom Tasks
+<p align="center">
+  <img src="icons/icon128.png" width="128" height="128" alt="Alma+ icon">
+</p>
 
-The Alma+ Custom Tasks is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
+<h1 align="center">Alma+ Custom Tasks</h1>
 
-### Setup
+<p align="center">
+  <b>Your own tasks, files and notes inside Alma, looking just like Alma.</b><br>
+  A Chrome extension for Seoul Academy students (and technically anyone who uses Alma)<br>
+  that adds custom tasks, attached files, notes, a Today dashboard, a fuller calendar and Google Calendar buttons.
+</p>
 
-1. Download the Github repo (click "Code" then "Download Zip").
-2. Unzip the zip file. This should create the extension folder.
-3. Open `chrome://extensions` (Chrome/Brave) or `edge://extensions` (Edge).
-4. Turn on **Developer mode** in the top right.
-5. Click **Load unpacked** and select this project folder.
-6. Open Alma's todo tab and you should be able to access the features this extension offers.
+<p align="center">
+  <img alt="Version 2.8.6" src="https://img.shields.io/badge/version-2.8.6-eb6841?style=flat-square">
+  <img alt="Chrome · Edge · Brave" src="https://img.shields.io/badge/Chrome%20%C2%B7%20Edge%20%C2%B7%20Brave-Manifest%20V3-3fc1c8?style=flat-square&logo=googlechrome&logoColor=white">
+  <img alt="Works on getalma.com" src="https://img.shields.io/badge/works%20on-getalma.com-9ec583?style=flat-square">
+  <img alt="Unofficial student project" src="https://img.shields.io/badge/status-unofficial%20student%20project-d69e2e?style=flat-square">
+</p>
 
-If a bug fix or a new version is released, you would have to manually update the extension by deleting the previous version and uploading the new one.
+<p align="center">
+  <a href="#install"><b>Install Alma+</b></a> ·
+  <a href="https://github.com/ians0316/alma-sync">Alma Sync</a> ·
+  <a href="#report-a-bug">Report a bug</a>
+</p>
 
-### What's new in 2.0
+<br>
 
-Everything the extension adds is built to look like Alma itself: same fonts, colors, buttons, and popups.
+<table>
+  <tr>
+    <td width="25%" valign="top">
+      <h3>📝 Your own tasks</h3>
+      Add anything Alma doesn't have: club deadlines, tests, multi-day projects. They sit in Upcoming Assignments looking just like Alma's own.
+    </td>
+    <td width="25%" valign="top">
+      <h3>📎 Files and notes</h3>
+      Attach files, Drive items and links to any assignment, and write your own notes on it, right in Alma's popup.
+    </td>
+    <td width="25%" valign="top">
+      <h3>📅 On your calendar</h3>
+      One click adds an assignment to Google Calendar. Alma's Calendar page shows your work and the official school calendar too.
+    </td>
+    <td width="25%" valign="top">
+      <h3>🎨 Feels like Alma</h3>
+      Same fonts, colors, buttons and popups as Alma. Everything can be switched on or off from the toolbar icon.
+    </td>
+  </tr>
+</table>
+
+<br>
+
+<p align="center">
+  <a href="#how-it-works">How it works</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#settings">Settings</a> ·
+  <a href="#notion--google-calendar">Notion &amp; Google Calendar</a> ·
+  <a href="#privacy">Privacy</a> ·
+  <a href="#under-the-hood">Under the hood</a> ·
+  <a href="#status">Status</a>
+</p>
+
+> [!IMPORTANT]
+> **Alma+ is an unofficial student project.** It is not made, supported, or approved by Alma or
+> Seoul Academy. Alma can change its website at any time and break parts of the extension, so
+> always double-check due dates in Alma itself.
+
+## How it works
+
+Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already there:
+
+1. **Add:** press **+ Add my own task** on the To Do page or a class page, or click a day on the Calendar.
+2. **See:** your tasks show up next to Alma's assignments, on the Today dashboard, and on the Calendar.
+3. **Attach:** open any assignment or task to add files, links and notes.
+4. **Finish:** press **Done** and the task moves to that class's Past Assignments with a green check.
+
+## Install
+
+1. Download this repo (click **Code**, then **Download ZIP**) and unzip it.
+2. Open `chrome://extensions` (Chrome or Brave) or `edge://extensions` (Edge).
+3. Turn on **Developer mode** in the top right.
+4. Click **Load unpacked** and pick the unzipped folder.
+5. Open Alma's To Do tab. The new buttons are there.
+
+> [!NOTE]
+> Updates are manual for now: when a new version comes out, remove the old one from the
+> extensions page and load the new folder. **Back up your tasks first** (see below).
+
+## Features
 
 ### Custom tasks
 
-- **Add your own tasks** with **+ Add my own task**. They show in Upcoming Assignments looking just like Alma's assignments.
-- **Multi-day tasks**: add an end date and the task shows as a range (e.g. Nov 13–15).
-- **Class pages** show each class's own tasks in its Upcoming list, with the class filled in when you add one there.
-- **Done** moves a task off the To Do page into that class's Past Assignments with a green check. **Undo** there brings it back.
-- **Past tasks** leave the To Do page by themselves after their date and move to the class's Past Assignments (never to Missing). The Updated column shows when they last changed.
-- Tasks without a class stay on the To Do page so they never disappear.
-- **Task popup**: click a task's name for an Alma-style popup with the class, teacher (with Alma's message envelope), status, dates, priority, description, and attached files.
-- **Filter** to see everything, items due today, or items due this week.
-- **Back up and restore tasks** with the JSON buttons.
+- **Add your own tasks** with **+ Add my own task**. They show in Upcoming Assignments looking just like Alma's.
+- **Multi-day tasks:** add an end date and the task shows as a range (e.g. Nov 13–15).
+- **Class pages** list each class's own tasks in its Upcoming block, with the class filled in when you add one there.
+- **Done** moves a task into that class's Past Assignments with a green check; **Undo** brings it back.
+- **Past tasks** leave the To Do page on their own after their date and go to Past Assignments, never to Missing.
+- Tasks without a class stay on the To Do page, so they never disappear.
+- **Task popup:** click a task's name for an Alma-style popup with its class, teacher (with Alma's message envelope), status, dates, priority, description and files.
+- **Filter** by everything, due today, or due this week.
+- **Back up and restore** all tasks with the JSON buttons.
 
 ### Attached files
 
-- Every assignment popup (and every task popup) has an **Attached files** section, laid out like Alma's "Submit your work here": **Upload File**, **Add from Drive**, and **Add Link**.
-- Rename or delete attached items; photos open in a viewer, PDFs open in a new tab.
-- Rows with attachments show a 📎 with the count; clicking it opens that popup.
+- Every assignment and task popup gets an **Attached files** section laid out like Alma's "Submit your work here": **Upload File**, **Add from Drive** and **Add Link**.
+- Rename or delete items; photos open in a viewer and PDFs in a new tab.
+- Rows with attachments show 📎 and a count; click it to open the popup.
 - After saving, Alma's own "Files Saved" message appears.
 
 ### My notes
 
-- Every Alma assignment popup has **My notes**: write a note (links become clickable), edit or delete it anytime.
+- Every assignment popup has **My notes**: write a note (links become clickable), edit or delete it any time.
 - Assignments with a note show a small note icon on their row.
-
-### Google Calendar
-
-- **Calendar icon next to each upcoming assignment** opens Google Calendar with an all-day event pre-filled (multi-day tasks cover every day). Click **Save** in Google to add it.
-- **Export to calendar (.ics)** downloads every upcoming assignment and task as one calendar file. In Google Calendar go to **Settings → Import & export → Import**.
-
-All updates to Google Calendar are one-time, so if an assignment changes you will have to add it again.
 
 ### Today dashboard
 
-Alma's Overview page gets **Due Today**, **Due Tomorrow**, and **Recently Updated Grades** under your schedule, in the same card style as Alma's schedule.
+Alma's Overview page gets **Due Today**, **Due Tomorrow** and **Recently Updated Grades** under your
+schedule, in the same card style as Alma's schedule. Click an assignment to open Alma's popup.
 
-### Notion & Google Calendar
+### Calendar page
 
-With [alma-sync](https://github.com/ians0316/alma-sync) set up on your Mac (run `./install_task_bridge.sh` once in its `alma_sync` folder), your tasks also show up in Notion and Google Calendar within seconds of adding or editing them. The settings menu shows when they last synced.
+- Colored dots under each day with assignments or tasks, one color per class period.
+- Hover a day to see them; click it for a popup with everything that day and **+ Add my own task** for that date.
+- The Events list mixes them in under each month.
+- The **official Seoul Academy 2026–2027 academic calendar** (breaks, closed days, shortened schedules) is shown alongside Alma's own events.
 
-### Settings
+### Google Calendar
 
-Click the extension's icon in Chrome's toolbar to turn features on or off: tasks on the To Do page, tasks on class pages, the extra buttons, Google Calendar buttons, My notes, attached files, and paperclip counts. The menu also shows how many tasks and files are saved.
+- A **calendar button** next to each upcoming assignment opens Google Calendar with an all-day event filled in (multi-day tasks cover every day). Press **Save** in Google to add it.
+- **Export to calendar (.ics)** downloads every upcoming assignment and task as one file. In Google Calendar, go to **Settings → Import & export → Import**.
 
-## Files
+These are one-time copies: if an assignment changes, add it again. For automatic updates, use
+[Alma Sync](#notion--google-calendar).
+
+### Around Alma
+
+- **Extra sidebar tabs:** Classes, Assignments, Attendance and Report Cards in the left menu, built with Alma's own icons.
+- **Top bar search and mail:** look people up in the Directory, or pick a teacher to open Alma's New Message window.
+- **Rounded corners** on Alma's boxes, tables, menus and buttons, matching its Schedule cards.
+
+## Settings
+
+Click the Alma+ icon in Chrome's toolbar to turn each part on or off:
+
+| Setting | What it controls |
+|---|---|
+| Today dashboard | Due Today, Due Tomorrow and Recently Updated Grades on the Overview page |
+| Calendar | Your work and the official school calendar on Alma's Calendar page |
+| Extra tabs | The extra sidebar tabs and the top bar buttons |
+| On the To Do page | Your own tasks in Upcoming Assignments |
+| On class pages | Each class's tasks in its Upcoming list |
+| Extra buttons | Export, Back up, Restore and Show next to "+ Add my own task" |
+| Google Calendar button | The calendar button on assignments and tasks |
+| My notes | Notes in assignment popups |
+| In popups | Upload File, Add from Drive and Add Link |
+| Paperclip counts | 📎 on rows with attached files |
+
+The menu also shows how many tasks and files are saved and when tasks last synced.
+
+## Notion & Google Calendar
+
+Pair Alma+ with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
+show up in Notion and Google Calendar within seconds of adding or editing them. Run this once in
+Alma Sync's `alma_sync` folder:
+
+```sh
+./install_task_bridge.sh
+```
+
+The settings menu shows when tasks last synced, with a **Sync now** button.
+
+## Privacy
+
+- Tasks, attached files and notes are stored **in this browser only** (Chrome `storage`). They stay on that computer unless you back them up.
+- Files can be up to 25 MB each.
+- Alma+ never asks for your Alma password; it reads Alma's pages with the sign-in you already have.
+- Besides Alma itself, the only place your data goes is Alma Sync on your own computer (your task list, if you set it up). The Google Calendar button just opens a pre-filled Google page; nothing is saved until you press Save.
+
+## Under the hood
+
+Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
 
 | File | What it does |
 |---|---|
-| `manifest.json` | Extension name, version, icons, and where it runs |
+| `manifest.json` | Name, version, icons, and which Alma pages each script runs on |
 | `alma-plus.js`, `alma-plus.css` | Custom tasks, task popup, add/edit window, filters, calendar tools, backup |
 | `materials.js`, `materials.css` | Attached files, My notes, paperclip and note icons, Files Saved message |
 | `dashboard.js`, `dashboard.css` | Today dashboard on the Overview page |
-| `background.js` | Sends your tasks to Alma Sync for Notion and Google Calendar |
-| `popup.html`, `popup.css`, `popup.js` | Settings menu |
-| `google-calendar.svg` | Calendar button icon |
-| `icons/` | Extension icons |
+| `calendar.js`, `calendar.css` | Your assignments and tasks on Alma's Calendar page |
+| `official-calendar.js` | The official school calendar (update each school year) |
+| `sidebar.js` | Extra sidebar tabs |
+| `topbar.js`, `topbar.css` | Search and mail buttons in the top bar |
+| `rounded.css` | Rounded corners across Alma |
+| `background.js` | Hands your tasks to Alma Sync for Notion and Google Calendar |
+| `popup.html`, `popup.css`, `popup.js` | The settings menu |
+| `google-calendar.svg`, `icons/` | Icons |
 
-Tasks, attached files, and notes are stored in this browser only (Chrome `storage`), so they stay on that computer unless backed up. Files can be up to 25 MB each.
+## Status
 
-## Related
+> [!IMPORTANT]
+> **Status:** version 2.8.6, used day to day at Seoul Academy.
+>
+> - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
+>   Calendar buttons and .ics export, extra tabs, settings menu, task sync through Alma Sync on macOS.
+> - **Limits:** updates are manual; data lives in one browser; Google Calendar buttons make one-time copies.
+> - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
 
-[alma-sync](https://github.com/ians0316/alma-sync) syncs Alma assignments and grades to Notion, Google Calendar, and Google Sheets.
+## Report a bug
 
-## Report Bug
+Email **ian.shin0316@gmail.com** with what you did, what you expected, and a screenshot if you can.
 
-Email to ian.shin0316@gmail.com
+---
 
+## The Alma Suite
 
+| | Project | What it's for | Code |
+|:-:|---|---|---|
+| <img src="icons/icon32.png" alt="" width="32" height="32"> | **Alma+ Custom Tasks** | Your own tasks, files and notes inside Alma | [GitHub](https://github.com/ians0316/alma-plus) |
+| 🔄 | **Alma Sync** | Assignments and grades synced to Notion, Google Calendar and Google Sheets every hour | [GitHub](https://github.com/ians0316/alma-sync) |
+
+<p align="center">
+  <sub>Made by a Seoul Academy student, for Seoul Academy students. Not affiliated with Alma or Seoul Academy.</sub>
+</p>
