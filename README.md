@@ -16,17 +16,23 @@ Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already ther
 3. **Attach:** open any assignment or task to add files, links and notes.
 4. **Finish:** press **Done** and the task moves to that class's Past Assignments with a green check.
 
-## Install
+## Setup
 
-1. Download this repo (click **Code**, then **Download ZIP**) and unzip it.
-2. Open `chrome://extensions` (Chrome or Brave) or `edge://extensions` (Edge).
-3. Turn on **Developer mode** in the top right.
-4. Click **Load unpacked** and pick the unzipped folder.
-5. Open Alma's To Do tab. The new buttons are there.
+1. Download the Github repo (click "Code" then "Download Zip").
+2. Unzip the zip file. This should create the extension folder.
+3. Open `chrome://extensions` (Chrome/Brave) or `edge://extensions` (Edge).
+4. Turn on **Developer mode** in the top right.
+5. Click **Load unpacked** and select this project folder.
+6. Open Alma's todo tab and you should be able to access the features this extension offers.
+
+If a bug fix or a new version is released, you would have to manually update the extension by deleting the previous version and uploading the new one.
 
 > [!NOTE]
-> Updates are manual for now: when a new version comes out, remove the old one from the
-> extensions page and load the new folder. **Back up your tasks first** (see below).
+> **Back up your tasks first** before updating (see Custom tasks below).
+
+## What's new in 2.0
+
+Everything the extension adds is built to look like Alma itself: same fonts, colors, buttons, and popups.
 
 ## Features
 
@@ -143,6 +149,10 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 >   Calendar buttons and .ics export, extra tabs, settings menu, task sync through Alma Sync on macOS.
 > - **Limits:** updates are manual; data lives in one browser; Google Calendar buttons make one-time copies.
 > - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
+
+## Related
+
+[alma-sync](https://github.com/ians0316/alma-sync) syncs Alma assignments and grades to Notion, Google Calendar, and Google Sheets.
 
 ## Report a bug
 
