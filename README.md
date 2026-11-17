@@ -1,58 +1,6 @@
 # Alma+ Custom Tasks
 
-<p align="center">
-  <b>Your own tasks, files and notes inside Alma, looking just like Alma.</b><br>
-  A Chrome extension for Seoul Academy students (and technically anyone who uses Alma)<br>
-  that adds custom tasks, attached files, notes, a Today dashboard, a fuller calendar and Google Calendar buttons.
-</p>
-
-<p align="center">
-  <img alt="Version 2.8.6" src="https://img.shields.io/badge/version-2.8.6-eb6841?style=flat-square">
-  <img alt="Chrome · Edge · Brave" src="https://img.shields.io/badge/Chrome%20%C2%B7%20Edge%20%C2%B7%20Brave-Manifest%20V3-3fc1c8?style=flat-square&logo=googlechrome&logoColor=white">
-  <img alt="Works on getalma.com" src="https://img.shields.io/badge/works%20on-getalma.com-9ec583?style=flat-square">
-  <img alt="Unofficial student project" src="https://img.shields.io/badge/status-unofficial%20student%20project-d69e2e?style=flat-square">
-</p>
-
-<p align="center">
-  <a href="#install"><b>Install Alma+</b></a> ·
-  <a href="https://github.com/ians0316/alma-sync">Alma Sync</a> ·
-  <a href="#report-a-bug">Report a bug</a>
-</p>
-
-<br>
-
-<table>
-  <tr>
-    <td width="25%" valign="top">
-      <h3>📝 Your own tasks</h3>
-      Add anything Alma doesn't have: club deadlines, tests, multi-day projects. They sit in Upcoming Assignments looking just like Alma's own.
-    </td>
-    <td width="25%" valign="top">
-      <h3>📎 Files and notes</h3>
-      Attach files, Drive items and links to any assignment, and write your own notes on it, right in Alma's popup.
-    </td>
-    <td width="25%" valign="top">
-      <h3>📅 On your calendar</h3>
-      One click adds an assignment to Google Calendar. Alma's Calendar page shows your work and the official school calendar too.
-    </td>
-    <td width="25%" valign="top">
-      <h3>🎨 Feels like Alma</h3>
-      Same fonts, colors, buttons and popups as Alma. Everything can be switched on or off from the toolbar icon.
-    </td>
-  </tr>
-</table>
-
-<br>
-
-<p align="center">
-  <a href="#how-it-works">How it works</a> ·
-  <a href="#features">Features</a> ·
-  <a href="#settings">Settings</a> ·
-  <a href="#notion--google-calendar">Notion &amp; Google Calendar</a> ·
-  <a href="#privacy">Privacy</a> ·
-  <a href="#under-the-hood">Under the hood</a> ·
-  <a href="#status">Status</a>
-</p>
+The Alma+ Custom Tasks is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
 
 > [!IMPORTANT]
 > **Alma+ is an unofficial student project.** It is not made, supported, or approved by Alma or
