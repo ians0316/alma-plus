@@ -148,11 +148,11 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.8.6, used day to day at Seoul Academy.
+> **Status:** version 2.10.1, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
->   Calendar buttons and .ics export, extra tabs, settings menu, task sync through Alma Sync on macOS.
-> - **Limits:** updates are manual; data lives in one browser; Google Calendar buttons make one-time copies.
+>   Calendar buttons and .ics export, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
+> - **Limits:** updates are manual; data lives in one browser, and removing the extension deletes it (to update, click reload instead); Google Calendar buttons make one-time copies.
 > - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
 
 ## Related
