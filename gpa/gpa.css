@@ -1,30 +1,33 @@
+/* GPA box, styled like Alma's own stat box ("Days This Year" on Attendance) */
 .alma-plus-gpa-summary {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 4px 12px;
-  margin: 12px 0;
-  padding: 10px 14px;
-  background: #eef4ff;
-  border-radius: 8px;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  gap: 4px 10px;
+  margin: 0 0 15px;
+  padding: 10px 15px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  line-height: 1.15;
+  color: #333;
 }
 
 .alma-plus-gpa-label {
-  font-size: 13px;
-  font-weight: 600;
-  color: #444;
+  font-weight: 400;
+  color: #333;
 }
 
 .alma-plus-gpa-value {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 700;
-  color: #2f6fed;
+  color: #333;
 }
 
 .alma-plus-gpa-note {
   font-size: 12px;
-  color: #666;
+  color: #5f6163;
 }
 
 .alma-plus-gpa-check {
