@@ -86,6 +86,10 @@ These are one-time copies: if an assignment changes, add it again. For automatic
 - **Top bar search and mail:** look people up in the Directory, or pick a teacher to open Alma's New Message window.
 - **Rounded corners** on Alma's boxes, tables, menus and buttons, matching its Schedule cards.
 
+### GPA
+
+On the Classes tab, a box above the class list shows your GPA on an unweighted 4.0 scale, calculated from the letter grades Alma shows (A = 4.0, A- = 3.7, B+ = 3.3, and so on). Classes without a grade are skipped, and cocurricular, advisory and study hall classes are left out by default. Use the checkbox in a class's Grade column to include or leave it out. Your choices are saved in the browser. From Juho Lee's Alma+.
+
 ## Settings
 
 Click the Alma+ icon in Chrome's toolbar to turn each part on or off:
@@ -136,6 +140,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `dashboard/` | `dashboard.js`, `dashboard.css`: Today dashboard on the Overview page |
 | `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year) |
 | `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma |
+| `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 | `sync/` | `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
 | `icons/` | Extension icons, the school crest, and the Google Calendar icon |
