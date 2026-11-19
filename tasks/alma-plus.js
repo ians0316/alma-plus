@@ -42,28 +42,42 @@ async function saveTasks(tasks) {
   await chrome.storage.local.set({ [STORAGE_KEY]: tasks });
 }
 
-async function addTask(task) {
-  const tasks = await loadTasks();
-  tasks.push({ id: crypto.randomUUID(), completed: false, priority: "normal", ...task, updated: new Date().toISOString() });
-  await saveTasks(tasks);
+// Every write is read-modify-write, so hold a lock: two Alma tabs saving at
+// the same moment could otherwise drop a task (fix from Juho Lee's Alma+).
+function withTasksLock(fn) {
+  return navigator.locks ? navigator.locks.request("alma-plus-tasks", fn) : fn();
 }
 
-async function updateTask(updatedTask) {
-  const tasks = await loadTasks();
-  const stamped = { ...updatedTask, updated: new Date().toISOString() };
-  await saveTasks(tasks.map((task) => task.id === updatedTask.id ? stamped : task));
+function addTask(task) {
+  return withTasksLock(async () => {
+    const tasks = await loadTasks();
+    tasks.push({ id: crypto.randomUUID(), completed: false, priority: "normal", ...task, updated: new Date().toISOString() });
+    await saveTasks(tasks);
+  });
+}
+
+function updateTask(updatedTask) {
+  return withTasksLock(async () => {
+    const tasks = await loadTasks();
+    const stamped = { ...updatedTask, updated: new Date().toISOString() };
+    await saveTasks(tasks.map((task) => task.id === updatedTask.id ? stamped : task));
+  });
 }
 
 async function deleteTask(id) {
-  const tasks = await loadTasks();
-  await saveTasks(tasks.filter((t) => t.id !== id));
+  await withTasksLock(async () => {
+    const tasks = await loadTasks();
+    await saveTasks(tasks.filter((t) => t.id !== id));
+  });
   // Its attached files go too (materials.js).
   if (typeof removeOwnerAttachments === "function") await removeOwnerAttachments("__tasks__", id);
 }
 
-async function setTaskCompleted(id, completed) {
-  const tasks = await loadTasks();
-  await saveTasks(tasks.map((task) => task.id === id ? { ...task, completed, updated: new Date().toISOString() } : task));
+function setTaskCompleted(id, completed) {
+  return withTasksLock(async () => {
+    const tasks = await loadTasks();
+    await saveTasks(tasks.map((task) => task.id === id ? { ...task, completed, updated: new Date().toISOString() } : task));
+  });
 }
 
 function isValidDate(value) {
@@ -567,10 +581,17 @@ function placeRows(table, tasks, withCalendar) {
     table.querySelector("thead tr")?.cells.length ||
     2;
 
-  for (const task of tasks) {
-    // With no Alma row to copy cell classes from, the header row has the same ones.
-    const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0] || table.querySelector("thead tr"), statusIndex, updatedIndex);
-    const rowValue = getCellSortValue(row, sort.columnIndex);
+  // Order your own rows among themselves first, or two that land between the
+  // same pair of Alma rows show up in the order they were added.
+  const customRows = tasks
+    .map((task) => {
+      // With no Alma row to copy cell classes from, the header row has the same ones.
+      const row = buildCustomRow(task, columnCount, nameIndex, existingRows[0] || table.querySelector("thead tr"), statusIndex, updatedIndex);
+      return { row, value: getCellSortValue(row, sort.columnIndex) };
+    })
+    .sort((a, b) => compareSortValues(a.value, b.value, sort.numeric) * sort.direction);
+
+  for (const { row, value: rowValue } of customRows) {
     const target = existingRows.find((r) => {
       const cmp = compareSortValues(rowValue, getCellSortValue(r, sort.columnIndex), sort.numeric);
       return cmp * sort.direction < 0;
@@ -744,15 +765,17 @@ async function importTaskBackup(file) {
     return;
   }
 
-  const currentTasks = await loadTasks();
-  const ids = new Set(currentTasks.map((task) => task.id));
-  const mergedTasks = [...currentTasks];
-  for (const task of importedTasks) {
-    const id = ids.has(task.id) ? crypto.randomUUID() : task.id;
-    ids.add(id);
-    mergedTasks.push({ ...task, id });
-  }
-  await saveTasks(mergedTasks);
+  await withTasksLock(async () => {
+    const currentTasks = await loadTasks();
+    const ids = new Set(currentTasks.map((task) => task.id));
+    const mergedTasks = [...currentTasks];
+    for (const task of importedTasks) {
+      const id = ids.has(task.id) ? crypto.randomUUID() : task.id;
+      ids.add(id);
+      mergedTasks.push({ ...task, id });
+    }
+    await saveTasks(mergedTasks);
+  });
   alert(`Restored ${importedTasks.length} task${importedTasks.length === 1 ? "" : "s"}. Existing tasks were kept.`);
   renderCustomRows();
 }

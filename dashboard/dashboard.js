@@ -35,13 +35,19 @@ function dayHeading(date) {
 
 // ---- Data ----
 
+// The assignment's name link. Rows with a Submit (cloud) button have a second,
+// empty link to the same assignment before it, so skip links with no text.
+function nameLinkIn(row) {
+  return [...row.querySelectorAll("a[href*='/home/assignment/']")].find((a) => a.textContent.trim()) || null;
+}
+
 // Alma's upcoming assignments, read from the To Do page.
 async function almaUpcoming() {
   const html = await fetch("/home/assignments", { credentials: "same-origin" }).then((r) => (r.ok ? r.text() : ""));
   const doc = new DOMParser().parseFromString(html, "text/html");
   return [...doc.querySelectorAll("table.upcoming-assignments tbody tr")].map((row) => {
     const ts = Number(row.cells[0]?.dataset.sortableVal);
-    const link = row.querySelector("a[href*='/home/assignment/']");
+    const link = nameLinkIn(row);
     const classLink = row.querySelector("small a[href*='/home/class/']");
     if (!ts || !link) return null;
     return {
@@ -73,7 +79,7 @@ async function recentGrades() {
     const updatedAt = heads.indexOf("updated");
     for (const row of table.querySelectorAll("tbody tr")) {
       const updated = Number(row.cells[updatedAt]?.dataset.sortableVal);
-      const link = row.querySelector("td a[href*='/home/assignment/']");
+      const link = nameLinkIn(row);
       const gradeText = row.cells[gradeAt]?.textContent.replace(/\s+/g, " ").trim() || "";
       if (!link || !updated || updated < cutoff || !gradeText || /ungraded/i.test(gradeText)) continue;
       const letter = gradeText.match(/^[A-F][+-]?/)?.[0] || "";
