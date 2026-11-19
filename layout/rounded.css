@@ -198,7 +198,7 @@ h1 > span.school-name::before {
   margin-right: 10px;
   width: 38px;
   height: 35px;
-  background: url("chrome-extension://__MSG_@@extension_id__/icons/seoul-academy.png") center / contain no-repeat;
+  background: url("chrome-extension://__MSG_@@extension_id__/layout/icons/seoul-academy.png") center / contain no-repeat;
 }
 
 /* Top bar (crest, Seoul Academy, profile button) stays at the top while

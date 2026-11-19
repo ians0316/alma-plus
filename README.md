@@ -145,12 +145,11 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `files-and-notes/` | `materials.js`, `materials.css`: attached files, My notes, paperclip and note icons, Files Saved message |
 | `dashboard/` | `dashboard.js`, `dashboard.css`: Today dashboard on the Overview page |
 | `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year) |
-| `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma |
+| `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma. `icons/`: extension icons, the school crest, and the Google Calendar icon |
 | `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab |
 | `class-tabs/` | `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 | `sync/` | `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
-| `icons/` | Extension icons, the school crest, and the Google Calendar icon |
 
 ## Bugs fixed
 
@@ -172,7 +171,7 @@ Newest first.
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.11.3, used day to day at Seoul Academy.
+> **Status:** version 2.11.4, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs and Gradebook, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
