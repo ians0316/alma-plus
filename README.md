@@ -152,6 +152,23 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `sync/` | `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
 | `icons/` | Extension icons, the school crest, and the Google Calendar icon |
 
+## Bugs fixed
+
+Newest first.
+
+- **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
+- **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
+- **Two Alma tabs:** if both saved a task at the same moment, one task could be lost. Saves now take turns. (From Juho Lee's Alma+.)
+- **Paperclip:** didn't show on assignments with a Submit button, even when they had a file attached.
+- **Class attendance:** the Attendance tab on class pages came up empty.
+- **Settings menu:** its icon was broken after the files were moved into folders.
+- **Calendar page:** school events with a date range, like "Sep 24-25", didn't show.
+- **Top bar mail button:** teacher names came up blank when the Classes page was in grid view.
+- **New Message window:** the close (×) button was invisible.
+- **Popups:** the fixed top bar covered a popup's title and close button.
+- **Login page:** the fixed top bar hid the WELCOME message.
+- **Speed:** class pages and the extension in general were slow (fixed in 2.0).
+
 ## Status
 
 > [!IMPORTANT]
