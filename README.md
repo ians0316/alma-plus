@@ -86,6 +86,12 @@ These are one-time copies: if an assignment changes, add it again. For automatic
 - **Top bar search and mail:** look people up in the Directory, or pick a teacher to open Alma's New Message window.
 - **Rounded corners** on Alma's boxes, tables, menus and buttons, matching its Schedule cards.
 
+### Class tabs
+
+Each class page gets a row of tabs, like the teacher version of Alma: **Dashboard** (Alma's class page as usual), **Bulletin** (class announcements), **Attendance** (your attendance for just this class), **Assignments** (just the assignment lists), and **Gradebook**. Teacher-only tabs (roster, curriculum, recommendations, settings, admin panel) are left out because Alma doesn't let students open them.
+
+The **Gradebook** shows every assignment as a column and each score as a colored box: green for A, light green for B, yellow for C, red for D or F. Click a box to open the assignment. Pick a category, turn the colors off, or use **Add Assignment** to add your own task to the class.
+
 ### GPA
 
 On the Classes tab, a box above the class list shows your GPA on an unweighted 4.0 scale, calculated from the letter grades Alma shows (A = 4.0, A- = 3.7, B+ = 3.3, and so on). Classes without a grade are skipped, and cocurricular, advisory and study hall classes are left out by default. Use the checkbox in a class's Grade column to include or leave it out. Your choices are saved in the browser. From Juho Lee's Alma+.
@@ -141,6 +147,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year) |
 | `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma |
 | `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab |
+| `class-tabs/` | `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 | `sync/` | `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
 | `icons/` | Extension icons, the school crest, and the Google Calendar icon |
@@ -148,10 +155,10 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.10.1, used day to day at Seoul Academy.
+> **Status:** version 2.11.0, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
->   Calendar buttons and .ics export, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
+>   Calendar buttons and .ics export, class tabs and Gradebook, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
 > - **Limits:** updates are manual; data lives in one browser, and removing the extension deletes it (to update, click reload instead); Google Calendar buttons make one-time copies.
 > - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
 

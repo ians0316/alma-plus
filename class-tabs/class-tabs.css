@@ -1,0 +1,155 @@
+/* Class tabs: the row itself uses Alma's own submenu classes, so it already
+   looks like Attendance's List / Year / Week. Only spacing is set here. */
+.alma-plus-class-tabs {
+  margin: 0 0 15px;
+  padding: 0 20px;
+}
+
+/* views: dashboard shows Alma's page as-is */
+section[data-alma-plus-view] > .alma-plus-class-panel { display: none; }
+section[data-alma-plus-view="assignments"] > .grades { display: none; }
+section[data-alma-plus-view="gradebook"] > :not(#alma-plus-gradebook),
+section[data-alma-plus-view="attendance"] > :not(#alma-plus-class-attendance) { display: none !important; }
+section[data-alma-plus-view="gradebook"] > #alma-plus-gradebook,
+section[data-alma-plus-view="attendance"] > #alma-plus-class-attendance { display: block; }
+
+/* ---- Gradebook ---- */
+.alma-plus-gb-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.alma-plus-gb-head .page-heading { margin: 0; }
+.alma-plus-gb-tools {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: #333;
+}
+.alma-plus-gb-tools label { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; }
+.alma-plus-gb-tools select { font-size: 13px; padding: 4px 8px; }
+
+.alma-plus-gb-scroll {
+  overflow-x: auto;
+  border: 1px solid #cbcbcb;
+  border-radius: 4px;
+}
+table.alma-plus-gb {
+  border: 0;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+table.alma-plus-gb th,
+table.alma-plus-gb td {
+  border: 0;
+  border-right: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e5e5;
+  padding: 6px;
+  text-align: center;
+  vertical-align: middle;
+  background: #fff;
+}
+table.alma-plus-gb thead th {
+  background: #fff;
+  color: #333;
+  font-weight: 400;
+  vertical-align: bottom;
+}
+/* left column stays put while scrolling */
+table.alma-plus-gb tr > th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 170px;
+  max-width: 220px;
+  text-align: left;
+  font-weight: 700;
+  background: #f7f8f8;
+  border-right: 1px solid #cbcbcb;
+}
+table.alma-plus-gb tr > th:first-child small,
+table.alma-plus-gb tr > th:first-child strong { display: block; }
+table.alma-plus-gb tr > th:first-child small { font-weight: 400; font-size: 12px; margin-top: 2px; }
+table.alma-plus-gb .alma-plus-gb-corner { font-size: 15px; vertical-align: bottom; }
+
+.alma-plus-gb-col { min-width: 52px; cursor: pointer; }
+.alma-plus-gb-col:hover { background: #f7f8f8 !important; }
+.alma-plus-gb-date { font-size: 11px; color: #5f6163; margin-bottom: 4px; }
+.alma-plus-gb-vert {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  max-height: 150px;
+  margin: 0 auto;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+.alma-plus-gb-vert small { display: block; font-size: 10px; color: #5f6163; }
+.alma-plus-gb-vert span { font-weight: 700; }
+.alma-plus-gb-upcoming .alma-plus-gb-vert span { font-weight: 400; color: #5f6163; }
+
+.alma-plus-gb-overall th,
+.alma-plus-gb-overall td { background: #f7f8f8 !important; }
+
+.alma-plus-gb-score {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 42px;
+  min-height: 34px;
+  padding: 2px 4px;
+  border: 0;
+  border-radius: 4px;
+  background: #f1f1f1;
+  color: #333;
+  font: inherit;
+  font-weight: 700;
+  line-height: 1.1;
+  cursor: pointer;
+}
+.alma-plus-gb-score small { font-size: 10px; font-weight: 400; }
+.alma-plus-gb-none { color: #999; font-weight: 400; }
+
+/* level colors, like the teacher gradebook: green good, yellow okay, red low */
+.alma-plus-gb-colors .alma-plus-gb-l4 { background: #9ec583; color: #24401a; }
+.alma-plus-gb-colors .alma-plus-gb-l3 { background: #d3e8c4; color: #33502a; }
+.alma-plus-gb-colors .alma-plus-gb-l2 { background: #fdd28a; color: #5b3d00; }
+.alma-plus-gb-colors .alma-plus-gb-l1 { background: #eb6841; color: #fff; }
+
+/* ---- Attendance for this class ---- */
+.alma-plus-att-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 18px;
+  margin: 0 0 15px;
+  padding: 10px 15px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 15px;
+  color: #333;
+}
+table.alma-plus-att-table { width: 100%; }
+table.alma-plus-att-table td { white-space: nowrap; }
+table.alma-plus-att-table td:last-child { width: 100%; }
+/* same pill Alma uses on its Attendance page */
+.alma-plus-att-table .attendance-status {
+  display: inline-block;
+  padding: 3px 9.5px;
+  border: 1px solid #ccc;
+  border-radius: 3px;
+  background: #f7f8f8;
+  color: #5f6163;
+  font-size: 12.75px;
+}
+.alma-plus-att-table .attendance-present { background: #f1f7ed; border-color: #9ec583; color: #517939; }
+.alma-plus-att-table .attendance-absent { background: #fdf0ec; border-color: #eb6841; color: #b7472a; }
+.alma-plus-att-table .attendance-late { background: #fff7ea; border-color: #ffcc80; color: #8a5a00; }
