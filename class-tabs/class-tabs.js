@@ -1,5 +1,5 @@
 // Class tabs on a class page, like the teacher version of Alma:
-// dashboard · bulletin · attendance · assignments · gradebook.
+// dashboard · bulletin · attendance · gradebook.
 // Only tabs a student can use. Teacher-only ones (roster, curriculum,
 // recommendations, settings, admin panel) are left out because Alma sends
 // students back to Home from them.
@@ -7,7 +7,6 @@
 // dashboard   = Alma's own class page, unchanged (default)
 // bulletin    = Alma's class announcements page
 // attendance  = your attendance for this class only (from Alma's Attendance list)
-// assignments = just Alma's Past / Upcoming assignment tables
 // gradebook   = every assignment as a column, each score as a colored box
 
 (() => {
@@ -15,7 +14,6 @@
     ["dashboard", "Dashboard"],
     ["bulletin", "Bulletin"],
     ["attendance", "Attendance"],
-    ["assignments", "Assignments"],
     ["gradebook", "Gradebook"],
   ];
 

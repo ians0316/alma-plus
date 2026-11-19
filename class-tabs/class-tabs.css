@@ -7,7 +7,6 @@
 
 /* views: dashboard shows Alma's page as-is */
 section[data-alma-plus-view] > .alma-plus-class-panel { display: none; }
-section[data-alma-plus-view="assignments"] > .grades { display: none; }
 section[data-alma-plus-view="gradebook"] > :not(#alma-plus-gradebook),
 section[data-alma-plus-view="attendance"] > :not(#alma-plus-class-attendance) { display: none !important; }
 section[data-alma-plus-view="gradebook"] > #alma-plus-gradebook,
