@@ -155,7 +155,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.11.0, used day to day at Seoul Academy.
+> **Status:** version 2.11.2, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs and Gradebook, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.

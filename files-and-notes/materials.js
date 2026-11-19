@@ -502,7 +502,9 @@ function buildAttachedSection(bucket, ownerId, ownerName = "") {
 let lastClickedAssignmentId = null;
 
 function assignmentLinkIn(row) {
-  return row?.querySelector("a[data-alma-modal='StudentAssignmentDetailsModal']") || null;
+  // the name link, not the Submit (cloud) button, which opens the same popup
+  return row?.querySelector("a[data-alma-modal='StudentAssignmentDetailsModal']:not(.pure-button)") ||
+    row?.querySelector("a[data-alma-modal='StudentAssignmentDetailsModal']") || null;
 }
 
 function assignmentIdOf(link) {
