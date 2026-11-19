@@ -179,10 +179,6 @@ Newest first.
 > - **Limits:** updates are manual; data lives in one browser, and removing the extension deletes it (to update, click reload instead); Google Calendar buttons make one-time copies.
 > - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
 
-## Related
-
-[alma-sync](https://github.com/ians0316/alma-sync) syncs Alma assignments and grades to Notion, Google Calendar, and Google Sheets.
-
 ## Report a bug
 
 Email **ian.shin0316@gmail.com** 
