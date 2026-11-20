@@ -48,12 +48,16 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 - **Filter** by everything, due today, or due this week.
 - **Back up and restore** all tasks with the JSON buttons.
 
+<img src="screenshots/todo.png" width="560" alt="To Do page with + Add my own task and Google Calendar buttons">
+
 ### Attached files
 
 - Every assignment and task popup gets an **Attached files** section laid out like Alma's "Submit your work here": **Upload File**, **Add from Drive** and **Add Link**.
 - Rename or delete items; photos open in a viewer and PDFs in a new tab.
 - Rows with attachments show 📎 and a count; click it to open the popup.
 - After saving, Alma's own "Files Saved" message appears.
+
+<img src="screenshots/attached-files.png" width="380" alt="Attached files section in an assignment popup">
 
 ### My notes
 
@@ -65,12 +69,16 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 Alma's Overview page gets **Due Today**, **Due Tomorrow** and **Recently Updated Grades** under your
 schedule, in the same card style as Alma's schedule. Click an assignment to open Alma's popup.
 
+<img src="screenshots/dashboard.png" width="520" alt="Due Today and Due Tomorrow on the Overview page">
+
 ### Calendar page
 
 - Colored dots under each day with assignments or tasks, one color per class period.
 - Hover a day to see them; click it for a popup with everything that day and **+ Add my own task** for that date.
 - The Events list mixes them in under each month.
 - The **official Seoul Academy 2026–2027 academic calendar** (breaks, closed days, shortened schedules) is shown alongside Alma's own events.
+
+<img src="screenshots/calendar.png" width="260" alt="Calendar with colored dots for each class">
 
 ### Google Calendar
 
@@ -115,6 +123,8 @@ Click the Alma+ icon in Chrome's toolbar to turn each part on or off:
 
 The menu also shows how many tasks and files are saved and when tasks last synced.
 
+<img src="screenshots/settings.png" width="260" alt="Alma+ settings menu">
+
 ## Notion & Google Calendar
 
 Pair Alma+ with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
@@ -150,6 +160,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `class-tabs/` | `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 | `sync/` | `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
+| `screenshots/` | Pictures used in this README (not part of the extension) |
 
 ## Bugs fixed
 
