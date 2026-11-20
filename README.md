@@ -48,7 +48,7 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 - **Filter** by everything, due today, or due this week.
 - **Back up and restore** all tasks with the JSON buttons.
 
-<img src="screenshots/todo.png" width="560" alt="To Do page with + Add my own task and Google Calendar buttons">
+<img src="layout/screenshots/todo.png" width="560" alt="To Do page with + Add my own task and Google Calendar buttons">
 
 ### Attached files
 
@@ -57,7 +57,7 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 - Rows with attachments show 📎 and a count; click it to open the popup.
 - After saving, Alma's own "Files Saved" message appears.
 
-<img src="screenshots/attached-files.png" width="380" alt="Attached files section in an assignment popup">
+<img src="layout/screenshots/attached-files.png" width="380" alt="Attached files section in an assignment popup">
 
 ### My notes
 
@@ -69,7 +69,7 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 Alma's Overview page gets **Due Today**, **Due Tomorrow** and **Recently Updated Grades** under your
 schedule, in the same card style as Alma's schedule. Click an assignment to open Alma's popup.
 
-<img src="screenshots/dashboard.png" width="520" alt="Due Today and Due Tomorrow on the Overview page">
+<img src="layout/screenshots/dashboard.png" width="520" alt="Due Today and Due Tomorrow on the Overview page">
 
 ### Calendar page
 
@@ -78,7 +78,7 @@ schedule, in the same card style as Alma's schedule. Click an assignment to open
 - The Events list mixes them in under each month.
 - The **official Seoul Academy 2026–2027 academic calendar** (breaks, closed days, shortened schedules) is shown alongside Alma's own events.
 
-<img src="screenshots/calendar.png" width="260" alt="Calendar with colored dots for each class">
+<img src="layout/screenshots/calendar.png" width="260" alt="Calendar with colored dots for each class">
 
 ### Google Calendar
 
@@ -123,7 +123,7 @@ Click the Alma+ icon in Chrome's toolbar to turn each part on or off:
 
 The menu also shows how many tasks and files are saved and when tasks last synced.
 
-<img src="screenshots/settings.png" width="260" alt="Alma+ settings menu">
+<img src="layout/screenshots/settings.png" width="260" alt="Alma+ settings menu">
 
 ## Notion & Google Calendar
 
@@ -155,12 +155,11 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `files-and-notes/` | `materials.js`, `materials.css`: attached files, My notes, paperclip and note icons, Files Saved message |
 | `dashboard/` | `dashboard.js`, `dashboard.css`: Today dashboard on the Overview page |
 | `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year) |
-| `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma. `icons/`: extension icons, the school crest, and the Google Calendar icon |
+| `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma. `icons/`: extension icons, the school crest, and the Google Calendar icon. `screenshots/`: pictures for this README |
 | `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab |
 | `class-tabs/` | `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 | `sync/` | `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
-| `screenshots/` | Pictures used in this README (not part of the extension) |
 
 ## Bugs fixed
 
