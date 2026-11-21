@@ -1,5 +1,5 @@
 # Makes a GitHub release with a ready-to-load zip whenever the version in
-# manifest.json goes up. Release titles are just the version, like v2.12.0.
+# manifest.json goes up. Release titles look like "Alma+ v2.12.0".
 name: Release
 
 on:
@@ -34,9 +34,9 @@ jobs:
             rsync -a --exclude .git --exclude .github --exclude dist --exclude layout/screenshots ./ dist/alma-plus/
             (cd dist && zip -qr "alma-plus-$TAG.zip" alma-plus)
             gh release create "$TAG" "dist/alma-plus-$TAG.zip" \
-              --target "$GITHUB_SHA" --title "$TAG" --generate-notes
+              --target "$GITHUB_SHA" --title "Alma+ $TAG" --generate-notes
           fi
-          # keep every release title as just its version
+          # keep every release title as "Alma+ <version>"
           gh release list --limit 100 --json tagName,name \
-            -q '.[] | select(.name != .tagName) | .tagName' |
-            while read -r t; do gh release edit "$t" --title "$t"; done
+            -q '.[] | select(.name != ("Alma+ " + .tagName)) | .tagName' |
+            while read -r t; do gh release edit "$t" --title "Alma+ $t"; done
