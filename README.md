@@ -161,7 +161,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 
 ## Bugs fixed
 
-Newest first.
+Newest first. Latest GitHub release: [**v2.12.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.12.0). Latest extension version: **2.12.0**.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
