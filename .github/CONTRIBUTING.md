@@ -31,7 +31,3 @@ Open an [issue](https://github.com/ians0316/alma-plus/issues), or use the email 
 ## Where things are
 
 See the **Files** table in the [README](../README.md#files). Each feature has its own folder.
-
-## Credits
-
-Alma+ builds on [Juho Lee's Alma+](https://github.com/juholee10/alma-plus), used with permission. If you bring in code from another project, say where it's from in your pull request.

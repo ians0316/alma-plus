@@ -1,6 +1,3 @@
-// Alma+ Custom Tasks by Juho Lee and Beomgyu Kim: https://github.com/juholee10/alma-plus
-// Included with the authors' permission.
-
 const STORAGE_KEY = "almaPlusCustomTasks";
 
 // Settings from the toolbar menu (popup.html). materials.js uses these too.
@@ -43,7 +40,7 @@ async function saveTasks(tasks) {
 }
 
 // Every write is read-modify-write, so hold a lock: two Alma tabs saving at
-// the same moment could otherwise drop a task (fix from Juho Lee's Alma+).
+// the same moment could otherwise drop a task.
 function withTasksLock(fn) {
   return navigator.locks ? navigator.locks.request("alma-plus-tasks", fn) : fn();
 }

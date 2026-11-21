@@ -102,7 +102,7 @@ The **Gradebook** shows every assignment as a column and each score as a colored
 
 ### GPA
 
-On the Classes tab, a box above the class list shows your GPA on an unweighted 4.0 scale, calculated from the letter grades Alma shows (A = 4.0, A- = 3.7, B+ = 3.3, and so on). Classes without a grade are skipped, and cocurricular, advisory and study hall classes are left out by default. Use the checkbox in a class's Grade column to include or leave it out. Your choices are saved in the browser. From Juho Lee's Alma+.
+On the Classes tab, a box above the class list shows your GPA on an unweighted 4.0 scale, calculated from the letter grades Alma shows (A = 4.0, A- = 3.7, B+ = 3.3, and so on). Classes without a grade are skipped, and cocurricular, advisory and study hall classes are left out by default. Use the checkbox in a class's Grade column to include or leave it out. Your choices are saved in the browser.
 
 ## Settings
 
@@ -165,7 +165,7 @@ Newest first.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
-- **Two Alma tabs:** if both saved a task at the same moment, one task could be lost. Saves now take turns. (From Juho Lee's Alma+.)
+- **Two Alma tabs:** if both saved a task at the same moment, one task could be lost. Saves now take turns.
 - **Paperclip:** didn't show on assignments with a Submit button, even when they had a file attached.
 - **Class attendance:** the Attendance tab on class pages came up empty.
 - **Settings menu:** its icon was broken after the files were moved into folders.
