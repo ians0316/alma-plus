@@ -1,0 +1,60 @@
+# One-time: posts big design and feature issues, then this file is deleted.
+name: Create big issues
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/create-issues.yml]
+permissions:
+  issues: write
+jobs:
+  issues:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - run: |
+          gh label create "big design" --color "D93F0B" --description "Large change to how Alma+ looks" 2>/dev/null || true
+          gh label create "big feature" --color "5319E7" --description "Large new feature" 2>/dev/null || true
+          make() {
+            if gh issue list --state all --limit 200 --json title -q ".[].title" | grep -Fxq "$1"; then
+              echo "exists: $1"; return; fi
+            gh issue create --title "$1" --label "$2" --body "$3"
+          }
+          make "Board view for the To Do page" "big design,enhancement" "Add a second view to the To Do page: a board with **To do / Doing / Done** columns. Drag Alma assignments and your own tasks between columns.
+
+          - Switch between List and Board with Alma's own segmented control.
+          - Cards use Alma's card style (white, light gray border).
+          - Done moves the task to Past Assignments, same as the Done button."
+          make "One-page Today home" "big design,enhancement" "Turn the Overview page into a single Today home: today's schedule, what's due today and tomorrow, newest grades, and today's attendance in one place.
+
+          - Keep Alma's existing schedule cards; add the rest in the same style.
+          - Each part can be hidden in settings."
+          make "Assignment popup with tabs" "big design,enhancement" "Rebuild the assignment and task popup with tabs: **Details**, **Files**, **Notes**. Right now everything stacks into one long popup.
+
+          - Tabs use Alma's submenu style.
+          - Remember the last tab used."
+          make "Accent color and theme picker" "big design,enhancement" "Let students pick an accent color (orange by default, or school colors) used by Alma+ buttons, dots and highlights.
+
+          - Only changes what Alma+ adds; Alma's own parts stay the same.
+          - Works with dark mode (#1)."
+          make "Compact mode" "big design,enhancement" "A Compact setting that tightens row spacing on the To Do page, Gradebook and class pages so more fits on the screen, for small laptop screens."
+          make "Quick command bar (Cmd+K)" "big feature,enhancement" "Press **Cmd+K** (Ctrl+K on Windows) anywhere on Alma to open a search bar: jump to a class, open an assignment, or type *add Read chapter 5 friday* to create a task."
+          make "Study planner" "big feature,enhancement" "Plan study time automatically: for each upcoming test or big assignment, suggest study blocks on the days before it and show them on the Calendar page.
+
+          - Students can move or delete blocks.
+          - Optional: add them to Google Calendar through Alma Sync."
+          make "Grades insights page" "big feature,enhancement" "A new page with each class's grade over time (line chart), category breakdowns, a what-if calculator, and GPA history for the semester.
+
+          - Data stays in the browser.
+          - Built from the grades Alma already shows."
+          make "Sync tasks across computers" "big feature,enhancement" "Keep tasks, notes and files the same on every computer you use (home and school), for example through Google Drive or Chrome sync.
+
+          - Must stay private to the student.
+          - Also fixes losing tasks when the extension is removed (#5)."
+          make "Test countdowns" "big feature,enhancement" "Mark an assignment as a test or exam and show a countdown (*Biology test in 3 days*) on the Today dashboard and To Do page."
+          make "Share a task list with classmates" "big feature,enhancement" "Export a set of tasks (for example a group project's steps) as a file or code that a classmate can import into their Alma+.
+
+          - No server: sharing happens through the file or code only.
+          - Never include grades or notes unless the student picks them."
+          make "Smart sort" "big feature,enhancement" "A **Smart** option in Show: that orders work by what to do first: due date, how much the category is worth, and whether it's a test."
