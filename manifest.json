@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Alma+ Custom Tasks",
-  "version": "2.11.7",
+  "version": "2.11.8",
   "description": "Your own tasks, attached files, and notes inside Alma, styled like Alma, plus Google Calendar buttons.",
   "icons": {
     "16": "layout/icons/icon16.png",
@@ -42,11 +42,11 @@
         "https://*.getalma.com/home/assignments*"
       ],
       "js": [
-        "tasks/alma-plus.js",
+        "content/alma-plus.js",
         "files-and-notes/materials.js"
       ],
       "css": [
-        "tasks/alma-plus.css",
+        "content/alma-plus.css",
         "files-and-notes/materials.css"
       ],
       "run_at": "document_idle"
@@ -57,12 +57,12 @@
         "https://*.getalma.com/home/class-announcements/*"
       ],
       "js": [
-        "tasks/alma-plus.js",
+        "content/alma-plus.js",
         "files-and-notes/materials.js",
         "gpa/class-tabs.js"
       ],
       "css": [
-        "tasks/alma-plus.css",
+        "content/alma-plus.css",
         "files-and-notes/materials.css",
         "gpa/class-tabs.css"
       ],
@@ -74,12 +74,12 @@
         "https://*.getalma.com/home?*"
       ],
       "js": [
-        "tasks/alma-plus.js",
+        "content/alma-plus.js",
         "files-and-notes/materials.js",
         "calendar/dashboard.js"
       ],
       "css": [
-        "tasks/alma-plus.css",
+        "content/alma-plus.css",
         "files-and-notes/materials.css",
         "calendar/dashboard.css"
       ],
@@ -99,13 +99,13 @@
         "https://*.getalma.com/calendar*"
       ],
       "js": [
-        "tasks/alma-plus.js",
+        "content/alma-plus.js",
         "files-and-notes/materials.js",
         "calendar/official-calendar.js",
         "calendar/calendar.js"
       ],
       "css": [
-        "tasks/alma-plus.css",
+        "content/alma-plus.css",
         "files-and-notes/materials.css",
         "calendar/calendar.css"
       ],
@@ -138,6 +138,6 @@
     }
   ],
   "background": {
-    "service_worker": "tasks/background.js"
+    "service_worker": "content/background.js"
   }
 }
