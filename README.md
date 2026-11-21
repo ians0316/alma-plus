@@ -154,8 +154,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `files-and-notes/` | `materials.js`, `materials.css`: attached files, My notes, paperclip and note icons, Files Saved message |
 | `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year). `dashboard.js`, `dashboard.css`: Today dashboard on the Overview page |
 | `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma. `icons/`: extension icons, the school crest, and the Google Calendar icon. `screenshots/`: pictures for this README |
-| `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab |
-| `class-tabs/` | `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, and class attendance on class pages |
+| `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab. `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 
 ## Bugs fixed
@@ -178,7 +177,7 @@ Newest first.
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.11.6, used day to day at Seoul Academy.
+> **Status:** version 2.11.7, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs and Gradebook, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
@@ -192,10 +191,6 @@ Want to help? See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for how to report b
 ## Report a bug
 
 Email **ian.shin0316@gmail.com** 
-
-## License
-
-[MIT](LICENSE). Copyright (c) 2026 ians0316.
 
 <p align="center">
   <sub>Made by a Seoul Academy student, for Seoul Academy students. Not affiliated with Alma or Seoul Academy.</sub>
