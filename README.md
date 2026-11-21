@@ -7,8 +7,7 @@ The Alma+ Custom Tasks is an extension that adds convenient features for Seoul A
 > Seoul Academy. Alma can change its website at any time and break parts of the extension, so
 > always double-check due dates in Alma itself.
 
-> [!WARNING]
-> Only works with **student** Alma accounts. Parent and teacher accounts are not supported.
+> ⚠️ **Student accounts only:** Alma+ works only when you sign in to Alma with a student account. Parent and teacher accounts are not supported, and some features may not show or may not work as intended on them.
 
 ## How it works
 
