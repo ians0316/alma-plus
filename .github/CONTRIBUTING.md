@@ -31,3 +31,7 @@ Open an [issue](https://github.com/ians0316/alma-plus/issues), or use the email 
 ## Where things are
 
 See the **Files** table in the [README](../README.md#files). Each feature has its own folder.
+
+## License
+
+Alma+ uses the [MIT License](../LICENSE). By contributing, you agree your changes are shared under it too.

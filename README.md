@@ -194,6 +194,10 @@ Want to help? See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for how to report b
 
 Email **ian.shin0316@gmail.com** 
 
+## License
+
+[MIT](LICENSE). Copyright (c) 2026 ians0316.
+
 <p align="center">
   <sub>Made by a Seoul Academy student, for Seoul Academy students. Not affiliated with Alma or Seoul Academy.</sub>
 </p>
