@@ -1,0 +1,19 @@
+# Checks every push for broken JavaScript or a broken manifest.json.
+name: Check
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: manifest.json is valid and its files exist
+        run: |
+          jq empty manifest.json
+          jq -r '[.content_scripts[].js[]?, .content_scripts[].css[]?, .background.service_worker, .action.default_popup] | .[] | select(.)' manifest.json | sort -u |
+            while read -r f; do test -f "$f" || { echo "missing: $f"; exit 1; }; done
+      - name: JavaScript has no syntax errors
+        run: find . -name '*.js' -not -path './.git/*' -print0 | xargs -0 -n1 node --check
