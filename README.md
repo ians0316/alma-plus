@@ -18,17 +18,16 @@ Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already ther
 
 ## Setup
 
-1. Download the Github repo (click "Code" then "Download Zip").
-2. Unzip the zip file. This should create the extension folder.
-3. Open `chrome://extensions` (Chrome/Brave) or `edge://extensions` (Edge).
-4. Turn on **Developer mode** in the top right.
-5. Click **Load unpacked** and select this project folder.
-6. Open Alma's todo tab and you should be able to access the features this extension offers.
+Download the Github repo (click "Code" then "Download Zip").
 
-If a bug fix or a new version is released, you would have to manually update the extension by deleting the previous version and uploading the new one.
+1. Unzip the zip file. This should create the extension folder.
+2. Open `chrome://extensions` (Chrome/Brave) or `edge://extensions` (Edge).
+3. Turn on Developer mode in the top right.
+4. Click Load unpacked and select this project folder.
+5. Open Alma's todo tab and you should be able to access the features this extension offers.
 
-> [!NOTE]
-> **Back up your tasks first** before updating (see Custom tasks below).
+Keep the extension folder where it is after loading it. Your custom tasks are stored in the browser under that folder's location, so moving, renaming or loading it from a different folder starts you with an empty task list. Use the backup button first if you ever need to move it.
+To update, download the new version and copy its files over the old folder (same location), then click the reload icon on the extension's card in `chrome://extensions`. Do not remove the extension to update it: removing it deletes your saved tasks.
 
 ## What's new in 2.0
 
