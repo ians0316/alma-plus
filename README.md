@@ -20,7 +20,7 @@ Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already ther
 
 ## Setup
 
-Download the Github repo (click "Code" then "Download Zip").
+Download the GitHub repo (click "Code" then "Download Zip").
 
 1. Unzip the zip file. This should create the extension folder.
 2. Open `chrome://extensions` (Chrome/Brave) or `edge://extensions` (Edge).
