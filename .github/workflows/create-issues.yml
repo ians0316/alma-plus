@@ -1,0 +1,42 @@
+# One-time: posts the starter issues, then this file is deleted.
+name: Create starter issues
+on:
+  push:
+    branches: [main]
+    paths: [.github/workflows/create-issues.yml]
+permissions:
+  issues: write
+jobs:
+  issues:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - run: |
+          make() {
+            if gh issue list --state all --search "\"$1\" in:title" --json title -q '.[].title' | grep -Fxq "$1"; then
+              echo "exists: $1"; return; fi
+            gh issue create --title "$1" --label "$2" --body "$3"
+          }
+          make "Add dark mode" "good first issue" "An optional dark theme for Alma, turned on with a switch in the Alma+ settings menu.
+
+          - Keep Alma's layout exactly the same; only change colors.
+          - Off by default.
+          - Should cover Alma's pages and the parts Alma+ adds (popups, Gradebook, Today dashboard)."
+          make "Search box on the To Do page" "good first issue" "A small search field next to **Show:** on the To Do page that filters assignments and your own tasks by name as you type.
+
+          - Should look like Alma's own inputs.
+          - Clearing the box shows everything again."
+          make "Reminder notification the night before" "enhancement" "A Chrome notification at 8pm for anything due tomorrow (Alma assignments and your own tasks).
+
+          - On/off switch in the settings menu.
+          - Clicking the notification opens the To Do page."
+          make "Grade calculator on the Gradebook tab" "enhancement" "On a class's Gradebook tab, answer: *What do I need on the next assignment to get an A?*
+
+          - Pick a target grade and the category of the next assignment.
+          - Use the category weights Alma already shows."
+          make "Auto backup of tasks" "enhancement" "Save a copy of all tasks (and notes) every day so removing the extension doesn't lose them.
+
+          - Could save through Alma Sync or as a file in Downloads/Google Drive.
+          - Restore tasks should be able to load the backup."
