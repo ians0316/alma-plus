@@ -1,11 +1,11 @@
 # Makes a GitHub release with a ready-to-load zip whenever the version in
-# manifest.json goes up.
+# manifest.json goes up. Release titles are just the version, like v2.12.0.
 name: Release
 
 on:
   push:
     branches: [main]
-    paths: [manifest.json]
+    paths: [manifest.json, .github/workflows/release.yml]
   workflow_dispatch:
 
 permissions:
@@ -26,11 +26,14 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           TAG: ${{ steps.v.outputs.tag }}
         run: |
-          if gh release view "$TAG" >/dev/null 2>&1; then
-            echo "$TAG already released"; exit 0
+          if ! gh release view "$TAG" >/dev/null 2>&1; then
+            mkdir -p dist/alma-plus
+            rsync -a --exclude .git --exclude .github --exclude dist --exclude layout/screenshots ./ dist/alma-plus/
+            (cd dist && zip -qr "alma-plus-$TAG.zip" alma-plus)
+            gh release create "$TAG" "dist/alma-plus-$TAG.zip" \
+              --target "$GITHUB_SHA" --title "$TAG" --generate-notes
           fi
-          mkdir -p dist/alma-plus
-          rsync -a --exclude .git --exclude .github --exclude dist --exclude layout/screenshots ./ dist/alma-plus/
-          (cd dist && zip -qr "alma-plus-$TAG.zip" alma-plus)
-          gh release create "$TAG" "dist/alma-plus-$TAG.zip" \
-            --target "$GITHUB_SHA" --title "Alma+ $TAG" --generate-notes
+          # keep every release title as just its version
+          gh release list --limit 100 --json tagName,name \
+            -q '.[] | select(.name != .tagName) | .tagName' |
+            while read -r t; do gh release edit "$t" --title "$t"; done
