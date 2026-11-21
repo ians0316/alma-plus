@@ -5,7 +5,7 @@ name: Release
 on:
   push:
     branches: [main]
-    paths: [manifest.json, .github/workflows/release.yml]
+    paths: [manifest.json, .github/workflows/release.yml, .github/RELEASE_NOTES.md]
   workflow_dispatch:
 
 permissions:
@@ -34,7 +34,10 @@ jobs:
             rsync -a --exclude .git --exclude .github --exclude dist --exclude layout/screenshots ./ dist/alma-plus/
             (cd dist && zip -qr "alma-plus-$TAG.zip" alma-plus)
             gh release create "$TAG" "dist/alma-plus-$TAG.zip" \
-              --target "$GITHUB_SHA" --title "Alma+ $TAG" --generate-notes
+              --target "$GITHUB_SHA" --title "Alma+ $TAG" --notes-file .github/RELEASE_NOTES.md --generate-notes
+          else
+            # notes were updated for the current version
+            gh release edit "$TAG" --notes-file .github/RELEASE_NOTES.md
           fi
           # keep every release title as "Alma+ <version>"
           gh release list --limit 100 --json tagName,name \
