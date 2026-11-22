@@ -1,0 +1,17 @@
+title: "[Question] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        The [Wiki](https://github.com/ians0316/alma-plus/wiki) and its [FAQ](https://github.com/ians0316/alma-plus/wiki/FAQ) may already have the answer.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your question
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Alma+ version (optional)
+      description: Shown at the bottom of the Alma+ settings menu.

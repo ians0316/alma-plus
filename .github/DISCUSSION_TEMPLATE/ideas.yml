@@ -1,0 +1,17 @@
+title: "[Idea] "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Share an idea and see what others think. Check the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) first, it might already be planned.
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: What should Alma+ do, and where on Alma?
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why would it help?

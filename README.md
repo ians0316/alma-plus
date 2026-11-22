@@ -208,7 +208,7 @@ The [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki) is the main guide, 
 
 ## Contributing
 
-Want to help? See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for how to report bugs, suggest features and make changes.
+Want to help? See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for how to report bugs, suggest features and make changes. Questions and ideas are welcome in [Discussions](https://github.com/ians0316/alma-plus/discussions).
 
 ## Report a bug
 
