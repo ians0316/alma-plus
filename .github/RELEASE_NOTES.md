@@ -1,14 +1,11 @@
 ## Highlights
-- **Releases with a ready-to-load zip.** Every new version now comes with `alma-plus-vX.Y.Z.zip` below. Download it, unzip it, and load it in Chrome — no need to download the whole repo.
-- **Cleaner project folders.** Files were grouped into fewer folders (`content/`, `calendar/`, `gpa/`, `layout/`, `files-and-notes/`, `settings/`), so the repo front page is shorter. The extension works exactly the same.
+- **New license: Apache 2.0.** Alma+ now uses the Apache License 2.0 instead of MIT. You can still use, change and share Alma+ freely. The new license also says what has to happen when someone shares a changed copy, and it covers patents.
 
 ## Changes
-- The `tasks` folder is now called `content`, and the sync helper (`background.js`) moved into it.
-- The Today dashboard files moved into `calendar/`; class tabs and the Gradebook moved into `gpa/`.
-- Extension icons and README pictures now live in `layout/`.
-- README: new Setup steps, screenshots of the main features, a Contributing section, and a note that Alma+ works only with **student** accounts.
-- New Contributing guide and Code of conduct, plus an MIT license.
-- Every push is now checked automatically for broken code.
+- `LICENSE` now has the full Apache License 2.0 text.
+- The Contributing guide now says new contributions are shared under Apache 2.0.
+- Dependabot now checks the GitHub Actions used by the automatic checks and releases, and opens a pull request when there's a newer version. The first one updated `actions/checkout` from v4 to v7.
+- The extension itself works exactly the same as 2.12.0. Nothing about your tasks, files or notes changed.
 
 ## How to update
 1. Download the zip below and unzip it.

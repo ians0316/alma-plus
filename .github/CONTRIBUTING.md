@@ -34,4 +34,4 @@ See the **Files** table in the [README](../README.md#files). Each feature has it
 
 ## License
 
-Alma+ uses the [MIT License](../LICENSE). By contributing, you agree your changes are shared under it too.
+Alma+ uses the [Apache License 2.0](../LICENSE). By contributing, you agree your changes are shared under it too.
