@@ -65,3 +65,22 @@
   font-size: 13px;
   color: #777;
 }
+
+/* "New" / "Updated" label on the right of New & Updated Assignments rows. */
+.alma-plus-dash-tag {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+.alma-plus-dash-tag-new {
+  background: #5cb85c;
+}
+.alma-plus-dash-tag-updated {
+  background: #f0ad4e;
+}
+#alma-plus-dash-changes {
+  margin-top: 16px;
+}

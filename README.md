@@ -70,6 +70,10 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 Alma's Overview page gets **Due Today**, **Due Tomorrow** and **Recently Updated Grades** under your
 schedule, in the same card style as Alma's schedule. Click an assignment to open Alma's popup.
 
+Below them, **New & Updated Assignments** lists assignments teachers posted in the last 3 days
+(green **New**) and ones whose due date or name changed (orange **Updated**, showing the old and new
+due date).
+
 <img src="layout/screenshots/dashboard.png" width="520" alt="Due Today and Due Tomorrow on the Overview page">
 
 ### Calendar page
@@ -111,7 +115,7 @@ Click the Alma+ icon in Chrome's toolbar to turn each part on or off:
 
 | Setting | What it controls |
 |---|---|
-| Today dashboard | Due Today, Due Tomorrow and Recently Updated Grades on the Overview page |
+| Today dashboard | Due Today, Due Tomorrow, Recently Updated Grades, and New & Updated Assignments on the Overview page |
 | Calendar | Your work and the official school calendar on Alma's Calendar page |
 | Extra tabs | The extra sidebar tabs and the top bar buttons |
 | On the To Do page | Your own tasks in Upcoming Assignments |
@@ -161,7 +165,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 
 ## Bugs fixed
 
-Newest first. Latest GitHub release: [**v2.12.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.12.1). Latest extension version: **2.12.1**.
+Newest first. Latest GitHub release: [**v2.13.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.13.0). Latest extension version: **2.13.0**.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
@@ -179,7 +183,7 @@ Newest first. Latest GitHub release: [**v2.12.1**](https://github.com/ians0316/a
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.12.1, used day to day at Seoul Academy.
+> **Status:** version 2.13.0, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs and Gradebook, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.

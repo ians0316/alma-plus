@@ -1,11 +1,14 @@
 ## Highlights
-- **New license: Apache 2.0.** Alma+ now uses the Apache License 2.0 instead of MIT. You can still use, change and share Alma+ freely. The new license also says what has to happen when someone shares a changed copy, and it covers patents.
+- **New & Updated Assignments on the Today dashboard.** Alma's Overview page now has a new box under Due Today, Due Tomorrow and Recently Updated Grades. It shows:
+  - **New** (green): assignments teachers posted in the last 3 days, with when they were posted and when they're due.
+  - **Updated** (orange): assignments whose due date or name changed, like "due Tue, Nov 17 → Thu, Nov 19".
+- Click any assignment in the box to open Alma's own assignment popup.
 
 ## Changes
-- `LICENSE` now has the full Apache License 2.0 text.
-- The Contributing guide now says new contributions are shared under Apache 2.0.
-- Dependabot now checks the GitHub Actions used by the automatic checks and releases, and opens a pull request when there's a newer version. The first one updated `actions/checkout` from v4 to v7.
-- The extension itself works exactly the same as 2.12.0. Nothing about your tasks, files or notes changed.
+- The dashboard reads each class page once for both grades and assignments, so it isn't any slower than before.
+- Alma+ remembers which assignments it has already seen (saved in this browser only), so it can tell when one is new or changes.
+- The first time you open Overview after updating, it shows only assignments posted in the last 3 days, not everything as "new".
+- The box turns on and off with the **Today dashboard** setting in the Alma+ menu.
 
 ## How to update
 1. Download the zip below and unzip it.

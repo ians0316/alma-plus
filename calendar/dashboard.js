@@ -1,11 +1,16 @@
 // Today dashboard for Alma+ on Alma's Overview page (/home): "Due Today",
-// "Due Tomorrow", and "Recently Updated Grades" side by side under the Schedule, as compact
-// lists styled like the rows of Alma's To Do tables. Uses helpers from
+// "Due Tomorrow", and "Recently Updated Grades" side by side under the Schedule, then
+// "New & Updated Assignments" below them, as compact lists styled like the rows of
+// Alma's To Do tables. Uses helpers from
 // alma-plus.js (loadTasks, loadSettings, getClasses, findClass, openDetails).
 
 const GRADES_CACHE_KEY = "almaPlusGradesCache";
 const GRADES_CACHE_MINUTES = 15;
 const NEW_GRADE_DAYS = 3;
+// Every assignment seen so far ({id: {name, due, seen}}), and the new/changed ones found.
+const SEEN_KEY = "almaPlusSeenAssignments";
+const CHANGES_KEY = "almaPlusAssignmentChanges";
+const CHANGE_DAYS = 3;
 
 function dEl(tag, className, text) {
   const node = document.createElement(tag);
@@ -60,36 +65,99 @@ async function almaUpcoming() {
   }).filter(Boolean);
 }
 
-// Grades updated in the last few days, read from each class page. Cached for a
-// few minutes so opening Overview stays quick.
-async function recentGrades() {
+// Reads each class page once for both recently updated grades and the full list of
+// assignments. Cached for a few minutes so opening Overview stays quick.
+async function scanClasses() {
   const cached = (await chrome.storage.local.get(GRADES_CACHE_KEY))[GRADES_CACHE_KEY];
-  if (cached && Date.now() - cached.time < GRADES_CACHE_MINUTES * 60000) return cached.items;
+  if (cached && cached.assignments && Date.now() - cached.time < GRADES_CACHE_MINUTES * 60000) return cached;
 
   const classes = (await getClasses()).filter((c) => /^\/home\/class\//.test(c.url));
   const cutoff = Date.now() / 1000 - NEW_GRADE_DAYS * 86400;
   const items = [];
+  const assignments = [];
+  let complete = true;
   await Promise.all(classes.map(async (c) => {
     const html = await fetch(c.url, { credentials: "same-origin" }).then((r) => (r.ok ? r.text() : "")).catch(() => "");
     const doc = new DOMParser().parseFromString(html, "text/html");
     const table = doc.querySelector(".student-assignments table.assignment-grades");
-    if (!table) return;
+    if (!table) {
+      complete = false;
+      return;
+    }
     const heads = [...table.querySelectorAll("thead th")].map((th) => th.textContent.trim().toLowerCase());
     const gradeAt = heads.indexOf("grade");
     const updatedAt = heads.indexOf("updated");
+    const dueAt = heads.indexOf("due");
     for (const row of table.querySelectorAll("tbody tr")) {
-      const updated = Number(row.cells[updatedAt]?.dataset.sortableVal);
       const link = nameLinkIn(row);
+      if (!link) continue;
+      const href = link.getAttribute("href");
+      const id = href.split("/").pop();
+      const due = Number(row.cells[dueAt]?.dataset.sortableVal) || 0;
+      assignments.push({ id, name: link.textContent.trim(), href, className: c.name, classHref: c.url, due });
+
+      const updated = Number(row.cells[updatedAt]?.dataset.sortableVal);
       const gradeText = row.cells[gradeAt]?.textContent.replace(/\s+/g, " ").trim() || "";
-      if (!link || !updated || updated < cutoff || !gradeText || /ungraded/i.test(gradeText)) continue;
+      if (!updated || updated < cutoff || !gradeText || /ungraded/i.test(gradeText)) continue;
       const letter = gradeText.match(/^[A-F][+-]?/)?.[0] || "";
       const percent = gradeText.match(/\(([\d.]+%)\)/)?.[1] || "";
-      items.push({ name: link.textContent.trim(), href: link.getAttribute("href"), className: c.name, classHref: c.url, letter, percent, updated });
+      items.push({ name: link.textContent.trim(), href, className: c.name, classHref: c.url, letter, percent, updated });
     }
   }));
   items.sort((a, b) => b.updated - a.updated);
-  await chrome.storage.local.set({ [GRADES_CACHE_KEY]: { time: Date.now(), items } });
-  return items;
+  const result = { time: Date.now(), items, assignments, complete };
+  await chrome.storage.local.set({ [GRADES_CACHE_KEY]: result });
+  return result;
+}
+
+// When Alma made an assignment: its ID starts with the creation time.
+function createdAt(id) {
+  const secs = parseInt(String(id).slice(0, 8), 16);
+  return /^[0-9a-f]{24}$/i.test(id) && secs ? secs * 1000 : 0;
+}
+
+function shortDay(secs) {
+  return secs ? new Date(secs * 1000).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) : "no date";
+}
+
+// Compares this read with the last one: assignments not seen before are new, and a
+// changed due date or name counts as updated. The very first time (nothing saved
+// yet), only assignments Alma made in the last few days count as new.
+async function assignmentChanges(scan) {
+  const store = await chrome.storage.local.get([SEEN_KEY, CHANGES_KEY]);
+  const firstTime = !store[SEEN_KEY];
+  const seen = store[SEEN_KEY] || {};
+  const since = Date.now() - CHANGE_DAYS * 86400000;
+  let changes = (store[CHANGES_KEY] || []).filter((c) => c.at >= since);
+  const now = Date.now();
+
+  for (const a of scan.assignments) {
+    const before = seen[a.id];
+    const base = { id: a.id, name: a.name, href: a.href, className: a.className, due: a.due };
+    if (!before) {
+      const made = createdAt(a.id);
+      if (firstTime ? made >= since : true) changes.push({ ...base, kind: "new", at: firstTime ? made : now });
+      seen[a.id] = { name: a.name, due: a.due, seen: now };
+      continue;
+    }
+    const what = [];
+    if (before.due !== a.due) what.push(`due ${shortDay(before.due)} → ${shortDay(a.due)}`);
+    if (before.name !== a.name) what.push(`renamed from "${before.name}"`);
+    if (what.length) {
+      changes = changes.filter((c) => !(c.id === a.id && c.kind === "updated"));
+      changes.push({ ...base, kind: "updated", what: what.join(", "), at: now });
+      seen[a.id] = { ...before, name: a.name, due: a.due };
+    }
+  }
+  // Keep names and dates current on saved entries.
+  const byId = new Map(scan.assignments.map((a) => [a.id, a]));
+  changes = changes.map((c) => (byId.has(c.id) ? { ...c, name: byId.get(c.id).name, due: byId.get(c.id).due } : c));
+  // Only save the list of seen assignments when every class page was read, so a
+  // class that failed to load doesn't come back later looking "new".
+  const save = { [CHANGES_KEY]: changes };
+  if (scan.complete || !firstTime) save[SEEN_KEY] = seen;
+  await chrome.storage.local.set(save);
+  return changes.sort((a, b) => b.at - a.at);
 }
 
 function tasksOnDay(tasks, day) {
@@ -125,8 +193,8 @@ function row({ classLine, title, href, onOpen, grade }) {
   return tr;
 }
 
-function column(id, heading, rows, emptyText) {
-  const col = dEl("div", "pure-u-1 pure-u-md-1-3");
+function column(id, heading, rows, emptyText, width = "pure-u-1 pure-u-md-1-3") {
+  const col = dEl("div", width);
   const box = dEl("div", "alma-plus-dash-col");
   box.id = id;
   box.appendChild(dEl("h4", "module-heading", heading));
@@ -152,6 +220,22 @@ function dueRows(day, alma, tasks) {
     }));
   }
   return rows;
+}
+
+function whenText(ms) {
+  const day = isoDay(new Date(ms));
+  if (day === isoDay(new Date())) return "today";
+  if (day === isoDay(new Date(Date.now() - 86400000))) return "yesterday";
+  return new Date(ms).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+}
+
+function changeRows(changes) {
+  return changes.slice(0, 8).map((c) => {
+    const detail = c.kind === "new" ? `posted ${whenText(c.at)} · due ${shortDay(c.due)}` : `${c.what} · ${whenText(c.at)}`;
+    const li = row({ classLine: `${c.className} · ${detail}`, title: c.name, href: c.href });
+    li.appendChild(dEl("div", `alma-plus-dash-tag alma-plus-dash-tag-${c.kind}`, c.kind === "new" ? "New" : "Updated"));
+    return li;
+  });
 }
 
 function gradeRows(grades) {
@@ -194,19 +278,27 @@ async function renderDashboard() {
     dash.id = "alma-plus-dashboard";
     const nextDate = new Date(date.getFullYear(), date.getMonth(), date.getDate() + 1);
     const gradesSlot = column("alma-plus-dash-grades", "Recently Updated Grades", [], "Loading…");
+    const changesHeading = "New & Updated Assignments";
+    const changesSlot = column("alma-plus-dash-changes", changesHeading, [], "Loading…", "pure-u-1");
     dash.append(
       column("alma-plus-dash-today", dayHeading(date), dueRows(day, alma, tasksOnDay(allTasks, day)), "Nothing due."),
       column("alma-plus-dash-tomorrow", dayHeading(nextDate), dueRows(next, alma, tasksOnDay(allTasks, next)), "Nothing due."),
       gradesSlot,
+      changesSlot,
     );
 
     document.getElementById("alma-plus-dashboard")?.remove();
     anchor.after(dash);
     dashRenderedFor = day;
 
-    recentGrades()
-      .then((grades) => gradesSlot.replaceWith(column("alma-plus-dash-grades", "Recently Updated Grades", gradeRows(grades), `No grades updated in the last ${NEW_GRADE_DAYS} days.`)))
+    const scan = scanClasses();
+    scan
+      .then((s) => gradesSlot.replaceWith(column("alma-plus-dash-grades", "Recently Updated Grades", gradeRows(s.items), `No grades updated in the last ${NEW_GRADE_DAYS} days.`)))
       .catch(() => gradesSlot.replaceWith(column("alma-plus-dash-grades", "Recently Updated Grades", [], "Couldn't load grades.")));
+    scan
+      .then(assignmentChanges)
+      .then((changes) => changesSlot.replaceWith(column("alma-plus-dash-changes", changesHeading, changeRows(changes), `No new or updated assignments in the last ${CHANGE_DAYS} days.`, "pure-u-1")))
+      .catch(() => changesSlot.replaceWith(column("alma-plus-dash-changes", changesHeading, [], "Couldn't load assignments.", "pure-u-1")));
   } finally {
     dashRendering = false;
   }
