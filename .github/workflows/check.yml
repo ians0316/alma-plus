@@ -13,7 +13,7 @@ jobs:
       name: ${{ github.event_name == 'pull_request' && 'preview' || 'main' }}
       url: https://github.com/ians0316/alma-plus/commit/${{ github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: manifest.json is valid and its files exist
         run: |
           jq empty manifest.json

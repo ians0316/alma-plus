@@ -18,7 +18,7 @@ jobs:
       name: release
       url: https://github.com/ians0316/alma-plus/releases/latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Read version
         id: v
