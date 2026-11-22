@@ -2,7 +2,7 @@
 
 The Alma+ Custom Tasks is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
 
-📖 **Full docs are in the [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki):** install and update, every feature, FAQ, troubleshooting, and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap).
+📖 **Full docs are in the [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki):** install and update, every feature, FAQ, troubleshooting, and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) (also as a [project board](https://github.com/users/ians0316/projects/3)).
 
 > [!IMPORTANT]
 > **Alma+ is an unofficial student project.** It is not made, supported, or approved by Alma or
@@ -204,7 +204,7 @@ Newest first. Latest GitHub release: [**v2.14.0**](https://github.com/ians0316/a
 
 ## Documentation
 
-The [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki) is the main guide, with a page for every feature, plus [FAQ](https://github.com/ians0316/alma-plus/wiki/FAQ), [Troubleshooting](https://github.com/ians0316/alma-plus/wiki/Troubleshooting) and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) of what's coming next.
+The [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki) is the main guide, with a page for every feature, plus [FAQ](https://github.com/ians0316/alma-plus/wiki/FAQ), [Troubleshooting](https://github.com/ians0316/alma-plus/wiki/Troubleshooting) and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) of what's coming next. Track progress on the [Alma+ Roadmap board](https://github.com/users/ians0316/projects/3).
 
 ## Contributing
 
