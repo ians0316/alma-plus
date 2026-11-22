@@ -134,7 +134,23 @@ footer {
 .sync-status .bad {
   color: #b42318;
 }
-#sync-now {
+.reminder-time {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: #777;
+}
+.reminder-time input {
+  padding: 2px 4px;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  font: inherit;
+  color: #333;
+}
+#sync-now,
+#test-reminder {
   flex-shrink: 0;
   padding: 4px 10px;
   border: 0;
@@ -144,6 +160,10 @@ footer {
   font: inherit;
   cursor: pointer;
 }
-#sync-now:disabled {
+#test-reminder {
+  margin-left: auto;
+}
+#sync-now:disabled,
+#test-reminder:disabled {
   opacity: 0.6;
 }

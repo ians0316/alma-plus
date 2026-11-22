@@ -14,6 +14,8 @@ const DEFAULT_SETTINGS = {
   calendar: true,
   sidebarTabs: true,
   syncTasks: true,
+  reminder: true,
+  reminderTime: "20:00",
 };
 
 async function loadSettings() {
@@ -82,6 +84,22 @@ async function start() {
       saved.hidden = false;
     });
   }
+  const timeInput = document.getElementById("reminder-time");
+  timeInput.value = settings.reminderTime || "20:00";
+  timeInput.addEventListener("change", async () => {
+    if (!timeInput.value) return;
+    const current = await loadSettings();
+    current.reminderTime = timeInput.value;
+    await chrome.storage.local.set({ [SETTINGS_KEY]: current });
+    const saved = document.getElementById("saved");
+    saved.textContent = `Saved. You'll get the reminder at ${timeInput.value.replace(/^0/, "")} each night.`;
+    saved.hidden = false;
+  });
+  document.getElementById("test-reminder").addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    await chrome.runtime.sendMessage({ type: "test-reminder" });
+    e.target.disabled = false;
+  });
   showStats();
   showSyncStatus();
   chrome.storage.onChanged.addListener((changes) => {

@@ -14,6 +14,8 @@ const DEFAULT_SETTINGS = {
   calendar: true,         // assignments and tasks on Alma's Academic Calendar
   sidebarTabs: true,       // extra tabs in Alma's left menu (sidebar.js)
   syncTasks: true,        // send tasks to Alma Sync -> Notion + Google Calendar (background.js)
+  reminder: true,         // night-before notification (background.js)
+  reminderTime: "20:00",
 };
 let settings = { ...DEFAULT_SETTINGS };
 async function loadSettings() {
@@ -1258,6 +1260,8 @@ function isTaskPage() {
 }
 
 async function init() {
+  // Remember which Alma site this is, for the night-before reminder (background.js).
+  chrome.storage.local.set({ almaPlusOrigin: location.origin });
   if (!isTaskPage()) return;
   await loadSettings();
   getClasses(); // start loading so suggestions and teacher names are ready

@@ -1,0 +1,60 @@
+name: 🐞 Bug report
+description: Something in Alma+ doesn't work or looks wrong
+title: "[Bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting! First try the quick fix: go to `chrome://extensions`, click reload ↻ on Alma+, then refresh Alma. See [Troubleshooting](https://github.com/ians0316/alma-plus/wiki/Troubleshooting) for more.
+  - type: dropdown
+    id: page
+    attributes:
+      label: Which Alma page?
+      options:
+        - To Do
+        - Overview (Today dashboard)
+        - Calendar
+        - Classes tab (GPA)
+        - A class page (tabs, Gradebook, calculator)
+        - Settings menu (Alma+ icon)
+        - Night-before reminder
+        - Somewhere else
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+      placeholder: I pressed Done on a task and it disappeared instead of moving to Past Assignments.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to make it happen again
+      placeholder: |
+        1. Go to the To Do page
+        2. Press + Add my own task
+        3. ...
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Drag a picture here. Please hide grades, names, or anything private.
+  - type: input
+    id: version
+    attributes:
+      label: Alma+ version
+      description: Shown at the bottom of the Alma+ settings menu, or on its card in chrome://extensions.
+      placeholder: "2.14.0"
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      options:
+        - Chrome
+        - Edge
+        - Brave
+        - Other

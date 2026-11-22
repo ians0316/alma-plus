@@ -7,7 +7,8 @@
 // dashboard   = Alma's own class page, unchanged (default)
 // bulletin    = Alma's class announcements page
 // attendance  = your attendance for this class only (from Alma's Attendance list)
-// gradebook   = every assignment as a column, each score as a colored box
+// gradebook   = every assignment as a column, each score as a colored box,
+//               plus a grade calculator under it
 
 (() => {
   const TABS = [
@@ -315,6 +316,200 @@
     table.appendChild(tbody);
     wrap.appendChild(table);
     box.appendChild(wrap);
+    renderCalculator(box);
+  }
+
+  // ---- Grade calculator (under the Gradebook) ----
+  // Alma's class grade = each category's score times its weight ("25% of Final
+  // Grade"), divided by the total weight of categories that have grades. A
+  // category's score is points earned / points possible. So for the next
+  // assignment (its category and points), we can work out the score needed for a
+  // target grade, or the grade a given score would give.
+
+  let calcCat = null;
+  let calcPoints = 100;
+  let calcTarget = null;
+  let calcCustom = 90;
+  let calcIf = "";
+
+  function gradeModel() {
+    const cats = readCategories().map((c) => ({
+      name: c.name,
+      weight: parseFloat((c.weight.match(/([\d.]+)\s*%/) || [])[1]) || 0,
+      pct: (() => { const m = c.score.match(/\(([\d.]+)%\)/); return m ? parseFloat(m[1]) : null; })(),
+      possible: 0,
+    }));
+    const key = (n) => n.trim().toLowerCase();
+    let earnedAll = 0, possibleAll = 0;
+    for (const tr of document.querySelectorAll("table.assignment-grades tbody tr")) {
+      const m = (tr.querySelector("td.points")?.textContent || "").match(/([\d.]+)\s*\/\s*([\d.]+)/);
+      if (!m) continue;
+      const earned = parseFloat(m[1]), possible = parseFloat(m[2]);
+      earnedAll += earned;
+      possibleAll += possible;
+      const cat = cats.find((c) => key(c.name) === key(tr.querySelector("td.name small")?.textContent || ""));
+      if (cat) cat.possible += possible;
+    }
+    const weighted = cats.length > 0 && cats.every((c) => c.weight > 0);
+    return { cats, weighted, earnedAll, possibleAll };
+  }
+
+  // Grade with the next assignment scored `score` out of `points` in category `catName`.
+  function gradeWith(model, catName, points, score) {
+    if (!model.weighted) return ((model.earnedAll + score) / (model.possibleAll + points)) * 100;
+    let sum = 0, total = 0;
+    for (const c of model.cats) {
+      if (c.name === catName) {
+        const earned = c.pct !== null ? (c.pct / 100) * c.possible : 0;
+        const possible = c.pct !== null ? c.possible : 0;
+        sum += c.weight * ((earned + score) / (possible + points)) * 100;
+        total += c.weight;
+      } else if (c.pct !== null) {
+        sum += c.weight * c.pct;
+        total += c.weight;
+      }
+    }
+    return total ? sum / total : 0;
+  }
+
+  // Score needed out of `points` to reach `target` %. The grade goes up in a
+  // straight line with the score, so two points on the line give the answer.
+  function scoreNeeded(model, catName, points, target) {
+    const at0 = gradeWith(model, catName, points, 0);
+    const atFull = gradeWith(model, catName, points, points);
+    if (atFull === at0) return null;
+    return ((target - at0) / (atFull - at0)) * points;
+  }
+
+  // Letter cutoffs. If Alma shows any + or - grades in this class, use the usual
+  // +/- scale; otherwise plain A 90 / B 80 / C 70 / D 60.
+  function letterScale() {
+    const letters = [...document.querySelectorAll("table.assignment-grades td.grade, .current-grade .grade")]
+      .map((td) => [...td.childNodes].filter((n) => n.nodeType === Node.TEXT_NODE).map((n) => n.textContent).join("").trim());
+    const plusMinus = letters.some((l) => /^[A-D][+-]$/.test(l));
+    return plusMinus
+      ? [["A", 93], ["A-", 90], ["B+", 87], ["B", 83], ["B-", 80], ["C+", 77], ["C", 73], ["C-", 70], ["D+", 67], ["D", 63], ["D-", 60]]
+      : [["A", 90], ["B", 80], ["C", 70], ["D", 60]];
+  }
+
+  function round1(n) {
+    return Math.round(n * 10) / 10;
+  }
+
+  function renderCalculator(box) {
+    const model = gradeModel();
+    if (!model.weighted && !model.possibleAll) return;
+    const cats = model.weighted ? model.cats : [];
+    if (!calcCat || !cats.some((c) => c.name === calcCat)) {
+      calcCat = cats.slice().sort((a, b) => b.weight - a.weight)[0]?.name || "";
+    }
+    const scale = letterScale();
+    if (calcTarget === null) calcTarget = scale[0][0];
+
+    const wrap = document.createElement("div");
+    wrap.className = "alma-plus-calc";
+    const h = document.createElement("h4");
+    h.className = "module-heading";
+    h.textContent = "Grade Calculator";
+    wrap.appendChild(h);
+
+    const form = document.createElement("div");
+    form.className = "pure-form alma-plus-calc-form";
+    const field = (label, control) => {
+      const l = document.createElement("label");
+      const span = document.createElement("span");
+      span.textContent = label;
+      l.append(span, control);
+      form.appendChild(l);
+      return control;
+    };
+
+    if (cats.length) {
+      const sel = document.createElement("select");
+      cats.forEach((c) => sel.append(new Option(`${c.name} (${c.weight}%)`, c.name)));
+      sel.value = calcCat;
+      sel.addEventListener("change", () => { calcCat = sel.value; update(); });
+      field("Next assignment's category", sel);
+    }
+
+    const pts = document.createElement("input");
+    pts.type = "number";
+    pts.min = "1";
+    pts.step = "any";
+    pts.value = calcPoints;
+    pts.addEventListener("input", () => { calcPoints = parseFloat(pts.value) || 0; update(); });
+    field("Out of (points)", pts);
+
+    const target = document.createElement("select");
+    scale.forEach(([l, cut]) => target.append(new Option(`${l} (${cut}%)`, l)));
+    target.append(new Option("Custom %", "custom"));
+    target.value = calcTarget;
+    const custom = document.createElement("input");
+    custom.type = "number";
+    custom.step = "any";
+    custom.value = calcCustom;
+    custom.className = "alma-plus-calc-custom";
+    const targetWrap = document.createElement("span");
+    targetWrap.className = "alma-plus-calc-target";
+    targetWrap.append(target, custom);
+    target.addEventListener("change", () => { calcTarget = target.value; update(); });
+    custom.addEventListener("input", () => { calcCustom = parseFloat(custom.value) || 0; update(); });
+    field("Grade I want", targetWrap);
+
+    const ifInput = document.createElement("input");
+    ifInput.type = "number";
+    ifInput.step = "any";
+    ifInput.placeholder = "score";
+    ifInput.value = calcIf;
+    ifInput.addEventListener("input", () => { calcIf = ifInput.value; update(); });
+    field("What if I get", ifInput);
+
+    wrap.appendChild(form);
+    const need = document.createElement("p");
+    need.className = "alma-plus-calc-result";
+    const ifResult = document.createElement("p");
+    ifResult.className = "alma-plus-calc-result";
+    const note = document.createElement("p");
+    note.className = "dimmed alma-plus-calc-note";
+    note.textContent = model.weighted
+      ? "Uses this class's category weights and points, the same way Alma works out your grade. It's an estimate, so check with your teacher."
+      : "This class has no category weights, so this uses total points. It's an estimate, so check with your teacher.";
+    wrap.append(need, ifResult, note);
+    box.appendChild(wrap);
+
+    function letterFor(pct) {
+      return (scale.find(([, cut]) => pct >= cut) || ["F"])[0];
+    }
+
+    function update() {
+      custom.hidden = calcTarget !== "custom";
+      const goal = calcTarget === "custom" ? calcCustom : (scale.find(([l]) => l === calcTarget) || [, 90])[1];
+      const p = calcPoints;
+      need.replaceChildren();
+      ifResult.replaceChildren();
+      if (!(p > 0)) {
+        need.textContent = "Enter how many points the assignment is out of.";
+        return;
+      }
+      const x = scoreNeeded(model, calcCat, p, goal);
+      const goalText = calcTarget === "custom" ? `${goal}%` : `${calcTarget} (${goal}%)`;
+      const strong = (t) => { const b = document.createElement("strong"); b.textContent = t; return b; };
+      if (x === null) {
+        need.textContent = "This assignment won't change your grade.";
+      } else if (x <= 0) {
+        need.append("You'll keep ", strong(goalText), " even with a 0.");
+      } else if (x > p) {
+        need.append("You'd need ", strong(`${round1(x)}/${p} (${round1((x / p) * 100)}%)`), ` to get ${goalText}, so it isn't reachable with this assignment alone.`);
+      } else {
+        need.append("You need at least ", strong(`${round1(x)}/${p} (${round1((x / p) * 100)}%)`), ` to get ${goalText}.`);
+      }
+      const y = parseFloat(calcIf);
+      if (calcIf !== "" && !Number.isNaN(y)) {
+        const g = gradeWith(model, calcCat, p, y);
+        ifResult.append(`With ${y}/${p}, your grade would be `, strong(`${letterFor(g)} (${round1(g)}%)`), ".");
+      }
+    }
+    update();
   }
 
   // ---- Attendance for this class ----

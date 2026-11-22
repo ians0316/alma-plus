@@ -29,6 +29,19 @@
     </section>
 
     <section>
+      <h2>Reminders</h2>
+      <label class="setting">
+        <span class="text"><strong>Night-before reminder</strong><small>A notification listing what's due tomorrow</small></span>
+        <input type="checkbox" data-setting="reminder"><span class="switch" aria-hidden="true"></span>
+      </label>
+      <div class="reminder-time">
+        <label for="reminder-time">Remind me at</label>
+        <input type="time" id="reminder-time" value="20:00">
+        <button type="button" id="test-reminder">Test</button>
+      </div>
+    </section>
+
+    <section>
       <h2>Your tasks</h2>
       <label class="setting">
         <span class="text"><strong>On the To Do page</strong><small>Your own tasks in Upcoming Assignments</small></span>

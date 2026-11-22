@@ -1,0 +1,28 @@
+name: 💡 Feature idea
+description: Suggest something new for Alma+
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Check the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) first. If your idea is already there, give that issue a 👍 instead.
+  - type: textarea
+    id: problem
+    attributes:
+      label: What would it help with?
+      placeholder: I always forget which tests are coming up this week.
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: Your idea
+      description: What should Alma+ do? Where on Alma should it show?
+    validations:
+      required: true
+  - type: textarea
+    id: picture
+    attributes:
+      label: Sketch or example (optional)
+      description: A drawing, screenshot, or another app that does something similar.

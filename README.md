@@ -78,6 +78,12 @@ due date).
 
 <img src="layout/screenshots/dashboard.png" width="520" alt="Due Today and Due Tomorrow on the Overview page">
 
+### Night-before reminder
+
+Every night at **8:00 PM** (you can change the time), Chrome shows a notification listing the Alma
+assignments and your own tasks due tomorrow. Click it to open the To Do page. Nothing due means no
+notification. Turn it off, pick the time, or press **Test** in the Alma+ settings menu.
+
 ### Calendar page
 
 - Colored dots under each day with assignments or tasks, one color per class period.
@@ -107,6 +113,8 @@ Each class page gets a row of tabs, like the teacher version of Alma: **Dashboar
 
 The **Gradebook** shows every assignment as a column and each score as a colored box: green for A, light green for B, yellow for C, red for D or F. Click a box to open the assignment. Pick a category, turn the colors off, or use **Add Assignment** to add your own task to the class.
 
+Under it, the **Grade Calculator** answers "what do I need on the next one?" Pick the next assignment's category and how many points it's out of, choose the grade you want, and it shows the score you need. Type a score in **What if I get** to see what your grade would become. It uses the class's category weights and points the same way Alma does.
+
 ### GPA
 
 On the Classes tab, a box above the class list shows your GPA on an unweighted 4.0 scale, calculated from the letter grades Alma shows (A = 4.0, A- = 3.7, B+ = 3.3, and so on). Classes without a grade are skipped, and cocurricular, advisory and study hall classes are left out by default. Use the checkbox in a class's Grade column to include or leave it out. Your choices are saved in the browser.
@@ -118,6 +126,7 @@ Click the Alma+ icon in Chrome's toolbar to turn each part on or off:
 | Setting | What it controls |
 |---|---|
 | Today dashboard | Due Today, Due Tomorrow, Recently Updated Grades, and New & Updated Assignments on the Overview page |
+| Night-before reminder | A notification of what's due tomorrow, at the time you pick (8:00 PM by default), with a **Test** button |
 | Calendar | Your work and the official school calendar on Alma's Calendar page |
 | Extra tabs | The extra sidebar tabs and the top bar buttons |
 | On the To Do page | Your own tasks in Upcoming Assignments |
@@ -149,6 +158,7 @@ The settings menu shows when tasks last synced, with a **Sync now** button.
 - Tasks, attached files and notes are stored **in this browser only** (Chrome `storage`). They stay on that computer unless you back them up.
 - Files can be up to 25 MB each.
 - Alma+ never asks for your Alma password; it reads Alma's pages with the sign-in you already have.
+- The night-before reminder reads your To Do page in the background with that same sign-in. The notification is made by Chrome on your computer.
 - Besides Alma itself, the only place your data goes is Alma Sync on your own computer (your task list, if you set it up). The Google Calendar button just opens a pre-filled Google page; nothing is saved until you press Save.
 
 ## Files
@@ -158,16 +168,16 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | Folder / file | What it does |
 |---|---|
 | `manifest.json` | Name, version, icons, and which Alma pages each script runs on |
-| `content/` | `alma-plus.js`, `alma-plus.css`: custom tasks, task popup, add/edit window, filters, calendar tools, backup. `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar |
+| `content/` | `alma-plus.js`, `alma-plus.css`: custom tasks, task popup, add/edit window, filters, calendar tools, backup. `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar, and sends the night-before reminder |
 | `files-and-notes/` | `materials.js`, `materials.css`: attached files, My notes, paperclip and note icons, Files Saved message |
 | `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year). `dashboard.js`, `dashboard.css`: Today dashboard on the Overview page |
 | `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma. `icons/`: extension icons, the school crest, and the Google Calendar icon. `screenshots/`: pictures for this README |
-| `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab. `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, and class attendance on class pages |
+| `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab. `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, Grade Calculator, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 
 ## Bugs fixed
 
-Newest first. Latest GitHub release: [**v2.13.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.13.1). Latest extension version: **2.13.1**.
+Newest first. Latest GitHub release: [**v2.14.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.14.0). Latest extension version: **2.14.0**.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
@@ -185,10 +195,10 @@ Newest first. Latest GitHub release: [**v2.13.1**](https://github.com/ians0316/a
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.13.1, used day to day at Seoul Academy.
+> **Status:** version 2.14.0, used day to day at Seoul Academy.
 >
-> - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
->   Calendar buttons and .ics export, class tabs and Gradebook, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
+> - **Works today:** custom tasks, attached files, notes, Today dashboard, night-before reminder, Calendar page, Google
+>   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
 > - **Limits:** updates are manual; data lives in one browser, and removing the extension deletes it (to update, click reload instead); Google Calendar buttons make one-time copies.
 > - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
 

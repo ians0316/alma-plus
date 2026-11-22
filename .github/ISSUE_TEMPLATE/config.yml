@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Alma+ Wiki
+    url: https://github.com/ians0316/alma-plus/wiki
+    about: How to install, use every feature, FAQ and Troubleshooting.
+  - name: 💬 Questions and ideas (Discussions)
+    url: https://github.com/ians0316/alma-plus/discussions
+    about: Ask a question or chat about an idea before opening an issue.

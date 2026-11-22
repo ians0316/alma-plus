@@ -152,3 +152,46 @@ table.alma-plus-att-table td:last-child { width: 100%; }
 .alma-plus-att-table .attendance-present { background: #f1f7ed; border-color: #9ec583; color: #517939; }
 .alma-plus-att-table .attendance-absent { background: #fdf0ec; border-color: #eb6841; color: #b7472a; }
 .alma-plus-att-table .attendance-late { background: #fff7ea; border-color: #ffcc80; color: #8a5a00; }
+
+/* Grade calculator under the Gradebook */
+.alma-plus-calc {
+  margin-top: 20px;
+  padding: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+}
+.alma-plus-calc .module-heading {
+  margin-top: 0;
+}
+.alma-plus-calc-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+}
+.alma-plus-calc-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #333;
+}
+.alma-plus-calc-form input[type="number"] {
+  width: 90px;
+}
+.alma-plus-calc-target {
+  display: flex;
+  gap: 6px;
+}
+.alma-plus-calc-custom {
+  width: 70px !important;
+}
+.alma-plus-calc-result {
+  margin: 12px 0 0;
+  font-size: 15px;
+}
+.alma-plus-calc-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+}
