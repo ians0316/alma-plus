@@ -1,14 +1,11 @@
 ## Highlights
-- **New & Updated Assignments on the Today dashboard.** Alma's Overview page now has a new box under Due Today, Due Tomorrow and Recently Updated Grades. It shows:
-  - **New** (green): assignments teachers posted in the last 3 days, with when they were posted and when they're due.
-  - **Updated** (orange): assignments whose due date or name changed, like "due Tue, Nov 17 → Thu, Nov 19".
-- Click any assignment in the box to open Alma's own assignment popup.
+- **New Alma+ Wiki.** Full docs now live in the [Wiki](https://github.com/ians0316/alma-plus/wiki): install and update, a page for every feature, FAQ, Troubleshooting, and a [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) of what's done and what's coming next.
+- **Settings menu text updated.** The **Today dashboard** switch now mentions the New & Updated Assignments box added in 2.13.0.
 
 ## Changes
-- The dashboard reads each class page once for both grades and assignments, so it isn't any slower than before.
-- Alma+ remembers which assignments it has already seen (saved in this browser only), so it can tell when one is new or changes.
-- The first time you open Overview after updating, it shows only assignments posted in the last 3 days, not everything as "new".
-- The box turns on and off with the **Today dashboard** setting in the Alma+ menu.
+- README: a link to the Wiki at the top and a new Documentation section.
+- Settings menu: the Today dashboard description now lists all four boxes.
+- The extension works the same as 2.13.0 otherwise. Your tasks, files and notes aren't touched.
 
 ## How to update
 1. Download the zip below and unzip it.

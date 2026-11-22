@@ -2,6 +2,8 @@
 
 The Alma+ Custom Tasks is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
 
+📖 **Full docs are in the [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki):** install and update, every feature, FAQ, troubleshooting, and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap).
+
 > [!IMPORTANT]
 > **Alma+ is an unofficial student project.** It is not made, supported, or approved by Alma or
 > Seoul Academy. Alma can change its website at any time and break parts of the extension, so
@@ -165,7 +167,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 
 ## Bugs fixed
 
-Newest first. Latest GitHub release: [**v2.13.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.13.0). Latest extension version: **2.13.0**.
+Newest first. Latest GitHub release: [**v2.13.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.13.1). Latest extension version: **2.13.1**.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
@@ -183,12 +185,16 @@ Newest first. Latest GitHub release: [**v2.13.0**](https://github.com/ians0316/a
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.13.0, used day to day at Seoul Academy.
+> **Status:** version 2.13.1, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs and Gradebook, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
 > - **Limits:** updates are manual; data lives in one browser, and removing the extension deletes it (to update, click reload instead); Google Calendar buttons make one-time copies.
 > - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
+
+## Documentation
+
+The [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki) is the main guide, with a page for every feature, plus [FAQ](https://github.com/ians0316/alma-plus/wiki/FAQ), [Troubleshooting](https://github.com/ians0316/alma-plus/wiki/Troubleshooting) and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) of what's coming next.
 
 ## Contributing
 
