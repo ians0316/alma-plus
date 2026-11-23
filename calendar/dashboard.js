@@ -94,13 +94,15 @@ async function scanClasses() {
       const href = link.getAttribute("href");
       const id = href.split("/").pop();
       const due = Number(row.cells[dueAt]?.dataset.sortableVal) || 0;
-      assignments.push({ id, name: link.textContent.trim(), href, className: c.name, classHref: c.url, due });
-
       const updated = Number(row.cells[updatedAt]?.dataset.sortableVal);
       const gradeText = row.cells[gradeAt]?.textContent.replace(/\s+/g, " ").trim() || "";
-      if (!updated || updated < cutoff || !gradeText || /ungraded/i.test(gradeText)) continue;
-      const letter = gradeText.match(/^[A-F][+-]?/)?.[0] || "";
-      const percent = gradeText.match(/\(([\d.]+%)\)/)?.[1] || "";
+      const isGraded = updated && gradeText && !/ungraded/i.test(gradeText);
+      const letter = isGraded ? gradeText.match(/^[A-F][+-]?/)?.[0] || "" : "";
+      const percent = isGraded ? gradeText.match(/\(([\d.]+%)\)/)?.[1] || "" : "";
+      assignments.push({ id, name: link.textContent.trim(), href, className: c.name, classHref: c.url, due,
+        letter, percent, graded: isGraded ? updated : 0 });
+
+      if (!isGraded || updated < cutoff) continue;
       items.push({ name: link.textContent.trim(), href, className: c.name, classHref: c.url, letter, percent, updated });
     }
   }));
@@ -151,7 +153,10 @@ async function assignmentChanges(scan) {
   }
   // Keep names and dates current on saved entries.
   const byId = new Map(scan.assignments.map((a) => [a.id, a]));
-  changes = changes.map((c) => (byId.has(c.id) ? { ...c, name: byId.get(c.id).name, due: byId.get(c.id).due } : c));
+  changes = changes.map((c) => {
+    const a = byId.get(c.id);
+    return a ? { ...c, name: a.name, due: a.due, letter: a.letter, percent: a.percent, graded: a.graded } : c;
+  });
   // Only save the list of seen assignments when every class page was read, so a
   // class that failed to load doesn't come back later looking "new".
   const save = { [CHANGES_KEY]: changes };
@@ -229,10 +234,19 @@ function whenText(ms) {
   return new Date(ms).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
 }
 
+// "today 3:42 PM", "yesterday 9:05 AM", "Mon, Nov 16 8:00 PM"
+function whenTimeText(ms) {
+  return `${whenText(ms)} ${new Date(ms).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+}
+
 function changeRows(changes) {
   return changes.slice(0, 8).map((c) => {
-    const detail = c.kind === "new" ? `posted ${whenText(c.at)} · due ${shortDay(c.due)}` : `${c.what} · ${whenText(c.at)}`;
-    const li = row({ classLine: `${c.className} · ${detail}`, title: c.name, href: c.href });
+    // Updated time: when it was posted or changed, or when it was graded if that's later.
+    const updated = Math.max(c.at, (c.graded || 0) * 1000);
+    const what = c.kind === "new" ? `due ${shortDay(c.due)}` : c.what;
+    const detail = `${what} · updated ${whenTimeText(updated)}`;
+    const grade = c.graded && c.letter ? { letter: c.letter, percent: c.percent } : null;
+    const li = row({ classLine: `${c.className} · ${detail}`, title: c.name, href: c.href, grade });
     li.appendChild(dEl("div", `alma-plus-dash-tag alma-plus-dash-tag-${c.kind}`, c.kind === "new" ? "New" : "Updated"));
     return li;
   });
