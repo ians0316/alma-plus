@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS = {
   syncTasks: true,
   reminder: true,
   reminderTime: "20:00",
+  gradeAlerts: true,
 };
 
 async function loadSettings() {
@@ -98,6 +99,11 @@ async function start() {
   document.getElementById("test-reminder").addEventListener("click", async (e) => {
     e.target.disabled = true;
     await chrome.runtime.sendMessage({ type: "test-reminder" });
+    e.target.disabled = false;
+  });
+  document.getElementById("test-grades").addEventListener("click", async (e) => {
+    e.target.disabled = true;
+    await chrome.runtime.sendMessage({ type: "test-grades" });
     e.target.disabled = false;
   });
   showStats();

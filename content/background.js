@@ -176,3 +176,134 @@ chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
     return true;
   }
 });
+
+// ---- New grade alerts ----
+// Every 30 minutes, reads each class page and shows a notification when Alma posts
+// a new grade (or changes one). Turned on and off in the settings menu.
+
+const GRADES_ALARM = "alma-plus-grades";
+const SEEN_GRADES_KEY = "almaPlusSeenGrades"; // { assignmentId: "updated|grade" }
+
+async function gradeAlertsOn() {
+  const s = (await chrome.storage.local.get(SETTINGS_KEY))[SETTINGS_KEY] || {};
+  return s.gradeAlerts !== false;
+}
+
+async function scheduleGradeCheck() {
+  await chrome.alarms.clear(GRADES_ALARM);
+  if (await gradeAlertsOn()) chrome.alarms.create(GRADES_ALARM, { delayInMinutes: 1, periodInMinutes: 30 });
+}
+
+function cellText(html) {
+  return decodeHtml(html.replace(/<[^>]+>/g, " "));
+}
+
+// Classes from Alma's schedule page: [{ name, url }]. Null if not signed in.
+async function almaClasses(origin) {
+  const res = await fetch(`${origin}/home/schedule`, { credentials: "include" });
+  const html = res.ok ? await res.text() : "";
+  const start = html.indexOf("current-classes");
+  if (start < 0) return null;
+  const table = html.slice(start, html.indexOf("</table>", start));
+  const classes = [];
+  for (const m of table.matchAll(/href="(\/home\/class\/[^"?]+)[^"]*"[^>]*>([\s\S]*?)<\/a>/g)) {
+    if (!classes.some((c) => c.url === m[1])) classes.push({ url: m[1], name: cellText(m[2]) });
+  }
+  return classes;
+}
+
+// Graded assignments on one class page. Null if the page couldn't be read.
+async function gradedOnClassPage(origin, cls) {
+  const res = await fetch(origin + cls.url, { credentials: "include" });
+  const html = res.ok ? await res.text() : "";
+  const start = html.indexOf("assignment-grades");
+  if (start < 0) return null;
+  const tbody = html.indexOf("<tbody", start);
+  const table = html.slice(tbody, html.indexOf("</table>", tbody));
+  const items = [];
+  for (const row of table.split(/<tr[\s>]/).slice(1)) {
+    const link = row.match(/href="\/home\/assignment\/([^"?]+)[^"]*"[^>]*>([\s\S]*?)<\/a>/);
+    const grade = row.match(/<td class="grade"[^>]*>([\s\S]*?)<\/td>/);
+    const updated = (row.match(/<td class="updated" data-sortable-val="(\d+)"/) || [])[1];
+    if (!link || !grade || !updated || updated === "0") continue;
+    const points = cellText((row.match(/<td class="points"[^>]*>([\s\S]*?)<\/td>/) || [])[1] || "");
+    items.push({ id: link[1], name: cellText(link[2]), grade: cellText(grade[1]), points, updated, className: cls.name, classUrl: cls.url });
+  }
+  return items;
+}
+
+// test = from the settings menu's "Test" button: shows your latest grade even if it isn't new.
+async function checkGrades({ test = false } = {}) {
+  if (!test && !(await gradeAlertsOn())) return;
+  const origin = (await chrome.storage.local.get(ORIGIN_KEY))[ORIGIN_KEY] || DEFAULT_ORIGIN;
+  const classes = await almaClasses(origin).catch(() => null);
+  if (!classes) {
+    if (test) notifyGrades([], origin, "Sign in to Alma, then try again.");
+    return;
+  }
+  const pages = await Promise.all(classes.map((c) => gradedOnClassPage(origin, c).catch(() => null)));
+  const graded = pages.filter(Boolean).flat();
+
+  const stored = (await chrome.storage.local.get(SEEN_GRADES_KEY))[SEEN_GRADES_KEY];
+  const firstRun = !stored;
+  const seen = stored || {};
+  const fresh = graded.filter((g) => seen[g.id] !== `${g.updated}|${g.grade}`);
+  for (const g of graded) seen[g.id] = `${g.updated}|${g.grade}`;
+  await chrome.storage.local.set({ [SEEN_GRADES_KEY]: seen });
+
+  if (test) {
+    const latest = [...graded].sort((a, b) => b.updated - a.updated).slice(0, 1);
+    notifyGrades(latest, origin, latest.length ? "" : "No grades yet.", "Latest grade");
+    return;
+  }
+  // The first check only remembers what's already graded, so you don't get every old grade at once.
+  if (firstRun || !fresh.length) return;
+  fresh.sort((a, b) => b.updated - a.updated);
+  notifyGrades(fresh, origin);
+}
+
+function gradeLine(g) {
+  return `${g.grade}${g.points ? ` · ${g.points}` : ""}`;
+}
+
+function notifyGrades(items, origin, note = "", label = "New grade") {
+  const one = items.length === 1 ? items[0] : null;
+  const lines = one
+    ? [gradeLine(one), one.className]
+    : items.slice(0, 6).map((g) => `• ${g.name}: ${g.grade} (${g.className})`);
+  if (items.length > 6) lines.push(`and ${items.length - 6} more`);
+  if (note) lines.push(note);
+  const target = one ? origin + one.classUrl : `${origin}/home`;
+  chrome.notifications.create(`alma-plus-grade-${Date.now()}|${target}`, {
+    type: "basic",
+    iconUrl: chrome.runtime.getURL("layout/icons/icon128.png"),
+    title: one ? `${label}: ${one.name}` : items.length ? `${items.length} new grades` : "New grade alerts",
+    message: lines.join("\n"),
+    priority: 1,
+  });
+}
+
+chrome.alarms.onAlarm.addListener((alarm) => {
+  if (alarm.name === GRADES_ALARM) checkGrades();
+});
+
+chrome.notifications.onClicked.addListener((id) => {
+  if (!id.startsWith("alma-plus-grade-")) return;
+  chrome.tabs.create({ url: id.split("|")[1] });
+  chrome.notifications.clear(id);
+});
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !changes[SETTINGS_KEY]) return;
+  if ((changes[SETTINGS_KEY].oldValue || {}).gradeAlerts !== (changes[SETTINGS_KEY].newValue || {}).gradeAlerts) scheduleGradeCheck();
+});
+
+chrome.runtime.onInstalled.addListener(scheduleGradeCheck);
+chrome.runtime.onStartup.addListener(scheduleGradeCheck);
+
+chrome.runtime.onMessage.addListener((msg, _sender, reply) => {
+  if (msg?.type === "test-grades") {
+    checkGrades({ test: true }).then(() => reply({ done: true }), (e) => reply({ error: String(e) }));
+    return true;
+  }
+});

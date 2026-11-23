@@ -1,18 +1,16 @@
 ## Highlights
-- **🔔 Night-before reminder.** Every night at 8:00 PM, Chrome shows a notification listing the Alma assignments and your own tasks due tomorrow. Click it to jump to the To Do page. If nothing is due, you won't be bothered.
-- **🧮 Grade Calculator.** Open any class's **Gradebook** tab and scroll down. Pick the next assignment's category and how many points it's out of, choose the grade you want, and it tells you the score you need ("You need at least 42/100 to get an A"). Type a score in **What if I get** to see what your grade would become.
+- **🎓 New grade alerts.** When a teacher posts or changes a grade, Chrome shows a notification right away, like "New grade: final draft — A (100%) · 100/100" with the class name. Click it to open that class. Several new grades at once come in one notification.
 
 ## Changes
-- **Settings menu:** a new **Reminders** section with an on/off switch, a time picker, and a **Test** button to see the notification right away.
-- **Grade Calculator math:** uses each category's weight ("25% of Final Grade") and points, the same way Alma works out your class grade, and picks the right letter scale (plain A/B/C or with +/−) for each class. Classes without category weights use total points.
-- If your computer was asleep at reminder time, the reminder is skipped instead of popping up the next morning with the wrong "tomorrow".
-- New issue forms for **Bug reports** and **Feature ideas**, with links to the Wiki and Discussions.
-- Alma+ now asks Chrome for **notifications** and **alarms** permissions (for the reminder) and access to `*.getalma.com` in the background (to read your To Do list for it).
+- **Settings menu:** a **New grade alerts** switch under Reminders (on by default) and a **Test** button that shows your latest grade so you can see what the alert looks like.
+- Alma+ checks your class pages in the background every 30 minutes while Chrome is open, using your existing Alma sign-in. Nothing is sent anywhere else.
+- The very first check only remembers the grades you already have, so you won't get a pile of old grades at once.
+- A changed grade (a regrade or a late fix) counts as new too.
 
 ## How to update
 1. Download the zip below and unzip it.
 2. Copy its files over your old Alma+ folder (same place, same folder name).
 3. Go to `chrome://extensions` and click reload ↻ on Alma+, then refresh Alma.
-4. Open the Alma+ menu and press **Test** under Reminders. On a Mac, if nothing shows, allow notifications for Chrome in **System Settings → Notifications → Google Chrome**.
+4. Open the Alma+ menu and press **Test** next to "Show my latest grade". On a Mac, if nothing shows, allow notifications for Chrome in **System Settings → Notifications → Google Chrome**.
 
 > ⚠️ Don't remove the extension to update — removing it deletes your saved tasks. Back up your tasks first with **Back up tasks** on the To Do page if you're unsure.

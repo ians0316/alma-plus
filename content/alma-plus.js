@@ -16,6 +16,7 @@ const DEFAULT_SETTINGS = {
   syncTasks: true,        // send tasks to Alma Sync -> Notion + Google Calendar (background.js)
   reminder: true,         // night-before notification (background.js)
   reminderTime: "20:00",
+  gradeAlerts: true,      // new grade notification (background.js)
 };
 let settings = { ...DEFAULT_SETTINGS };
 async function loadSettings() {
