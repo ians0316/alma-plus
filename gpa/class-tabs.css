@@ -97,10 +97,6 @@ table.alma-plus-gb .alma-plus-gb-corner { font-size: 15px; vertical-align: botto
 .alma-plus-gb-overall th,
 .alma-plus-gb-overall td { background: #f7f8f8 !important; }
 
-/* bottom row: when each grade was updated */
-.alma-plus-gb-updated td { font-size: 11px; color: #5f6163; white-space: nowrap; line-height: 1.2; }
-.alma-plus-gb-updated td small { display: block; font-size: 10px; }
-
 .alma-plus-gb-score {
   display: inline-flex;
   flex-direction: column;
@@ -199,3 +195,6 @@ table.alma-plus-att-table td:last-child { width: 100%; }
   margin: 10px 0 0;
   font-size: 12px;
 }
+
+/* time under the date in Alma's Updated column */
+.alma-plus-updated-time { display: block; font-size: 11px; color: #5f6163; }

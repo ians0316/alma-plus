@@ -118,7 +118,9 @@ These are one-time copies: if an assignment changes, add it again. For automatic
 
 Each class page gets a row of tabs, like the teacher version of Alma: **Dashboard** (Alma's class page as usual), **Bulletin** (class announcements), **Attendance** (your attendance for just this class), and **Gradebook**. Teacher-only tabs (roster, curriculum, recommendations, settings, admin panel) are left out because Alma doesn't let students open them.
 
-The **Gradebook** shows every assignment as a column and each score as a colored box: green for A, light green for B, yellow for C, red for D or F. Click a box to open the assignment. The bottom **Updated** row shows when each grade was entered or last changed (date and time). Pick a category, turn the colors off, or use **Add Assignment** to add your own task to the class.
+The **Gradebook** shows every assignment as a column and each score as a colored box: green for A, light green for B, yellow for C, red for D or F. Click a box to open the assignment. Pick a category, turn the colors off, or use **Add Assignment** to add your own task to the class.
+
+In Alma's **Past Assignments** table, the **Updated** column also shows the time a grade was entered or changed, under the date (like "11/23/26" and "3:00 PM").
 
 Under it, the **Grade Calculator** answers "what do I need on the next one?" Pick the next assignment's category and how many points it's out of, choose the grade you want, and it shows the score you need. Type a score in **What if I get** to see what your grade would become. It uses the class's category weights and points the same way Alma does.
 
@@ -185,7 +187,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 
 ## Bugs fixed
 
-Newest first. Latest GitHub release: [**v2.15.2**](https://github.com/ians0316/alma-plus/releases/tag/v2.15.2). Latest extension version: **2.15.2**.
+Newest first. Latest GitHub release: [**v2.15.3**](https://github.com/ians0316/alma-plus/releases/tag/v2.15.3). Latest extension version: **2.15.3**.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
@@ -203,7 +205,7 @@ Newest first. Latest GitHub release: [**v2.15.2**](https://github.com/ians0316/a
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.15.2, used day to day at Seoul Academy.
+> **Status:** version 2.15.3, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, night-before reminder, new grade alerts, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
