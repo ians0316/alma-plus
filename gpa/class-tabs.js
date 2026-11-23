@@ -119,7 +119,9 @@
         if (m) percent = parseFloat(m[1]);
         text = gradeCell.textContent.replace(/\s+/g, " ").trim();
       }
-      rows.push({ link, due, category, name: link.textContent.trim(), letter, percent, text, upcoming });
+      // When the grade was entered or last changed (Alma's Updated column), in seconds.
+      const updated = Number(tr.querySelector("td.updated")?.dataset.sortableVal) || 0;
+      rows.push({ link, due, category, name: link.textContent.trim(), letter, percent, text, upcoming, updated });
     };
     document.querySelectorAll("table.assignment-grades tbody tr").forEach((tr) => add(tr, false));
     document.querySelectorAll("table.upcoming-assignments tbody tr:not([data-alma-plus-row])").forEach((tr) => add(tr, true));
@@ -148,6 +150,10 @@
     if (!sec) return "";
     const d = new Date(sec * 1000);
     return `${d.getMonth() + 1}/${d.getDate()}`;
+  }
+
+  function timeLabel(sec) {
+    return new Date(sec * 1000).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   }
 
   let gbFilter = "";
@@ -292,7 +298,7 @@
           const cell = document.createElement("button");
           cell.type = "button";
           cell.className = "alma-plus-gb-score" + (lv ? ` alma-plus-gb-l${lv}` : " alma-plus-gb-none");
-          cell.title = `${a.name}: ${a.text || "not graded yet"}`;
+          cell.title = `${a.name}: ${a.text || "not graded yet"}${a.updated ? ` (updated ${dateLabel(a.updated)} ${timeLabel(a.updated)})` : ""}`;
           if (lv) {
             const L = document.createElement("span");
             L.textContent = a.letter || "";
@@ -312,6 +318,24 @@
       }
       tbody.appendChild(tr);
     }
+
+    // last row: when each grade was entered or last changed
+    const upd = document.createElement("tr");
+    upd.className = "alma-plus-gb-updated";
+    const uth = document.createElement("th");
+    uth.textContent = "Updated";
+    upd.appendChild(uth);
+    for (const a of shown) {
+      const td = document.createElement("td");
+      if (a.updated) {
+        td.title = `${a.name}: grade updated ${dateLabel(a.updated)} at ${timeLabel(a.updated)}`;
+        const t = document.createElement("small");
+        t.textContent = timeLabel(a.updated);
+        td.append(dateLabel(a.updated), t);
+      }
+      upd.appendChild(td);
+    }
+    tbody.appendChild(upd);
 
     table.appendChild(tbody);
     wrap.appendChild(table);
