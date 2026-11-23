@@ -253,13 +253,8 @@ function changeRows(changes) {
 }
 
 function gradeRows(grades) {
-  const today = isoDay(new Date());
-  const yesterday = isoDay(new Date(Date.now() - 86400000));
   return grades.slice(0, 8).map((g) => {
-    const day = isoDay(new Date(g.updated * 1000));
-    const when = day === today ? "today" : day === yesterday ? "yesterday"
-      : new Date(g.updated * 1000).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
-    return row({ classLine: `${g.className} · ${when}`, title: g.name, href: g.href, grade: g });
+    return row({ classLine: `${g.className} · ${whenTimeText(g.updated * 1000)}`, title: g.name, href: g.href, grade: g });
   });
 }
 

@@ -531,6 +531,52 @@ function addAttachedFilesToPopup() {
   bd.appendChild(buildAttachedSection(classId, lastClickedAssignmentId, name));
 }
 
+// "Last Updated: 11/23/26" in Alma's popup has no time. The class page's Updated
+// column has the exact time, so read it from there and add it ("11/23/26, 3:00 PM").
+const classUpdatedTimes = {}; // classId -> Promise<{ assignmentId: seconds }>
+
+function updatedTimesFor(classId) {
+  if (!classUpdatedTimes[classId]) {
+    classUpdatedTimes[classId] = fetch(`/home/class/${classId}`, { credentials: "same-origin" })
+      .then((r) => (r.ok ? r.text() : ""))
+      .then((html) => {
+        const doc = new DOMParser().parseFromString(html, "text/html");
+        const times = {};
+        doc.querySelectorAll("table.assignment-grades tbody tr").forEach((tr) => {
+          const id = assignmentIdOf(tr.querySelector("a[href*='/home/assignment/']"));
+          const sec = Number(tr.querySelector("td.updated")?.dataset.sortableVal);
+          if (id && sec) times[id] = sec;
+        });
+        return times;
+      })
+      .catch(() => ({}));
+  }
+  return classUpdatedTimes[classId];
+}
+
+async function addUpdatedTimeToPopup() {
+  const bd = document.querySelector(".alma-student-assignment-details-modal:not(.alma-plus-details) .yui3-widget-bd");
+  const em = bd?.querySelector(".grade .meta em.updated");
+  const id = lastClickedAssignmentId;
+  if (!em || !id || em.dataset.almaPlusTime === id) return;
+  em.dataset.almaPlusTime = id;
+  em.querySelector(".alma-plus-popup-time")?.remove();
+  // On a class page the row is right here; otherwise read the class page.
+  const cell = [...document.querySelectorAll(`table.assignment-grades a[href*='/home/assignment/${id}']`)]
+    .map((a) => a.closest("tr")?.querySelector("td.updated")).find(Boolean);
+  let sec = Number(cell?.dataset.sortableVal) || 0;
+  if (!sec) {
+    const classId = bd.querySelector("header .class a[href*='/home/class/']")
+      ?.getAttribute("href").match(/\/home\/class\/([0-9a-f]+)/)?.[1];
+    if (classId) sec = (await updatedTimesFor(classId))[id] || 0;
+  }
+  if (!sec || !em.isConnected || em.dataset.almaPlusTime !== id) return;
+  const t = document.createElement("span");
+  t.className = "alma-plus-popup-time";
+  t.textContent = `, ${new Date(sec * 1000).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}`;
+  em.appendChild(t);
+}
+
 // "My notes" section: same look as "Attached files" (divider, heading, Alma
 // buttons). The saved note shows as a paragraph with line breaks and clickable links.
 function linkifiedParagraph(text) {
@@ -743,7 +789,7 @@ async function startAttachments() {
   }, true);
 
   refreshAttachmentClips();
-  const OURS = "#alma-plus-assignments-heading, #alma-plus-message, #alma-plus-message-mask, .alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay";
+  const OURS = "#alma-plus-assignments-heading, #alma-plus-message, #alma-plus-message-mask, .alma-plus-clip, .alma-plus-notes, .alma-plus-attached, #alma-plus-photo, #alma-plus-photo-overlay, .alma-plus-popup-time";
   let popupPending = false;
   let clipTimer = null;
   new MutationObserver((mutations) => {
@@ -757,6 +803,7 @@ async function startAttachments() {
         popupPending = false;
         addNotesToPopup();
         addAttachedFilesToPopup();
+        addUpdatedTimeToPopup();
       });
     }
     clearTimeout(clipTimer);
