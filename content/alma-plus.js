@@ -1260,9 +1260,40 @@ function isTaskPage() {
   return location.pathname.startsWith("/home/assignments") || isClassPage();
 }
 
+// ---- Moving copy for Alma+ 3.0 ----
+// Alma+ 3.0 gets a fixed extension ID so it can sync between computers. Chrome
+// treats a new ID as a new extension with empty storage, so this version keeps
+// a copy of your Alma+ data in this Alma site's page storage, on this computer
+// only. 3.0 reads it on its first run, then deletes it.
+const MOVE_KEY = "almaPlusMoveToV3";
+const MOVE_KEYS = [
+  "almaPlusCustomTasks", "almaPlusNotes", "almaPlusMaterials", "almaPlusSettings",
+  "almaPlusGpaIncluded", "almaPlusSeenAssignments", "almaPlusAssignmentChanges",
+  "almaPlusSeenGrades", "almaPlusLastReminder",
+];
+async function saveMovingCopy() {
+  const data = await chrome.storage.local.get(MOVE_KEYS);
+  const write = (d, filesLeftOut) => localStorage.setItem(MOVE_KEY, JSON.stringify({ at: Date.now(), filesLeftOut, data: d }));
+  try {
+    write(data, false);
+  } catch {
+    // Too big for page storage (big files): keep everything except file contents.
+    const lite = { ...data, almaPlusMaterials: Object.fromEntries(Object.entries(data.almaPlusMaterials || {})
+      .map(([bucket, items]) => [bucket, items.filter((i) => i.kind === "link")])) };
+    try { write(lite, true); } catch { /* page storage full; nothing to do */ }
+  }
+}
+let moveTimer = null;
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local" || !MOVE_KEYS.some((k) => k in changes)) return;
+  clearTimeout(moveTimer);
+  moveTimer = setTimeout(saveMovingCopy, 1000);
+});
+
 async function init() {
   // Remember which Alma site this is, for the night-before reminder (background.js).
   chrome.storage.local.set({ almaPlusOrigin: location.origin });
+  saveMovingCopy();
   if (!isTaskPage()) return;
   await loadSettings();
   getClasses(); // start loading so suggestions and teacher names are ready

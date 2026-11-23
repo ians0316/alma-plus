@@ -187,7 +187,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 
 ## Bugs fixed
 
-Newest first. Latest GitHub release: [**v2.15.4**](https://github.com/ians0316/alma-plus/releases/tag/v2.15.4). Latest extension version: **2.15.4**.
+Newest first. Latest GitHub release: [**v2.16.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.16.0). Latest extension version: **2.16.0**.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
@@ -205,7 +205,7 @@ Newest first. Latest GitHub release: [**v2.15.4**](https://github.com/ians0316/a
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.15.4, used day to day at Seoul Academy.
+> **Status:** version 2.16.0, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, night-before reminder, new grade alerts, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
