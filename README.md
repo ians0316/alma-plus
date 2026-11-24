@@ -1,11 +1,11 @@
 # Alma+ Custom Tasks
 
-`Alma+ Custom Tasks` is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
+The Alma+ Custom Tasks is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
 
 📖 **Full docs are in the [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki):** install and update, every feature, FAQ, troubleshooting, and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) (also as a [project board](https://github.com/users/ians0316/projects/3)).
 
 > [!IMPORTANT]
-> **`Alma+` is an unofficial student project.** It is not made, supported, or approved by Alma or
+> **Alma+ is an unofficial student project.** It is not made, supported, or approved by Alma or
 > Seoul Academy. Alma can change its website at any time and break parts of the extension, so
 > always double-check due dates in Alma itself.
 
@@ -13,7 +13,7 @@
 
 ## How it works
 
-`Alma+` runs on Alma's own pages (`*.getalma.com`) and adds to what's already there:
+Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already there:
 
 1. **Add:** press **+ Add my own task** on the To Do page or a class page, or click a day on the Calendar.
 2. **See:** your tasks show up next to Alma's assignments, on the Today dashboard, and on the Calendar.
@@ -33,7 +33,7 @@ Download the GitHub repo (click "Code" then "Download Zip").
 Keep the extension folder where it is after loading it. Your custom tasks are stored in the browser under that folder's location, so moving, renaming or loading it from a different folder starts you with an empty task list. Use the backup button first if you ever need to move it.
 To update, download the new version and copy its files over the old folder (same location), then click the reload icon on the extension's card in `chrome://extensions`. Do not remove the extension to update it: removing it deletes your saved tasks.
 
-## What's new in v2.0
+## What's new in 2.0
 
 Everything the extension adds is built to look like Alma itself: same fonts, colors, buttons, and popups.
 
@@ -153,7 +153,7 @@ The menu also shows how many tasks and files are saved and when tasks last synce
 
 ## Notion & Google Calendar
 
-Pair `Alma+` with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
+Pair Alma+ with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
 show up in Notion and Google Calendar within seconds of adding or editing them. Run this once in
 Alma Sync's `alma_sync` folder:
 
@@ -173,7 +173,7 @@ The settings menu shows when tasks last synced, with a **Sync now** button.
 
 ## Files
 
-Plain `Javascript`and `CSS`, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
+Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
 
 | Folder / file | What it does |
 |---|---|
@@ -218,22 +218,7 @@ Latest GitHub release: [**v2.16.1**](https://github.com/ians0316/alma-plus/relea
 - **Login page:** the fixed top bar hid the WELCOME message.
 - **Speed:** class pages and the extension in general were slow (fixed in 2.0).
 
-## Bugs fixed
-
-Newest first. Latest GitHub release: [**v2.16.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.16.1). Latest extension version: **2.16.1**.
-
-- **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
-- **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
-- **Two Alma tabs:** if both saved a task at the same moment, one task could be lost. Saves now take turns.
-- **Paperclip:** didn't show on assignments with a Submit button, even when they had a file attached.
-- **Class attendance:** the Attendance tab on class pages came up empty.
-- **Settings menu:** its icon was broken after the files were moved into folders.
-- **Calendar page:** school events with a date range, like "Sep 24-25", didn't show.
-- **Top bar mail button:** teacher names came up blank when the Classes page was in grid view.
-- **New Message window:** the close (×) button was invisible.
-- **Popups:** the fixed top bar covered a popup's title and close button.
-- **Login page:** the fixed top bar hid the WELCOME message.
-- **Speed:** class pages and the extension in general were slow (fixed in 2.0).
+</details>
 
 ## Status
 
