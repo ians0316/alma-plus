@@ -13,7 +13,7 @@
 
 ## How it works
 
-Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already there:
+`Alma+` runs on Alma's own pages (`*.getalma.com`) and adds to what's already there:
 
 1. **Add:** press **+ Add my own task** on the To Do page or a class page, or click a day on the Calendar.
 2. **See:** your tasks show up next to Alma's assignments, on the Today dashboard, and on the Calendar.
@@ -33,7 +33,7 @@ Download the GitHub repo (click "Code" then "Download Zip").
 Keep the extension folder where it is after loading it. Your custom tasks are stored in the browser under that folder's location, so moving, renaming or loading it from a different folder starts you with an empty task list. Use the backup button first if you ever need to move it.
 To update, download the new version and copy its files over the old folder (same location), then click the reload icon on the extension's card in `chrome://extensions`. Do not remove the extension to update it: removing it deletes your saved tasks.
 
-## What's new in 2.0
+## What's new in v2.0
 
 Everything the extension adds is built to look like Alma itself: same fonts, colors, buttons, and popups.
 
@@ -153,7 +153,7 @@ The menu also shows how many tasks and files are saved and when tasks last synce
 
 ## Notion & Google Calendar
 
-Pair Alma+ with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
+Pair `Alma+` with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
 show up in Notion and Google Calendar within seconds of adding or editing them. Run this once in
 Alma Sync's `alma_sync` folder:
 
@@ -173,7 +173,7 @@ The settings menu shows when tasks last synced, with a **Sync now** button.
 
 ## Files
 
-Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
+Plain `Javascript`and `CSS`, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
 
 | Folder / file | What it does |
 |---|---|
