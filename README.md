@@ -185,6 +185,39 @@ Plain `Javascript`and `CSS`, no build step, no outside libraries. Each Alma page
 | `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab. `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, Grade Calculator, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
 
+## Roadmap
+
+- [x] Custom tasks, attached files, notes, Calendar dots and the official school calendar
+- [x] Today dashboard with New & Updated Assignments
+- [x] Night-before reminder and new grade alerts
+- [x] Gradebook tab, Grade Calculator and GPA
+- [x] Exact update times everywhere
+- [ ] Sync tasks across computers (coming in 3.0)
+- [ ] Dark mode
+- [ ] Search box on the To Do page
+- [ ] This week view
+- [ ] Test countdowns
+
+→ Full list on the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) and the [project board](https://github.com/users/ians0316/projects/3).
+
+<details>
+<summary><b>Bugs fixed</b> (newest first)</summary>
+
+Latest GitHub release: [**v2.16.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.16.1). Latest extension version: **2.16.1**.
+
+- **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
+- **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
+- **Two Alma tabs:** if both saved a task at the same moment, one task could be lost. Saves now take turns.
+- **Paperclip:** didn't show on assignments with a Submit button, even when they had a file attached.
+- **Class attendance:** the Attendance tab on class pages came up empty.
+- **Settings menu:** its icon was broken after the files were moved into folders.
+- **Calendar page:** school events with a date range, like "Sep 24-25", didn't show.
+- **Top bar mail button:** teacher names came up blank when the Classes page was in grid view.
+- **New Message window:** the close (×) button was invisible.
+- **Popups:** the fixed top bar covered a popup's title and close button.
+- **Login page:** the fixed top bar hid the WELCOME message.
+- **Speed:** class pages and the extension in general were slow (fixed in 2.0).
+
 ## Bugs fixed
 
 Newest first. Latest GitHub release: [**v2.16.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.16.1). Latest extension version: **2.16.1**.
