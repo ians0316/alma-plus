@@ -76,21 +76,21 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 
 ### Custom tasks
 
-- **Add your own tasks** with **+ Add my own task**. They show in Upcoming Assignments looking just like Alma's.
-- **Multi-day tasks:** add an end date and the task shows as a range (e.g. Nov 13–15).
-- **Class pages** list each class's own tasks in its Upcoming block, with the class filled in when you add one there.
-- **Done** moves a task into that class's Past Assignments with a green check; **Undo** brings it back.
-- **Past tasks** leave the To Do page on their own after their date and go to Past Assignments, never to Missing.
+- `Add your own tasks` with `+ Add my own task`. They show in Upcoming Assignments looking just like Alma's.
+- `Multi-day tasks`: add an end date and the task shows as a range (e.g. Nov 13–15).
+- `Class pages` list each class's own tasks in its Upcoming block, with the class filled in when you add one there.
+- `Done` moves a task into that class's Past Assignments with a green check; `Undo` brings it back.
+- `Past tasks` leave the To Do page on their own after their date and go to Past Assignments, never to Missing.
 - Tasks without a class stay on the To Do page, so they never disappear.
-- **Task popup:** click a task's name for an Alma-style popup with its class, teacher (with Alma's message envelope), status, dates, priority, description and files.
-- **Filter** by everything, due today, or due this week.
-- **Back up and restore** all tasks with the JSON buttons (saved as `alma-plus-tasks-YYYY-MM-DD.json`).
+- `Task popup`: click a task's name for an Alma-style popup with its class, teacher (with Alma's message envelope), status, dates, priority, description and files.
+- `Filter` by everything, due today, or due this week.
+- `Back up and restore` all tasks with the JSON buttons (saved as `alma-plus-tasks-YYYY-MM-DD.json`).
 
 <img src="layout/screenshots/todo.png" width="560" alt="To Do page with + Add my own task and Google Calendar buttons">
 
 ### Attached files
 
-- Every assignment and task popup gets an **Attached files** section laid out like Alma's "Submit your work here": **Upload File**, **Add from Drive** and **Add Link**.
+- Every assignment and task popup gets an `Attached files` section laid out like Alma's "Submit your work here": `Upload File`, `Add from Drive` and `Add Link`.
 - Rename or delete items; photos open in a viewer and PDFs in a new tab.
 - Rows with attachments show 📎 and a count; click it to open the popup.
 - After saving, Alma's own "Files Saved" message appears.
@@ -99,69 +99,69 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 
 ### My notes
 
-- Every assignment popup has **My notes**: write a note (links become clickable), edit or delete it any time.
+- Every assignment popup has `My notes`: write a note (links become clickable), edit or delete it any time.
 - Assignments with a note show a small note icon on their row.
 
 ### Today dashboard
 
-Alma's Overview page gets **Due Today**, **Due Tomorrow** and **Recently Updated Grades** under your
+Alma's Overview page gets `Due Today`, `Due Tomorrow` and `Recently Updated Grades` under your
 schedule, in the same card style as Alma's schedule. Click an assignment to open Alma's popup.
 
-Below them, **New & Updated Assignments** lists assignments teachers posted in the last 3 days
-(green **New**) and ones whose due date or name changed (orange **Updated**, showing the old and new
+Below them, `New & Updated Assignments` lists assignments teachers posted in the last 3 days
+(green `New`) and ones whose due date or name changed (orange `Updated`, showing the old and new
 due date). Each one shows when it was last updated (like "updated today 3:42 PM") and its grade, if it has one.
 
 <img src="layout/screenshots/dashboard.png" width="520" alt="Due Today and Due Tomorrow on the Overview page">
 
 ### Night-before reminder
 
-Every night at **8:00 PM** (you can change the time), Chrome shows a notification listing the Alma
+Every night at `8:00 PM` (you can change the time), Chrome shows a notification listing the Alma
 assignments and your own tasks due tomorrow. Click it to open the To Do page. Nothing due means no
-notification. Turn it off, pick the time, or press **Test** in the Alma+ settings menu.
+notification. Turn it off, pick the time, or press `Test` in the `Alma+` settings menu.
 
 ### New grade alerts
 
 When a teacher posts or changes a grade, Chrome shows a notification with the assignment, the grade
 and the points, like "New grade: final draft — A (100%) · 100/100". Click it to open that class.
-Alma+ checks your class pages every 30 minutes while Chrome is open. Turn it off or press **Test**
-in the Alma+ settings menu.
+`Alma+` checks your class pages every 30 minutes while Chrome is open. Turn it off or press `Test`
+in the `Alma+` settings menu.
 
 ### Calendar page
 
 - Colored dots under each day with assignments or tasks, one color per class period.
-- Hover a day to see them; click it for a popup with everything that day and **+ Add my own task** for that date.
+- Hover a day to see them; click it for a popup with everything that day and `+ Add my own task` for that date.
 - The Events list mixes them in under each month.
-- The **official Seoul Academy 2026–2027 academic calendar** (breaks, closed days, shortened schedules) is shown alongside Alma's own events.
+- The `official Seoul Academy 2026–2027 academic calendar` (breaks, closed days, shortened schedules) is shown alongside Alma's own events.
 
 <img src="layout/screenshots/calendar.png" width="260" alt="Calendar with colored dots for each class">
 
 ### Google Calendar
 
-- A **calendar button** next to each upcoming assignment opens Google Calendar with an all-day event filled in (multi-day tasks cover every day). Press **Save** in Google to add it.
-- **Export to calendar (.ics)** downloads every upcoming assignment and task as one file. In Google Calendar, go to **Settings → Import & export → Import**.
+- A `calendar button` next to each upcoming assignment opens Google Calendar with an all-day event filled in (multi-day tasks cover every day). Press `Save` in Google to add it.
+- `Export to calendar (.ics)` downloads every upcoming assignment and task as one file. In Google Calendar, go to `Settings → Import & export → Import`.
 
 These are one-time copies: if an assignment changes, add it again. For automatic updates, use
 [Alma Sync](#notion--google-calendar).
 
 ### Around Alma
 
-- **Extra sidebar tabs:** My Classes, Assignments, Attendance and Report Cards in the left menu, built with Alma's own icons.
-- **Top bar search and mail:** look people up in the Directory, or pick a teacher to open Alma's New Message window.
-- **Rounded corners** on Alma's boxes, tables, menus and buttons, matching its Schedule cards.
+- `Extra sidebar tabs`: My Classes, Assignments, Attendance and Report Cards in the left menu, built with Alma's own icons.
+- `Top bar search and mail`: look people up in the Directory, or pick a teacher to open Alma's New Message window.
+- `Rounded corners` on Alma's boxes, tables, menus and buttons, matching its Schedule cards.
 
 ### Class tabs
 
-Each class page gets a row of tabs, like the teacher version of Alma: **Dashboard** (Alma's class page as usual), **Bulletin** (class announcements), **Attendance** (your attendance for just this class), and **Gradebook**. Teacher-only tabs (roster, curriculum, recommendations, settings, admin panel) are left out because Alma doesn't let students open them.
+Each class page gets a row of tabs, like the teacher version of Alma: `Dashboard` (Alma's class page as usual), `Bulletin` (class announcements), `Attendance` (your attendance for just this class), and `Gradebook`. Teacher-only tabs (roster, curriculum, recommendations, settings, admin panel) are left out because Alma doesn't let students open them.
 
-The **Gradebook** shows every assignment as a column and each score as a colored box: green for A, light green for B, yellow for C, red for D or F. Click a box to open the assignment. Pick a category, turn the colors off, or use **Add Assignment** to add your own task to the class.
+The `Gradebook` shows every assignment as a column and each score as a colored box: green for A, light green for B, yellow for C, red for D or F. Click a box to open the assignment. Pick a category, turn the colors off, or use `Add Assignment` to add your own task to the class.
 
-In Alma's **Past Assignments** table, the **Updated** column also shows the time a grade was entered or changed, under the date (like "11/23/26" and "3:00 PM"), and so does **Last Updated** in the Assignment Details popup.
+In Alma's `Past Assignments` table, the `Updated` column also shows the time a grade was entered or changed, under the date (like "11/23/26" and "3:00 PM"), and so does `Last Updated` in the Assignment Details popup.
 
-Under it, the **Grade Calculator** answers "what do I need on the next one?" Pick the next assignment's category and how many points it's out of, choose the grade you want, and it shows the score you need. Type a score in **What if I get** to see what your grade would become. It uses the class's category weights and points the same way Alma does.
+Under it, the `Grade Calculator` answers "what do I need on the next one?" Pick the next assignment's category and how many points it's out of, choose the grade you want, and it shows the score you need. Type a score in `What if I get` to see what your grade would become. It uses the class's category weights and points the same way Alma does.
 
 ### GPA
 
-On the Classes tab, a box above the class list shows your GPA on an unweighted 4.0 scale, calculated from the letter grades Alma shows (A = 4.0, A- = 3.7, B+ = 3.3, and so on). Classes without a grade are skipped, and cocurricular, advisory and study hall classes are left out by default. Use the checkbox in a class's Grade column to include or leave it out. Your choices are saved in the browser.
+On the `My Classes` tab, a box above the class list shows your `GPA` on an unweighted `4.0` scale, calculated from the letter grades Alma shows (`A` = 4.0, `A-` = 3.7, `B+` = 3.3, and so on). Classes without a grade are skipped, and cocurricular, advisory and study hall classes are left out by default. Use the checkbox in a class's `Grade` column to include or leave it out. Your choices are saved in the browser.
 
 ## Settings
 
