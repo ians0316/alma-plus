@@ -5,7 +5,7 @@
 📖 **Full docs are in the [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki):** install and update, every feature, FAQ, troubleshooting, and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) (also as a [project board](https://github.com/users/ians0316/projects/3)).
 
 > [!IMPORTANT]
-> **Alma+ is an unofficial student project.** It is not made, supported, or approved by Alma or
+> **`Alma+` is an unofficial student project.** It is not made, supported, or approved by Alma or
 > Seoul Academy. Alma can change its website at any time and break parts of the extension, so
 > always double-check due dates in Alma itself.
 
