@@ -1,6 +1,6 @@
 # Alma+ Custom Tasks
 
-The Alma+ Custom Tasks is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
+`Alma+ Custom Tasks` is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
 
 📖 **Full docs are in the [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki):** install and update, every feature, FAQ, troubleshooting, and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) (also as a [project board](https://github.com/users/ians0316/projects/3)).
 
