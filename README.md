@@ -110,7 +110,7 @@ These are one-time copies: if an assignment changes, add it again. For automatic
 
 ### Around Alma
 
-- **Extra sidebar tabs:** Classes, Assignments, Attendance and Report Cards in the left menu, built with Alma's own icons.
+- **Extra sidebar tabs:** My Classes, Assignments, Attendance and Report Cards in the left menu, built with Alma's own icons.
 - **Top bar search and mail:** look people up in the Directory, or pick a teacher to open Alma's New Message window.
 - **Rounded corners** on Alma's boxes, tables, menus and buttons, matching its Schedule cards.
 
@@ -187,7 +187,7 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 
 ## Bugs fixed
 
-Newest first. Latest GitHub release: [**v2.16.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.16.0). Latest extension version: **2.16.0**.
+Newest first. Latest GitHub release: [**v2.16.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.16.1). Latest extension version: **2.16.1**.
 
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
@@ -205,7 +205,7 @@ Newest first. Latest GitHub release: [**v2.16.0**](https://github.com/ians0316/a
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.16.0, used day to day at Seoul Academy.
+> **Status:** version 2.16.1, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, night-before reminder, new grade alerts, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.

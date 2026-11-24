@@ -14,7 +14,7 @@
 
   const path = location.pathname;
   const tabs = [
-    { cls: "nav-classes", label: "Classes", href: "/home/schedule", active: /^\/home\/(schedule|class\/)/ },
+    { cls: "nav-classes", label: "My Classes", href: "/home/schedule", active: /^\/home\/(schedule|class\/)/ },
     { cls: "nav-alma-plus-assignments", label: "Assignments", href: "/home/assignments", active: /^\/home\/assignments/ },
     { cls: "nav-attendance", label: "Attendance", href: "/home/attendance", active: /^\/home\/attendance/ },
     { cls: "nav-reportcards", label: "Report Cards", href: "/home/report-cards", active: /^\/home\/report-cards/ },
