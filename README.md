@@ -1,11 +1,11 @@
 # Alma+ Custom Tasks
 
-The Alma+ Custom Tasks is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
+`Alma+ Custom Tasks` is an extension that adds convenient features for Seoul Academy students and technically everyone who uses Alma. Alma+ Custom Tasks allows students to add custom tasks to Alma's "todo" tab, so that any tasks or events that are not on Alma can be added. Also, the extension allows students to add assignments on Alma to their Google Calendar with a click of a button.
 
 📖 **Full docs are in the [Alma+ Wiki](https://github.com/ians0316/alma-plus/wiki):** install and update, every feature, FAQ, troubleshooting, and the [Roadmap](https://github.com/ians0316/alma-plus/wiki/Roadmap) (also as a [project board](https://github.com/users/ians0316/projects/3)).
 
 > [!IMPORTANT]
-> **Alma+ is an unofficial student project.** It is not made, supported, or approved by Alma or
+> **`Alma+` is an unofficial student project.** It is not made, supported, or approved by Alma or
 > Seoul Academy. Alma can change its website at any time and break parts of the extension, so
 > always double-check due dates in Alma itself.
 
@@ -13,7 +13,7 @@ The Alma+ Custom Tasks is an extension that adds convenient features for Seoul A
 
 ## How it works
 
-Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already there:
+`Alma+` runs on Alma's own pages (`*.getalma.com`) and adds to what's already there:
 
 1. **Add:** press **+ Add my own task** on the To Do page or a class page, or click a day on the Calendar.
 2. **See:** your tasks show up next to Alma's assignments, on the Today dashboard, and on the Calendar.
@@ -68,7 +68,7 @@ Alma+ icon      Test                       # see the reminder or grade alert rig
 Everything Alma+ adds can be turned off from the Alma+ icon in Chrome's toolbar. Your data is in
 Chrome's storage on this computer; back it up with **Back up tasks** before moving the folder.
 
-## What's new in 2.0
+## What's new in v2.0
 
 Everything the extension adds is built to look like Alma itself: same fonts, colors, buttons, and popups.
 
@@ -188,7 +188,7 @@ The menu also shows how many tasks and files are saved and when tasks last synce
 
 ## Notion & Google Calendar
 
-Pair Alma+ with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
+Pair `Alma+` with **[Alma Sync](https://github.com/ians0316/alma-sync)** on your Mac and your tasks
 show up in Notion and Google Calendar within seconds of adding or editing them. Run this once in
 Alma Sync's `alma_sync` folder:
 
@@ -208,7 +208,7 @@ The settings menu shows when tasks last synced, with a **Sync now** button.
 
 ## Files
 
-Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
+Plain `Javascript`and `CSS`, no build step, no outside libraries. Each Alma page gets only the scripts it needs:
 
 | Folder / file | What it does |
 |---|---|
