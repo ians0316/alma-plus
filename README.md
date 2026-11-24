@@ -20,6 +20,18 @@ Alma+ runs on Alma's own pages (`*.getalma.com`) and adds to what's already ther
 3. **Attach:** open any assignment or task to add files, links and notes.
 4. **Finish:** press **Done** and the task moves to that class's Past Assignments with a green check.
 
+```
+Alma pages (*.getalma.com)
+      |  your normal sign-in, no password
+      v
+   Alma+  (Chrome extension)
+      |
+      +--> on the page      tasks, Today dashboard, class tabs, Gradebook, Calendar dots
+      +--> background.js    night-before reminder, new grade alerts (every 30 min)
+      +--> chrome.storage   your tasks, notes, files, settings (this computer)
+      +--> Alma Sync        your tasks to Notion + Google Calendar (optional)
+```
+
 ## Setup
 
 Download the GitHub repo (click "Code" then "Download Zip").
@@ -30,8 +42,31 @@ Download the GitHub repo (click "Code" then "Download Zip").
 4. Click Load unpacked and select this project folder.
 5. Open Alma's todo tab and you should be able to access the features this extension offers.
 
+```
+chrome://extensions           # or edge://extensions on Edge
+Developer mode  -> on         # switch in the top right
+Load unpacked   -> alma-plus  # pick the unzipped folder
+reload ↻                      # after copying a new version over the old folder
+```
+
 Keep the extension folder where it is after loading it. Your custom tasks are stored in the browser under that folder's location, so moving, renaming or loading it from a different folder starts you with an empty task list. Use the backup button first if you ever need to move it.
 To update, download the new version and copy its files over the old folder (same location), then click the reload icon on the extension's card in `chrome://extensions`. Do not remove the extension to update it: removing it deletes your saved tasks.
+
+## Using Alma+
+
+```
+To Do page      + Add my own task          # your own task, mixed in with Alma's
+                calendar button            # add an assignment to Google Calendar
+                Export to calendar (.ics)  # every upcoming assignment and task in one file
+                Back up tasks / Restore    # save or load all tasks as a .json file
+Overview        Due Today / Due Tomorrow   # plus Recently Updated Grades, New & Updated
+Class page      Gradebook                  # every score as a colored box + Grade Calculator
+Calendar        click a day                # everything that day, + Add my own task
+Alma+ icon      Test                       # see the reminder or grade alert right now
+```
+
+Everything Alma+ adds can be turned off from the Alma+ icon in Chrome's toolbar. Your data is in
+Chrome's storage on this computer; back it up with **Back up tasks** before moving the folder.
 
 ## What's new in 2.0
 
@@ -49,7 +84,7 @@ Everything the extension adds is built to look like Alma itself: same fonts, col
 - Tasks without a class stay on the To Do page, so they never disappear.
 - **Task popup:** click a task's name for an Alma-style popup with its class, teacher (with Alma's message envelope), status, dates, priority, description and files.
 - **Filter** by everything, due today, or due this week.
-- **Back up and restore** all tasks with the JSON buttons.
+- **Back up and restore** all tasks with the JSON buttons (saved as `alma-plus-tasks-YYYY-MM-DD.json`).
 
 <img src="layout/screenshots/todo.png" width="560" alt="To Do page with + Add my own task and Google Calendar buttons">
 
@@ -184,6 +219,32 @@ Plain JavaScript and CSS, no build step, no outside libraries. Each Alma page ge
 | `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma. `icons/`: extension icons, the school crest, and the Google Calendar icon. `screenshots/`: pictures for this README |
 | `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab. `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, Grade Calculator, and class attendance on class pages |
 | `settings/` | `popup.html`, `popup.css`, `popup.js`: the settings menu |
+
+### Project layout
+
+```
+manifest.json                 Name, version, and which Alma pages each script runs on
+content/
+  alma-plus.js                Custom tasks, task popup, add/edit window, filters, backup
+  alma-plus.css               Styles for the above, matching Alma
+  background.js               Alma Sync hand-off, night-before reminder, grade alerts
+files-and-notes/
+  materials.js                Attached files, My notes, paperclips, update times in popups
+calendar/
+  dashboard.js                Today dashboard on Overview
+  calendar.js                 Your work on Alma's Calendar page
+  official-calendar.js        Official Seoul Academy calendar (update each school year)
+gpa/
+  class-tabs.js               Class tabs, Gradebook, Grade Calculator, class attendance
+  gpa.js                      GPA box and checkboxes on My Classes
+layout/
+  sidebar.js                  Extra tabs in the left menu
+  topbar.js                   Top bar search and mail buttons
+  rounded.css                 Rounded corners and fixed top bar across Alma
+  icons/  screenshots/        Pictures
+settings/
+  popup.html  popup.js        The Alma+ settings menu
+```
 
 ## Roadmap
 
