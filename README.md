@@ -301,7 +301,7 @@ Want to help? See [CONTRIBUTING.md](.github/CONTRIBUTING.md) for how to report b
 
 ## Report a bug
 
-Email **ian.shin0316@gmail.com** 
+Email **`ian.shin0316@gmail.com` or at `ian.shin0316@seoulacademy.org`** 
 
 <p align="center">
   <sub>Made by a Seoul Academy student, for Seoul Academy students. Not affiliated with Alma or Seoul Academy.</sub>
