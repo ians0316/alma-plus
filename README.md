@@ -52,6 +52,28 @@ reload ↻                      # after copying a new version over the old folde
 Keep the extension folder where it is after loading it. Your custom tasks are stored in the browser under that folder's location, so moving, renaming or loading it from a different folder starts you with an empty task list. Use the backup button first if you ever need to move it.
 To update, download the new version and copy its files over the old folder (same location), then click the reload icon on the extension's card in `chrome://extensions`. Do not remove the extension to update it: removing it deletes your saved tasks.
 
+## iPad and Safari
+
+`Alma+` also works in **Safari on iPad** (and iPhone and Mac), on the Alma website, through the
+free **Userscripts** app. No app to build, nothing to re-install.
+
+1. Install **Userscripts** from the App Store (free).
+2. Open **Settings → Apps → Safari → Extensions → Userscripts**, turn it on, and allow it on `getalma.com`.
+3. Open the Userscripts app once and pick a folder for scripts (iCloud Drive works).
+4. In Safari, open the [Alma+ Safari script](https://raw.githubusercontent.com/ians0316/alma-plus/main/ipad/alma-plus.user.js), tap the puzzle icon in the address bar → **Userscripts** → **Install**.
+5. Open Alma. The `Alma+` icon in Alma's top bar opens the settings.
+
+```
+Userscripts app     # free, App Store; runs alma-plus.user.js on getalma.com
+alma-plus.user.js   # every Alma+ feature in one file, updated with each release
+Alma+ icon (top bar) # settings menu, since Safari has no extension toolbar here
+```
+
+- **Everything on the Alma pages works:** your tasks, Today dashboard, Calendar dots, class tabs, Gradebook, Grade Calculator, GPA, files and notes.
+- **Reminders and grade alerts** pop up inside Alma (top right) when you open it, instead of as iPad notifications. For alerts when Alma isn't open, use [Alma Sync](https://github.com/ians0316/alma-sync)'s Google Calendar.
+- **Your tasks start empty on the iPad.** To bring them over: **Back up tasks** on the Mac, AirDrop the file, then **Restore tasks** on the iPad.
+- Sending tasks to Notion and Google Calendar needs Alma Sync on a Mac.
+
 ## Using Alma+
 
 ```
@@ -264,8 +286,9 @@ settings/
 <details>
 <summary><b>Bugs fixed</b> (newest first)</summary>
 
-Latest GitHub release: [**v2.16.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.16.1). Latest extension version: **2.16.1**.
+Latest GitHub release: [**v2.17.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.17.0). Latest extension version: **2.17.0**.
 
+- **Grade alerts:** grades in classes with a Submit (cloud) button came up with no assignment name.
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
 - **Two Alma tabs:** if both saved a task at the same moment, one task could be lost. Saves now take turns.
@@ -284,10 +307,10 @@ Latest GitHub release: [**v2.16.1**](https://github.com/ians0316/alma-plus/relea
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.16.1, used day to day at Seoul Academy.
+> **Status:** version 2.17.0, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, night-before reminder, new grade alerts, Calendar page, Google
->   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS.
+>   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS, and Safari on iPad through Userscripts.
 > - **Limits:** updates are manual; data lives in one browser, and removing the extension deletes it (to update, click reload instead); Google Calendar buttons make one-time copies.
 > - **Other schools:** most features work on any `getalma.com` site, but the official calendar is Seoul Academy's.
 

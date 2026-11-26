@@ -222,7 +222,10 @@ async function gradedOnClassPage(origin, cls) {
   const table = html.slice(tbody, html.indexOf("</table>", tbody));
   const items = [];
   for (const row of table.split(/<tr[\s>]/).slice(1)) {
-    const link = row.match(/href="\/home\/assignment\/([^"?]+)[^"]*"[^>]*>([\s\S]*?)<\/a>/);
+    // The name link is in the name cell; classes with a Submit column also have an
+    // empty cloud-button link to the same assignment earlier in the row.
+    const nameCell = (row.match(/<td class="name"[\s\S]*?<\/td>/) || [])[0] || "";
+    const link = nameCell.match(/href="\/home\/assignment\/([^"?]+)[^"]*"[^>]*>([\s\S]*?)<\/a>/);
     const grade = row.match(/<td class="grade"[^>]*>([\s\S]*?)<\/td>/);
     const updated = (row.match(/<td class="updated" data-sortable-val="(\d+)"/) || [])[1];
     if (!link || !grade || !updated || updated === "0") continue;

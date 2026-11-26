@@ -1,0 +1,58 @@
+/* Safari-only styles: notification boxes and the settings panel (see safari-extras.js). */
+
+#alma-plus-notes-stack {
+  position: fixed;
+  top: 76px;
+  right: 16px;
+  z-index: 100002; /* above the settings panel */
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+}
+.alma-plus-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+  font-size: 14px;
+  line-height: 1.35;
+  color: #333;
+  cursor: pointer;
+}
+.alma-plus-note img { width: 28px; height: 28px; flex-shrink: 0; }
+.alma-plus-note > div { flex: 1; min-width: 0; white-space: pre-line; }
+.alma-plus-note strong { display: block; margin-bottom: 2px; }
+.alma-plus-note-close {
+  border: 0;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: #888;
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+#alma-plus-settings-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 100001;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  padding: 70px 16px 16px;
+}
+.alma-plus-settings-host {
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  -webkit-overflow-scrolling: touch;
+}
+
+.alma-plus-settings-btn img { width: 20px; height: 20px; vertical-align: middle; }

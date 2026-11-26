@@ -31,9 +31,12 @@ jobs:
         run: |
           if ! gh release view "$TAG" >/dev/null 2>&1; then
             mkdir -p dist/alma-plus
-            rsync -a --exclude .git --exclude .github --exclude dist --exclude layout/screenshots ./ dist/alma-plus/
+            rsync -a --exclude .git --exclude .github --exclude dist --exclude layout/screenshots --exclude ipad ./ dist/alma-plus/
             (cd dist && zip -qr "alma-plus-$TAG.zip" alma-plus)
-            gh release create "$TAG" "dist/alma-plus-$TAG.zip" \
+            # Safari version (iPad, iPhone, Mac) for the Userscripts app
+            python3 ipad/build_userscript.py
+            cp ipad/alma-plus.user.js dist/alma-plus.user.js
+            gh release create "$TAG" "dist/alma-plus-$TAG.zip" dist/alma-plus.user.js \
               --target "$GITHUB_SHA" --title "Alma+ $TAG" --notes-file .github/RELEASE_NOTES.md --generate-notes
           else
             # notes were updated for the current version

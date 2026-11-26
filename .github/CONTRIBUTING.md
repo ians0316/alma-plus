@@ -26,6 +26,7 @@ Open an [issue](https://github.com/ians0316/alma-plus/issues), or use the email 
 - **Keep data private.** Nothing leaves the browser except to Alma itself and Alma Sync on the student's own computer. Never ask for or store an Alma password.
 - **Don't break saved tasks.** Students' tasks, files and notes live in `chrome.storage.local`. If you change how they're saved, old data must still load.
 - **Bump the version** in `manifest.json` and the Status section of the README.
+- **Rebuild the Safari version** with `python3 ipad/build_userscript.py` and commit `ipad/alma-plus.user.js` (the Check workflow fails if it's out of date). If you use a new `chrome.*` API, add it to `ipad/safari-shim.js`.
 - **Use the issue forms.** Bugs and ideas have their own forms under **New issue**; please fill in every field you can.
 - **Test real pages** before opening a pull request: To Do, Overview, Calendar, Classes and a class page, with no errors in the console.
 
