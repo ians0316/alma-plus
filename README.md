@@ -74,6 +74,12 @@ Alma+ icon (top bar) # settings menu, since Safari has no extension toolbar here
 - **Your tasks start empty on the iPad.** To bring them over: **Back up tasks** on the Mac, AirDrop the file, then **Restore tasks** on the iPad.
 - Sending tasks to Notion and Google Calendar needs Alma Sync on a Mac.
 
+> [!NOTE]
+> **Home Screen web apps don't work.** If you add Alma to the Home Screen ("Add to Home Screen"),
+> iPadOS opens it without Safari extensions, so `Alma+` can't load there. Use Alma in a Safari tab
+> instead. To keep it one tap away, press and hold its tab and choose **Pin Tab**, or add it to your
+> Safari **Favorites**.
+
 ## Using Alma+
 
 ```
