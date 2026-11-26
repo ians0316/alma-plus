@@ -286,8 +286,9 @@ settings/
 <details>
 <summary><b>Bugs fixed</b> (newest first)</summary>
 
-Latest GitHub release: [**v2.17.0**](https://github.com/ians0316/alma-plus/releases/tag/v2.17.0). Latest extension version: **2.17.0**.
+Latest GitHub release: [**v2.17.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.17.1). Latest extension version: **2.17.1**.
 
+- **Collapsed left menu:** when it opened on hover or tap, the top bar covered the Home row.
 - **Grade alerts:** grades in classes with a Submit (cloud) button came up with no assignment name.
 - **Today dashboard:** assignments with a Submit (cloud) button showed up with no name.
 - **To Do:** your own tasks that fell between the same two Alma assignments showed in the order you made them, not by date.
@@ -307,7 +308,7 @@ Latest GitHub release: [**v2.17.0**](https://github.com/ians0316/alma-plus/relea
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.17.0, used day to day at Seoul Academy.
+> **Status:** version 2.17.1, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, night-before reminder, new grade alerts, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS, and Safari on iPad through Userscripts.

@@ -225,6 +225,12 @@ body.has-nav #header > #user-menu {
   z-index: 10; /* above the white bar (9), below Alma's popups (11) */
 }
 
+/* The left menu sits above the fixed top bar, so when it's collapsed and opens on
+   hover or tap, the Home row isn't covered by the bar. */
+body.has-nav #nav {
+  z-index: 10; /* above the white bar (9), below Alma's popups (11) */
+}
+
 /* Assignments tab in the sidebar (sidebar.js): checklist icon from Alma's icon sheet */
 #nav .nav-alma-plus-assignments i {
   background-position: -30px -3230px;
