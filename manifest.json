@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Alma+ Custom Tasks",
-  "version": "2.17.1",
+  "version": "2.17.2",
   "description": "Your own tasks, attached files, and notes inside Alma, styled like Alma, plus Google Calendar buttons.",
   "icons": {
     "16": "layout/icons/icon16.png",
@@ -48,11 +48,11 @@
       ],
       "js": [
         "content/alma-plus.js",
-        "files-and-notes/materials.js"
+        "content/materials.js"
       ],
       "css": [
         "content/alma-plus.css",
-        "files-and-notes/materials.css"
+        "content/materials.css"
       ],
       "run_at": "document_idle"
     },
@@ -63,12 +63,12 @@
       ],
       "js": [
         "content/alma-plus.js",
-        "files-and-notes/materials.js",
+        "content/materials.js",
         "gpa/class-tabs.js"
       ],
       "css": [
         "content/alma-plus.css",
-        "files-and-notes/materials.css",
+        "content/materials.css",
         "gpa/class-tabs.css"
       ],
       "run_at": "document_idle"
@@ -80,12 +80,12 @@
       ],
       "js": [
         "content/alma-plus.js",
-        "files-and-notes/materials.js",
+        "content/materials.js",
         "calendar/dashboard.js"
       ],
       "css": [
         "content/alma-plus.css",
-        "files-and-notes/materials.css",
+        "content/materials.css",
         "calendar/dashboard.css"
       ],
       "run_at": "document_idle"
@@ -105,13 +105,13 @@
       ],
       "js": [
         "content/alma-plus.js",
-        "files-and-notes/materials.js",
+        "content/materials.js",
         "calendar/official-calendar.js",
         "calendar/calendar.js"
       ],
       "css": [
         "content/alma-plus.css",
-        "files-and-notes/materials.css",
+        "content/materials.css",
         "calendar/calendar.css"
       ],
       "run_at": "document_idle"

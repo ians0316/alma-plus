@@ -20,7 +20,7 @@ OUT = HERE / "alma-plus.user.js"
 RAW = "https://raw.githubusercontent.com/ians0316/alma-plus/main/ipad/alma-plus.user.js"
 ASSETS = ["layout/icons/icon32.png", "layout/icons/icon128.png",
           "layout/icons/google-calendar.svg", "layout/icons/seoul-academy.png"]
-SHARED = ["content/alma-plus.js", "files-and-notes/materials.js"]
+SHARED = ["content/alma-plus.js", "content/materials.js"]
 
 
 def read(rel):

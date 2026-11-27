@@ -241,8 +241,7 @@ Plain `Javascript`and `CSS`, no build step, no outside libraries. Each Alma page
 | Folder / file | What it does |
 |---|---|
 | `manifest.json` | Name, version, icons, and which Alma pages each script runs on |
-| `content/` | `alma-plus.js`, `alma-plus.css`: custom tasks, task popup, add/edit window, filters, calendar tools, backup. `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar, sends the night-before reminder, and checks for new grades |
-| `files-and-notes/` | `materials.js`, `materials.css`: attached files, My notes, paperclip and note icons, Files Saved message |
+| `content/` | `alma-plus.js`, `alma-plus.css`: custom tasks, task popup, add/edit window, filters, calendar tools, backup. `background.js`: hands your tasks to Alma Sync for Notion and Google Calendar, sends the night-before reminder, and checks for new grades. `materials.js`, `materials.css`: attached files, My notes, paperclip and note icons, Files Saved message |
 | `calendar/` | `calendar.js`, `calendar.css`: your assignments and tasks on Alma's Calendar page. `official-calendar.js`: the official school calendar (update each school year). `dashboard.js`, `dashboard.css`: Today dashboard on the Overview page |
 | `layout/` | `sidebar.js`: extra sidebar tabs. `topbar.js`, `topbar.css`: search and mail buttons in the top bar. `rounded.css`: rounded corners, crest, and fixed top bar across Alma. `icons/`: extension icons, the school crest, and the Google Calendar icon. `screenshots/`: pictures for this README |
 | `gpa/` | `gpa.js`, `gpa.css`: GPA box and checkboxes on the Classes tab. `class-tabs.js`, `class-tabs.css`: class tabs, Gradebook, Grade Calculator, and class attendance on class pages |
@@ -256,7 +255,6 @@ content/
   alma-plus.js                Custom tasks, task popup, add/edit window, filters, backup
   alma-plus.css               Styles for the above, matching Alma
   background.js               Alma Sync hand-off, night-before reminder, grade alerts
-files-and-notes/
   materials.js                Attached files, My notes, paperclips, update times in popups
 calendar/
   dashboard.js                Today dashboard on Overview
@@ -292,7 +290,7 @@ settings/
 <details>
 <summary><b>Bugs fixed</b> (newest first)</summary>
 
-Latest GitHub release: [**v2.17.1**](https://github.com/ians0316/alma-plus/releases/tag/v2.17.1). Latest extension version: **2.17.1**.
+Latest GitHub release: [**v2.17.2**](https://github.com/ians0316/alma-plus/releases/tag/v2.17.2). Latest extension version: **2.17.2**.
 
 - **Collapsed left menu:** when it opened on hover or tap, the top bar covered the Home row.
 - **Grade alerts:** grades in classes with a Submit (cloud) button came up with no assignment name.
@@ -314,7 +312,7 @@ Latest GitHub release: [**v2.17.1**](https://github.com/ians0316/alma-plus/relea
 ## Status
 
 > [!IMPORTANT]
-> **Status:** version 2.17.1, used day to day at Seoul Academy.
+> **Status:** version 2.17.2, used day to day at Seoul Academy.
 >
 > - **Works today:** custom tasks, attached files, notes, Today dashboard, night-before reminder, new grade alerts, Calendar page, Google
 >   Calendar buttons and .ics export, class tabs, Gradebook and Grade Calculator, GPA, extra tabs, settings menu, task sync through Alma Sync on macOS, and Safari on iPad through Userscripts.
